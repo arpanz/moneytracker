@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:ui' hide LockState;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -100,7 +100,7 @@ class _LockScreenState extends ConsumerState<LockScreen>
             end: Alignment.bottomCenter,
             colors: [
               colorScheme.primary,
-              colorScheme.primary.withOpacity(0.7),
+              colorScheme.primary.withValues(alpha: 0.7),
               colorScheme.surface,
             ],
             stops: const [0.0, 0.5, 1.0],
@@ -146,7 +146,7 @@ class _LockScreenState extends ConsumerState<LockScreen>
               Text(
                 'Authenticate to continue',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onPrimary.withOpacity(0.8),
+                  color: colorScheme.onPrimary.withValues(alpha: 0.8),
                 ),
               ),
 
@@ -176,11 +176,11 @@ class _LockScreenState extends ConsumerState<LockScreen>
                   ),
                 )
                     .animate()
-                    .fadeIn(duration: Durations.fast)
+                    .fadeIn(duration: AppDurations.fast)
                     .scale(
                       begin: const Offset(0.9, 0.9),
                       end: const Offset(1.0, 1.0),
-                      duration: Durations.fast,
+                      duration: AppDurations.fast,
                     ),
               ],
 
@@ -209,9 +209,9 @@ class _LockScreenState extends ConsumerState<LockScreen>
                 child: Text(
                   'Use PIN instead',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onPrimary.withOpacity(0.7),
+                    color: colorScheme.onPrimary.withValues(alpha: 0.7),
                     decoration: TextDecoration.underline,
-                    decorationColor: colorScheme.onPrimary.withOpacity(0.4),
+                    decorationColor: colorScheme.onPrimary.withValues(alpha: 0.4),
                   ),
                 ),
               ),
