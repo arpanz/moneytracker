@@ -14,6 +14,7 @@ import '../../../../config/constants/asset_paths.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_extensions.dart';
+import '../../../../config/theme/theme_provider.dart';
 import '../../../../domain/models/transaction_model.dart';
 import '../providers/home_provider.dart';
 import '../widgets/balance_card.dart';
@@ -211,11 +212,11 @@ class _GreetingHeader extends StatelessWidget {
           ),
         )
             .animate()
-            .fadeIn(duration: Durations.medium)
+            .fadeIn(duration: AppDurations.medium)
             .slideY(
               begin: -0.1,
               end: 0,
-              duration: Durations.medium,
+              duration: AppDurations.medium,
               curve: Curves.easeOut,
             ),
         const SizedBox(height: Spacing.xs),
@@ -226,7 +227,7 @@ class _GreetingHeader extends StatelessWidget {
           ),
         ).animate().fadeIn(
               delay: const Duration(milliseconds: 100),
-              duration: Durations.medium,
+              duration: AppDurations.medium,
             ),
       ],
     );
@@ -247,11 +248,11 @@ class _BalanceSection extends StatelessWidget {
     return balanceAsync.when(
       data: (balance) => BalanceCard(balance: balance)
           .animate()
-          .fadeIn(duration: Durations.medium)
+          .fadeIn(duration: AppDurations.medium)
           .slideY(
             begin: 0.05,
             end: 0,
-            duration: Durations.medium,
+            duration: AppDurations.medium,
             curve: Curves.easeOut,
           ),
       loading: () => const _BalanceCardShimmer(),
@@ -277,8 +278,8 @@ class _BalanceCardShimmer extends StatelessWidget {
     )
         .animate(onPlay: (c) => c.repeat())
         .shimmer(
-          duration: Durations.shimmer,
-          color: colorScheme.surface.withOpacity(0.5),
+          duration: AppDurations.shimmer,
+          color: colorScheme.surface.withValues(alpha: 0.5),
         );
   }
 }
@@ -302,7 +303,7 @@ class _IncomeExpenseRow extends StatelessWidget {
         Expanded(
           child: _MiniStatCard(
             label: 'Income',
-            amount: incomeAsync.valueOrNull ?? 0,
+            amount: incomeAsync.value ?? 0,
             isLoading: incomeAsync.isLoading,
             icon: Icons.arrow_upward_rounded,
             iconColor: cheddarColors?.income ?? Colors.green,
@@ -313,7 +314,7 @@ class _IncomeExpenseRow extends StatelessWidget {
         Expanded(
           child: _MiniStatCard(
             label: 'Expense',
-            amount: expenseAsync.valueOrNull ?? 0,
+            amount: expenseAsync.value ?? 0,
             isLoading: expenseAsync.isLoading,
             icon: Icons.arrow_downward_rounded,
             iconColor: cheddarColors?.expense ?? Colors.red,
@@ -325,13 +326,13 @@ class _IncomeExpenseRow extends StatelessWidget {
         .animate()
         .fadeIn(
           delay: const Duration(milliseconds: 200),
-          duration: Durations.medium,
+          duration: AppDurations.medium,
         )
         .slideY(
           begin: 0.05,
           end: 0,
           delay: const Duration(milliseconds: 200),
-          duration: Durations.medium,
+          duration: AppDurations.medium,
           curve: Curves.easeOut,
         );
   }
@@ -364,7 +365,7 @@ class _MiniStatCard extends StatelessWidget {
         color: colorScheme.surfaceContainerLow,
         borderRadius: Radii.borderLg,
         border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(0.3),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -373,7 +374,7 @@ class _MiniStatCard extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
+              color: iconColor.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: iconColor, size: 18),
@@ -469,7 +470,7 @@ class _QuickActionsRow extends StatelessWidget {
         .animate()
         .fadeIn(
           delay: const Duration(milliseconds: 300),
-          duration: Durations.medium,
+          duration: AppDurations.medium,
         );
   }
 }
@@ -493,7 +494,7 @@ class _QuickActionChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Material(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: Radii.borderMd,
         child: InkWell(
           onTap: onTap,
@@ -538,8 +539,10 @@ class _SpendingChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categoryAsync = ref.watch(categoryTotalsProvider);
-    final cheddarColors = theme.extension<CheddarColors>();
-    final chartColors = cheddarColors?.chartColors ?? _defaultChartColors;
+    final themeState = ref.watch(themeProvider);
+    final chartColors = themeState.vibeTheme.data.chartColors.isNotEmpty
+        ? themeState.vibeTheme.data.chartColors
+        : _defaultChartColors;
 
     return categoryAsync.when(
       data: (totals) {
@@ -559,7 +562,7 @@ class _SpendingChart extends StatelessWidget {
             color: theme.colorScheme.surfaceContainerLow,
             borderRadius: Radii.borderLg,
             border: Border.all(
-              color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
             ),
           ),
           child: Column(
@@ -658,13 +661,13 @@ class _SpendingChart extends StatelessWidget {
             .animate()
             .fadeIn(
               delay: const Duration(milliseconds: 400),
-              duration: Durations.medium,
+              duration: AppDurations.medium,
             )
             .slideY(
               begin: 0.05,
               end: 0,
               delay: const Duration(milliseconds: 400),
-              duration: Durations.medium,
+              duration: AppDurations.medium,
               curve: Curves.easeOut,
             );
       },
@@ -722,7 +725,7 @@ class _RecentTransactionsList extends StatelessWidget {
                     'Tap "Add Expense" to get started',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant
-                          .withOpacity(0.7),
+                          .withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -779,13 +782,13 @@ class _RecentTransactionsList extends StatelessWidget {
                     .animate()
                     .fadeIn(
                       delay: Duration(milliseconds: 100 * index),
-                      duration: Durations.medium,
+                      duration: AppDurations.medium,
                     )
                     .slideX(
                       begin: 0.05,
                       end: 0,
                       delay: Duration(milliseconds: 100 * index),
-                      duration: Durations.medium,
+                      duration: AppDurations.medium,
                       curve: Curves.easeOut,
                     ),
               );
@@ -1025,8 +1028,8 @@ class _TransactionShimmer extends StatelessWidget {
     )
         .animate(onPlay: (c) => c.repeat())
         .shimmer(
-          duration: Durations.shimmer,
-          color: colorScheme.surface.withOpacity(0.5),
+          duration: AppDurations.shimmer,
+          color: colorScheme.surface.withValues(alpha: 0.5),
         );
   }
 }
