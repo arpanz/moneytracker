@@ -55,7 +55,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
     _autoAdvanceTimer = Timer.periodic(_autoAdvanceDuration, (_) {
       if (_currentPage < _pageCount - 1) {
         _pageController.nextPage(
-          duration: Durations.medium,
+          duration: Durations.medium1,
           curve: Curves.easeInOut,
         );
       } else {
@@ -68,7 +68,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
     _autoAdvanceTimer?.cancel();
     if (_currentPage < _pageCount - 1) {
       _pageController.nextPage(
-        duration: Durations.medium,
+        duration: Durations.medium2,
         curve: Curves.easeInOut,
       );
     }

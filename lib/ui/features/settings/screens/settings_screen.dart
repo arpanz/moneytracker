@@ -210,7 +210,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     color: colors.onSurfaceVariant.withOpacity(0.6),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xxs),
+                const SizedBox(height: Spacing.xs),
                 Text(
                   'Cheddar v${AppConstants.appVersion}',
                   style: theme.textTheme.labelSmall?.copyWith(

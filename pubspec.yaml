@@ -5,7 +5,6 @@ version: 1.0.0+1
 
 environment:
   sdk: ^3.9.0
-  flutter: ">=3.41.0"
 
 dependencies:
   flutter:
@@ -14,22 +13,21 @@ dependencies:
     sdk: flutter
 
   # State Management
-  flutter_riverpod: ^3.2.0
-  riverpod_annotation: ^3.2.0
+  flutter_riverpod: ^2.6.1
 
   # Navigation
   go_router: ^14.8.0
 
   # Database
-  isar: ^4.0.0-dev.14
-  isar_flutter_libs: ^4.0.0-dev.14
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
   path_provider: ^2.1.5
 
   # Charts
   fl_chart: ^1.1.1
 
   # Authentication
-  local_auth: ^2.3.0
+  local_auth: ^3.0.0
 
   # Camera & Image
   camera: ^0.11.1
@@ -50,7 +48,7 @@ dependencies:
   animated_text_kit: ^4.2.3
 
   # Utilities
-  intl: ^0.19.0
+  intl: ^0.20.2
   uuid: ^4.5.1
   equatable: ^2.0.7
   shared_preferences: ^2.3.4
@@ -64,9 +62,6 @@ dependencies:
   collection: ^1.19.0
   csv: ^6.0.0
 
-  # Data Classes
-  freezed_annotation: ^3.0.0
-  json_annotation: ^4.9.0
 
 dependency_overrides:
 
@@ -74,13 +69,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  build_runner: ^2.4.14
-  freezed: ^3.0.0
-  json_serializable: ^6.9.4
-  riverpod_generator: ^3.2.0
-  isar_generator: ^4.0.0-dev.14
+  build_runner: 2.4.9
+  isar_generator: ^3.1.0+1
   custom_lint:
-  riverpod_lint: ^3.2.0
 
 flutter:
   uses-material-design: true

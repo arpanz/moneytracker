@@ -18,9 +18,7 @@ class ThemePickerScreen extends ConsumerWidget {
     final allThemes = VibeTheme.values;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Theme & Vibes'),
-      ),
+      appBar: AppBar(title: const Text('Theme & Vibes')),
       body: GridView.builder(
         padding: const EdgeInsets.all(AppSpacing.md),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -35,12 +33,13 @@ class ThemePickerScreen extends ConsumerWidget {
           final isSelected = currentTheme.vibeTheme == vibe;
 
           return _ThemeCard(
-            vibe: vibe,
-            isSelected: isSelected,
-            onTap: () {
-              ref.read(themeProvider.notifier).setVibeTheme(vibe);
-            },
-          ).animate(delay: (index * 80).ms)
+                vibe: vibe,
+                isSelected: isSelected,
+                onTap: () {
+                  ref.read(themeProvider.notifier).setVibeTheme(vibe);
+                },
+              )
+              .animate(delay: (index * 80).ms)
               .fadeIn(duration: 300.ms)
               .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1));
         },
@@ -98,10 +97,7 @@ class _ThemeCard extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [
-                        d.primaryLight,
-                        d.secondaryLight,
-                      ],
+                      colors: [d.primaryLight, d.secondaryLight],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -110,10 +106,7 @@ class _ThemeCard extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          d.emoji,
-                          style: const TextStyle(fontSize: 32),
-                        ),
+                        Text(d.emoji, style: const TextStyle(fontSize: 32)),
                         const SizedBox(height: AppSpacing.xs),
                         // Color dots preview
                         Row(

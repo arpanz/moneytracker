@@ -173,7 +173,7 @@ class NotificationParser {
 
   /// Extract merchant from bank notifications: "at Y" / "to Y" / "from Y"
   static final _merchantPattern = RegExp(
-    r'(?:at|to|from|towards)\s+([A-Za-z][\w\s&.\'-]{1,40}?)(?:\s+on|\s+ref|\s+txn|\s*\.|\s*$)',
+    r"(?:at|to|from|towards)\s+([A-Za-z][\w\s&.'-]{1,40}?)(?:\s+on|\s+ref|\s+txn|\s*\.|\s*$)",
     caseSensitive: false,
   );
 
