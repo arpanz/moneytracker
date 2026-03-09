@@ -51,11 +51,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     debugLogDiagnostics: false,
 
-    // FIX: Added redirect guard for onboarding completion and biometric lock.
-    // This ensures:
-    // 1. Users who haven't completed onboarding always see the onboarding screen.
-    // 2. Users with app lock enabled must authenticate before accessing the app.
-    // 3. Users who completed onboarding and don't have lock skip straight to /home.
     redirect: (context, state) {
       final onboardingComplete =
           prefs.getBool(AppConstants.prefOnboardingComplete) ?? false;
@@ -63,24 +58,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           prefs.getBool(AppConstants.prefAppLockEnabled) ?? false;
       final currentPath = state.uri.path;
 
-      // Not onboarded yet -- force to onboarding.
       if (!onboardingComplete) {
-        if (currentPath == '/') return null; // already there
+        if (currentPath == '/') return null;
         return '/';
       }
 
-      // Onboarded but lock is enabled and not yet authenticated this session.
       if (lockEnabled && !_isSessionAuthenticated) {
-        if (currentPath == '/lock') return null; // already there
+        if (currentPath == '/lock') return null;
         return '/lock';
       }
 
-      // Onboarded (+ authenticated if needed) but still on onboarding/lock page.
       if (currentPath == '/' || currentPath == '/lock') {
         return '/home';
       }
 
-      return null; // no redirect needed
+      return null;
     },
 
     routes: [
@@ -149,10 +141,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       // ── Detail / Modal Routes ──
+
+      // FIX #6: addTransaction now reads an optional int `extra` as the
+      // initial transaction type (0=income, 1=expense, 2=transfer).
+      // Home screen quick-action chips pass the correct type so the form
+      // pre-selects the right tab instead of always defaulting to Expense.
       GoRoute(
         path: '/transaction/add',
         name: RouteNames.addTransaction,
-        builder: (context, state) => const AddTransactionScreen(),
+        builder: (context, state) {
+          final initialType = state.extra is int ? state.extra as int : null;
+          return AddTransactionScreen(initialType: initialType);
+        },
       ),
       GoRoute(
         path: '/transaction/:id',
@@ -169,8 +169,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/budget/:id',
         name: RouteNames.budgetDetail,
-        // FIX: BudgetDetailScreen.budgetId is declared as String.
-        // Pass the raw path parameter directly instead of int.parse().
         builder: (context, state) => BudgetDetailScreen(
           budgetId: state.pathParameters['id']!,
         ),

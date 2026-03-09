@@ -21,11 +21,21 @@ import '../widgets/amount_input_widget.dart';
 /// Full add / edit transaction screen.
 ///
 /// Pass an existing [TransactionModel] via `extra` in GoRouter to enter edit mode.
+/// Pass an int (0=income, 1=expense, 2=transfer) as [initialType] to pre-select
+/// the transaction type tab (used by home screen quick-action buttons).
 class AddTransactionScreen extends ConsumerStatefulWidget {
   /// If non-null the screen operates in edit mode.
   final TransactionModel? existingTransaction;
 
-  const AddTransactionScreen({super.key, this.existingTransaction});
+  /// FIX #6: Optional initial type so home quick-action chips can pre-select
+  /// Income or Expense without the user having to change it manually.
+  final int? initialType;
+
+  const AddTransactionScreen({
+    super.key,
+    this.existingTransaction,
+    this.initialType,
+  });
 
   @override
   ConsumerState<AddTransactionScreen> createState() =>
@@ -35,7 +45,7 @@ class AddTransactionScreen extends ConsumerStatefulWidget {
 class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   // ── Form State ──
   double _amount = 0.0;
-  int _type = 1; // default: expense
+  late int _type;
   CategoryModel? _selectedCategory;
   AccountModel? _selectedAccount;
   AccountModel? _selectedToAccount; // for transfers
@@ -54,6 +64,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   @override
   void initState() {
     super.initState();
+    // FIX #6: honour the initialType passed from the router.
+    _type = widget.initialType ?? 1; // default: expense
     if (_isEditing) {
       _populateFromExisting();
     }
@@ -108,6 +120,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final cheddarColors = theme.extension<CheddarColors>()!;
     final categoriesAsync = ref.watch(_categoriesForTypeProvider(_type));
     final accountsAsync = ref.watch(_activeAccountsProvider);
+    // FIX #16: use runtime currency symbol.
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -131,6 +145,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 amount: _amount,
                 type: _type,
                 cheddarColors: cheddarColors,
+                currencySymbol: currencySymbol,
                 onTap: () => _showAmountInput(context, cheddarColors),
               ),
 
@@ -141,25 +156,29 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               const SizedBox(height: Spacing.lg),
 
-              // ── Category Picker ──
-              Text(
-                'Category',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
+              // ── Category Picker (hidden for Transfer) ──
+              // FIX #9: Transfers don't need a meaningful expense category,
+              // so we hide the category section entirely for type==2 and
+              // auto-assign a 'Transfer' label when saving.
+              if (_type != 2) ...[
+                Text(
+                  'Category',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: Spacing.sm),
-              categoriesAsync.when(
-                data: (categories) =>
-                    _buildCategoryGrid(categories, cheddarColors),
-                loading: () => const SizedBox(
-                  height: 120,
-                  child: Center(child: CircularProgressIndicator()),
+                const SizedBox(height: Spacing.sm),
+                categoriesAsync.when(
+                  data: (categories) =>
+                      _buildCategoryGrid(categories, cheddarColors),
+                  loading: () => const SizedBox(
+                    height: 120,
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (e, _) => Text('Error loading categories: $e'),
                 ),
-                error: (e, _) => Text('Error loading categories: $e'),
-              ),
-
-              const SizedBox(height: Spacing.lg),
+                const SizedBox(height: Spacing.lg),
+              ],
 
               // ── Account Selector ──
               Text(
@@ -317,7 +336,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Drag handle
               Container(
                 width: 40,
                 height: 4,
@@ -399,7 +417,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: () => setState(() => _type = option.value),
+                  // FIX #2: reset selected category whenever the type changes
+                  // so a category from the old type isn't silently saved.
+                  onTap: () => setState(() {
+                    if (_type != option.value) {
+                      _type = option.value;
+                      _selectedCategory = null;
+                    }
+                  }),
                   borderRadius: Radii.borderMd,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -458,8 +483,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       );
     }
 
+    // FIX #12: previous clamp of 300 cut off the 4th row for 13+ categories.
+    // Each row is ~100px; calculate rows correctly and clamp higher.
+    final rowCount = (categories.length / 4).ceil();
+    final gridHeight = (rowCount * 100.0).clamp(100.0, 420.0);
+
     return SizedBox(
-      height: ((categories.length / 4).ceil() * 100.0).clamp(100.0, 300.0),
+      height: gridHeight,
       child: GridView.builder(
         physics: const BouncingScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -676,11 +706,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   Future<void> _pickDate() async {
+    final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
       firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
+      // FIX #5: use dynamic last date (10 years ahead) instead of hardcoded 2030.
+      lastDate: DateTime(now.year + 10, now.month, now.day),
     );
     if (picked != null) {
       setState(() => _selectedDate = picked);
@@ -879,12 +911,12 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   // ── Save Logic ──
 
   Future<void> _onSave() async {
-    // Validation
     if (_amount <= 0) {
       _showSnackBar('Please enter an amount greater than zero.');
       return;
     }
-    if (_selectedCategory == null) {
+    // FIX #9: for transfers, skip category validation and use 'Transfer' label.
+    if (_type != 2 && _selectedCategory == null) {
       _showSnackBar('Please select a category.');
       return;
     }
@@ -921,7 +953,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
       txn.amount = _amount;
       txn.type = _type;
-      txn.category = _selectedCategory!.name;
+      // FIX #9: auto-label transfers instead of requiring a category.
+      txn.category = _type == 2 ? 'Transfer' : _selectedCategory!.name;
       txn.accountId = _selectedAccount!.id.toString();
       txn.toAccountId = _type == 2 ? _selectedToAccount?.id.toString() : null;
       txn.date = dateTime;
@@ -1008,12 +1041,14 @@ class _AmountDisplayButton extends StatelessWidget {
   final double amount;
   final int type;
   final CheddarColors cheddarColors;
+  final String currencySymbol;
   final VoidCallback onTap;
 
   const _AmountDisplayButton({
     required this.amount,
     required this.type,
     required this.cheddarColors,
+    required this.currencySymbol,
     required this.onTap,
   });
 
@@ -1064,7 +1099,7 @@ class _AmountDisplayButton extends StatelessWidget {
                 textBaseline: TextBaseline.alphabetic,
                 children: [
                   Text(
-                    AppConstants.currencySymbol,
+                    currencySymbol,
                     style: theme.textTheme.headlineSmall?.copyWith(
                       color: _amountColor.withOpacity(0.7),
                       fontWeight: FontWeight.w500,
@@ -1098,10 +1133,11 @@ final _categoriesForTypeProvider = FutureProvider.family<List<CategoryModel>, in
   type,
 ) async {
   final repo = ref.watch(categoryRepositoryProvider);
-  // For expenses (1), get expense categories; for income (0), income categories.
-  // For transfers (2), return all expense categories as a sensible default.
-  final queryType = type == 2 ? 0 : type;
-  return repo.getByType(queryType);
+  // FIX #1: type 2 (transfer) was incorrectly mapping to 0 (income).
+  // Transfers should show expense categories (type 1) as the most sensible
+  // default, but since the category section is now hidden for transfers (#9)
+  // this provider is only called for type 0 and 1.
+  return repo.getByType(type);
 });
 
 /// All active (non-archived) accounts.

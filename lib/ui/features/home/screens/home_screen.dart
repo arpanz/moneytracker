@@ -38,7 +38,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ref.invalidate(monthlyExpenseProvider);
     ref.invalidate(recentTransactionsProvider);
     ref.invalidate(categoryTotalsProvider);
-    // Small delay to let providers re-fetch.
     await Future.delayed(const Duration(milliseconds: 300));
   }
 
@@ -54,8 +53,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final userName = ref.watch(userNameProvider);
+    // FIX #16: use runtime currency symbol from provider instead of hardcoded constant.
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
-    // Watch the transaction stream for live updates.
     ref.listen(transactionStreamProvider, (_, __) {
       ref.invalidate(totalBalanceProvider);
       ref.invalidate(monthlyIncomeProvider);
@@ -106,7 +106,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: Spacing.horizontalLg,
-                  child: _IncomeExpenseRow(ref: ref, theme: theme),
+                  child: _IncomeExpenseRow(
+                    ref: ref,
+                    theme: theme,
+                    currencySymbol: currencySymbol,
+                  ),
                 ),
               ),
 
@@ -116,6 +120,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: Spacing.horizontalLg,
+                  // FIX #6: pass theme so the row can navigate with the correct
+                  // initial type (expense=1, income=0, scanner).
                   child: _QuickActionsRow(theme: theme),
                 ),
               ),
@@ -126,7 +132,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: Spacing.horizontalLg,
-                  child: _SpendingChart(ref: ref, theme: theme),
+                  child: _SpendingChart(
+                    ref: ref,
+                    theme: theme,
+                    currencySymbol: currencySymbol,
+                  ),
                 ),
               ),
 
@@ -163,10 +173,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
 
               // ── Recent Transactions List ──
-              _RecentTransactionsList(ref: ref, theme: theme),
+              _RecentTransactionsList(
+                ref: ref,
+                theme: theme,
+                currencySymbol: currencySymbol,
+              ),
 
-              // Bottom padding for nav bar clearance.
-              const SliverToBoxAdapter(child: SizedBox(height: 100)),
+              // FIX #15: Use dynamic bottom padding that accounts for the OS
+              // navigation bar height so the last row isn't obscured.
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 72 + MediaQuery.of(context).padding.bottom,
+                ),
+              ),
             ],
           ),
         ),
@@ -280,8 +299,13 @@ class _BalanceCardShimmer extends StatelessWidget {
 class _IncomeExpenseRow extends StatelessWidget {
   final WidgetRef ref;
   final ThemeData theme;
+  final String currencySymbol;
 
-  const _IncomeExpenseRow({required this.ref, required this.theme});
+  const _IncomeExpenseRow({
+    required this.ref,
+    required this.theme,
+    required this.currencySymbol,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -299,6 +323,7 @@ class _IncomeExpenseRow extends StatelessWidget {
                 icon: Icons.arrow_upward_rounded,
                 iconColor: cheddarColors?.income ?? Colors.green,
                 theme: theme,
+                currencySymbol: currencySymbol,
               ),
             ),
             const SizedBox(width: Spacing.md),
@@ -310,6 +335,7 @@ class _IncomeExpenseRow extends StatelessWidget {
                 icon: Icons.arrow_downward_rounded,
                 iconColor: cheddarColors?.expense ?? Colors.red,
                 theme: theme,
+                currencySymbol: currencySymbol,
               ),
             ),
           ],
@@ -336,6 +362,7 @@ class _MiniStatCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final ThemeData theme;
+  final String currencySymbol;
 
   const _MiniStatCard({
     required this.label,
@@ -344,6 +371,7 @@ class _MiniStatCard extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     required this.theme,
+    required this.currencySymbol,
   });
 
   @override
@@ -392,7 +420,7 @@ class _MiniStatCard extends StatelessWidget {
                         ),
                       )
                     : Text(
-                        '${AppConstants.currencySymbol} ${_formatCompact(amount)}',
+                        '$currencySymbol ${_formatCompact(amount)}',
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: iconColor,
@@ -437,7 +465,11 @@ class _QuickActionsRow extends StatelessWidget {
           label: 'Add Expense',
           icon: Icons.remove_circle_outline_rounded,
           color: colorScheme.error,
-          onTap: () => context.pushNamed(RouteNames.addTransaction),
+          // FIX #6: pass type=1 (expense) so the form pre-selects Expense tab.
+          onTap: () => context.pushNamed(
+            RouteNames.addTransaction,
+            extra: 1,
+          ),
           theme: theme,
         ),
         const SizedBox(width: Spacing.sm),
@@ -445,7 +477,11 @@ class _QuickActionsRow extends StatelessWidget {
           label: 'Add Income',
           icon: Icons.add_circle_outline_rounded,
           color: Colors.green.shade600,
-          onTap: () => context.pushNamed(RouteNames.addTransaction),
+          // FIX #6: pass type=0 (income) so the form pre-selects Income tab.
+          onTap: () => context.pushNamed(
+            RouteNames.addTransaction,
+            extra: 0,
+          ),
           theme: theme,
         ),
         const SizedBox(width: Spacing.sm),
@@ -522,8 +558,13 @@ class _QuickActionChip extends StatelessWidget {
 class _SpendingChart extends StatelessWidget {
   final WidgetRef ref;
   final ThemeData theme;
+  final String currencySymbol;
 
-  const _SpendingChart({required this.ref, required this.theme});
+  const _SpendingChart({
+    required this.ref,
+    required this.theme,
+    required this.currencySymbol,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -536,10 +577,35 @@ class _SpendingChart extends StatelessWidget {
     return categoryAsync.when(
       data: (totals) {
         if (totals.isEmpty) {
-          return const SizedBox.shrink();
+          // FIX #10: show a gentle placeholder instead of invisible SizedBox.
+          return Container(
+            padding: const EdgeInsets.all(Spacing.md),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerLow,
+              borderRadius: Radii.borderLg,
+              border: Border.all(
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.pie_chart_outline_rounded,
+                  size: 32,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                ),
+                const SizedBox(width: Spacing.md),
+                Text(
+                  'No spending data yet',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                  ),
+                ),
+              ],
+            ),
+          );
         }
 
-        // Sort by amount descending, take top 5.
         final sorted = totals.entries.toList()
           ..sort((a, b) => b.value.compareTo(a.value));
         final top5 = sorted.take(5).toList();
@@ -570,7 +636,6 @@ class _SpendingChart extends StatelessWidget {
                     height: 160,
                     child: Row(
                       children: [
-                        // Pie chart.
                         SizedBox(
                           width: 120,
                           height: 120,
@@ -600,7 +665,6 @@ class _SpendingChart extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: Spacing.lg),
-                        // Legend.
                         Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -632,7 +696,7 @@ class _SpendingChart extends StatelessWidget {
                                       ),
                                     ),
                                     Text(
-                                      '${AppConstants.currencySymbol} ${_MiniStatCard._formatCompact(entry.value)}',
+                                      '$currencySymbol ${_MiniStatCard._formatCompact(entry.value)}',
                                       style: theme.textTheme.bodySmall
                                           ?.copyWith(
                                             fontWeight: FontWeight.w600,
@@ -685,8 +749,13 @@ class _SpendingChart extends StatelessWidget {
 class _RecentTransactionsList extends StatelessWidget {
   final WidgetRef ref;
   final ThemeData theme;
+  final String currencySymbol;
 
-  const _RecentTransactionsList({required this.ref, required this.theme});
+  const _RecentTransactionsList({
+    required this.ref,
+    required this.theme,
+    required this.currencySymbol,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -761,6 +830,7 @@ class _RecentTransactionsList extends StatelessWidget {
                           transaction: txn,
                           theme: theme,
                           cheddarColors: cheddarColors,
+                          currencySymbol: currencySymbol,
                           onTap: () {
                             context.pushNamed(
                               RouteNames.transactionDetail,
@@ -832,12 +902,14 @@ class _TransactionRow extends StatelessWidget {
   final TransactionModel transaction;
   final ThemeData theme;
   final CheddarColors? cheddarColors;
+  final String currencySymbol;
   final VoidCallback onTap;
 
   const _TransactionRow({
     required this.transaction,
     required this.theme,
     required this.cheddarColors,
+    required this.currencySymbol,
     required this.onTap,
   });
 
@@ -857,7 +929,6 @@ class _TransactionRow extends StatelessWidget {
         : '-';
     final dateStr = DateFormat('MMM d').format(transaction.date);
 
-    // Map category to SVG icon.
     final categoryIcon = _categoryToAssetPath(transaction.category);
 
     return InkWell(
@@ -867,7 +938,6 @@ class _TransactionRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: Spacing.sm + 2),
         child: Row(
           children: [
-            // Category icon.
             Container(
               width: 42,
               height: 42,
@@ -887,7 +957,6 @@ class _TransactionRow extends StatelessWidget {
 
             const SizedBox(width: Spacing.md),
 
-            // Category name & date.
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -915,9 +984,8 @@ class _TransactionRow extends StatelessWidget {
               ),
             ),
 
-            // Amount.
             Text(
-              '$prefix${AppConstants.currencySymbol} ${transaction.amount.toStringAsFixed(0)}',
+              '$prefix$currencySymbol ${transaction.amount.toStringAsFixed(0)}',
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: amountColor,
@@ -929,7 +997,6 @@ class _TransactionRow extends StatelessWidget {
     );
   }
 
-  /// Maps a category name to its corresponding SVG asset path.
   static String? _categoryToAssetPath(String category) {
     final normalized = category.toLowerCase().trim();
     const map = {
@@ -1002,7 +1069,7 @@ class _TransactionShimmer extends StatelessWidget {
               ),
               Container(
                 width: 50,
-                height: 14,
+                height: 12,
                 decoration: BoxDecoration(
                   color: colorScheme.surfaceContainerHighest,
                   borderRadius: Radii.borderSm,

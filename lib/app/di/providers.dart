@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../config/constants/app_constants.dart';
 import '../../data/local/database_service.dart';
 import '../../data/repositories/transaction_repository.dart';
 import '../../data/repositories/account_repository.dart';
@@ -48,4 +49,31 @@ final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) {
 
 final splitRepositoryProvider = Provider<SplitRepository>((ref) {
   return SplitRepository(ref.watch(databaseServiceProvider));
+});
+
+// ── Currency ──────────────────────────────────────────────────────────────────
+
+/// Returns the currency symbol that matches the user's chosen currency code
+/// stored in SharedPreferences. Falls back to 'Rs.' for INR.
+///
+/// FIX #16: AppConstants.currencySymbol was a hardcoded compile-time constant
+/// that never reflected the user's onboarding currency selection. This provider
+/// reads the pref at runtime so the symbol updates correctly for INR/USD/EUR/GBP.
+final currencySymbolProvider = Provider<String>((ref) {
+  final prefs = ref.watch(sharedPreferencesProvider);
+  final code = prefs.getString(AppConstants.prefCurrency) ??
+      AppConstants.defaultCurrency;
+  switch (code) {
+    case 'USD':
+      return r'$';
+    case 'EUR':
+      return '€';
+    case 'GBP':
+      return '£';
+    case 'JPY':
+      return '¥';
+    case 'INR':
+    default:
+      return 'Rs.';
+  }
 });
