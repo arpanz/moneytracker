@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app/app.dart';
 import 'app/di/providers.dart';
 import 'data/local/database_service.dart';
-import 'data/repositories/category_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,11 +30,6 @@ void main() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   final databaseService = DatabaseService();
   await databaseService.initialize();
-
-  // FIX: Seed default categories so they're available on first launch.
-  // seedDefaults() is a no-op if categories already exist.
-  final categoryRepo = CategoryRepository(databaseService);
-  await categoryRepo.seedDefaults();
 
   runApp(
     ProviderScope(
