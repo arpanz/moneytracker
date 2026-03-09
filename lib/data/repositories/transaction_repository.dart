@@ -46,7 +46,9 @@ class TransactionRepository {
   ///
   /// Results are ordered by [date] descending (newest first).
   Future<List<TransactionModel>> getAll({int? limit, int? offset}) async {
-    var query = _isar.transactionModels
+    // Use dynamic to avoid QueryBuilder type-parameter mismatch when
+    // chaining offset/limit after sortByDateDesc.
+    dynamic query = _isar.transactionModels
         .where()
         .sortByDateDesc();
 
@@ -57,7 +59,7 @@ class TransactionRepository {
       query = query.limit(limit);
     }
 
-    return query.findAll();
+    return (query as dynamic).findAll() as Future<List<TransactionModel>>;
   }
 
   // ── FILTERED QUERIES ─────────────────────────────────────────────────────

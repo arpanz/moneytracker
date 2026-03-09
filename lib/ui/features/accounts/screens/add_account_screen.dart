@@ -117,8 +117,8 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: colors.primaryContainer.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                color: colors.primaryContainer.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(Radii.md),
               ),
               child: Row(
                 children: [
@@ -149,7 +149,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
     try {
       final account = AccountModel()
         ..name = _nameController.text.trim()
-        ..type = _type
+        ..accountType = _type
         ..balance = double.parse(_balanceController.text)
         ..createdAt = DateTime.now();
 

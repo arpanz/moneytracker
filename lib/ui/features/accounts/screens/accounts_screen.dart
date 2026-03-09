@@ -63,13 +63,13 @@ class _AccountsScreenState extends ConsumerState<AccountsScreen> {
                     gradient: LinearGradient(
                       colors: [colors.primaryContainer, colors.secondaryContainer],
                     ),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                    borderRadius: BorderRadius.circular(Radii.lg),
                   ),
                   child: Column(
                     children: [
                       Text('Total Balance',
                           style: theme.textTheme.bodySmall?.copyWith(
-                              color: colors.onPrimaryContainer.withOpacity(0.7))),
+                              color: colors.onPrimaryContainer.withValues(alpha: 0.7))),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
                         '\$${totalBalance.toStringAsFixed(2)}',
@@ -82,7 +82,7 @@ class _AccountsScreenState extends ConsumerState<AccountsScreen> {
                       Text(
                         '${_accounts.length} account${_accounts.length != 1 ? 's' : ''}',
                         style: theme.textTheme.bodySmall?.copyWith(
-                            color: colors.onPrimaryContainer.withOpacity(0.6)),
+                            color: colors.onPrimaryContainer.withValues(alpha: 0.6)),
                       ),
                     ],
                   ),
@@ -97,7 +97,7 @@ class _AccountsScreenState extends ConsumerState<AccountsScreen> {
                       child: Column(
                         children: [
                           Icon(Icons.account_balance_wallet_outlined,
-                              size: 64, color: colors.onSurfaceVariant.withOpacity(0.3)),
+                              size: 64, color: colors.onSurfaceVariant.withValues(alpha: 0.3)),
                           const SizedBox(height: AppSpacing.md),
                           Text('No accounts yet', style: theme.textTheme.titleMedium),
                           const SizedBox(height: AppSpacing.xs),
@@ -143,7 +143,7 @@ class _AccountCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final typeIcon = _accountTypeIcon(account.type);
+    final typeIcon = _accountTypeIcon(account.accountType);
 
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -154,7 +154,7 @@ class _AccountCard extends StatelessWidget {
           child: Icon(typeIcon, color: colors.onPrimaryContainer, size: 20),
         ),
         title: Text(account.name, style: theme.textTheme.titleSmall),
-        subtitle: Text(_accountTypeLabel(account.type),
+        subtitle: Text(_accountTypeLabel(account.accountType),
             style: theme.textTheme.bodySmall),
         trailing: Text(
           '\$${account.balance.toStringAsFixed(2)}',

@@ -35,7 +35,8 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
     final txnRepo = ref.read(transactionRepositoryProvider);
 
     final account = await accountRepo.getById(id);
-    final transactions = await txnRepo.getByAccount(id);
+    // getByAccount expects a String accountId
+    final transactions = await txnRepo.getByAccount(id.toString());
 
     if (mounted) {
       setState(() {
@@ -215,7 +216,6 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
   }
 
   void _editAccount() {
-    // TODO: Navigate to edit screen or show edit dialog
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Edit coming soon')),
     );

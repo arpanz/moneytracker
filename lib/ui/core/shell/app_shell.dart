@@ -188,7 +188,7 @@ class _NavBarItem extends StatelessWidget {
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
-          duration: Durations.fast,
+          duration: AppDurations.fast,
           curve: Curves.easeInOut,
           padding: const EdgeInsets.symmetric(vertical: Spacing.xs),
           decoration: BoxDecoration(
@@ -202,7 +202,7 @@ class _NavBarItem extends StatelessWidget {
             children: [
               // ── Icon ──
               AnimatedSwitcher(
-                duration: Durations.fast,
+                duration: AppDurations.fast,
                 child: FaIcon(
                   isSelected ? tab.activeIcon : tab.icon,
                   key: ValueKey<bool>(isSelected),
@@ -213,7 +213,7 @@ class _NavBarItem extends StatelessWidget {
               const SizedBox(height: 4),
               // ── Label ──
               AnimatedDefaultTextStyle(
-                duration: Durations.fast,
+                duration: AppDurations.fast,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 10,
