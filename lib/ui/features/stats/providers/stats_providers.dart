@@ -10,12 +10,7 @@ import '../../../../config/theme/vibe_themes.dart';
 // ── Enums ───────────────────────────────────────────────────────────────────
 
 /// Time period options for statistics display.
-enum PeriodType {
-  week,
-  month,
-  year,
-  custom,
-}
+enum PeriodType { week, month, year, custom }
 
 // ── Data Classes ────────────────────────────────────────────────────────────
 
@@ -89,8 +84,9 @@ final spendingTrendProvider = FutureProvider<List<FlSpot>>((ref) async {
 
 /// Category breakdown for the pie chart.
 /// Returns List<CategoryTotal> sorted by amount descending.
-final categoryBreakdownProvider =
-    FutureProvider<List<CategoryTotal>>((ref) async {
+final categoryBreakdownProvider = FutureProvider<List<CategoryTotal>>((
+  ref,
+) async {
   final txnRepo = ref.watch(transactionRepositoryProvider);
   final range = ref.watch(dateRangeProvider);
   final themeState = ref.watch(themeProvider);
@@ -118,31 +114,50 @@ final categoryBreakdownProvider =
 });
 
 /// Income vs expense comparison for the last 6 months.
-final incomeVsExpenseProvider =
-    FutureProvider<List<MonthlyComparison>>((ref) async {
+final incomeVsExpenseProvider = FutureProvider<List<MonthlyComparison>>((
+  ref,
+) async {
   final txnRepo = ref.watch(transactionRepositoryProvider);
   final now = DateTime.now();
 
   final results = <MonthlyComparison>[];
   final monthNames = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   for (int i = 5; i >= 0; i--) {
     final monthDate = DateTime(now.year, now.month - i, 1);
     final monthStart = DateTime(monthDate.year, monthDate.month, 1);
-    final monthEnd =
-        DateTime(monthDate.year, monthDate.month + 1, 0, 23, 59, 59);
+    final monthEnd = DateTime(
+      monthDate.year,
+      monthDate.month + 1,
+      0,
+      23,
+      59,
+      59,
+    );
 
     final income = await txnRepo.getTotalByType(0, monthStart, monthEnd);
     final expense = await txnRepo.getTotalByType(1, monthStart, monthEnd);
 
-    results.add(MonthlyComparison(
-      monthLabel: monthNames[monthDate.month - 1],
-      income: income,
-      expense: expense,
-    ));
+    results.add(
+      MonthlyComparison(
+        monthLabel: monthNames[monthDate.month - 1],
+        income: income,
+        expense: expense,
+      ),
+    );
   }
 
   return results;
@@ -150,8 +165,9 @@ final incomeVsExpenseProvider =
 
 /// Daily spending map for the heatmap calendar.
 /// Returns Map<DateTime (day only), double>.
-final dailySpendingMapProvider =
-    FutureProvider<Map<DateTime, double>>((ref) async {
+final dailySpendingMapProvider = FutureProvider<Map<DateTime, double>>((
+  ref,
+) async {
   final txnRepo = ref.watch(transactionRepositoryProvider);
   final range = ref.watch(dateRangeProvider);
 
@@ -168,8 +184,7 @@ final dailySpendingMapProvider =
 });
 
 /// Top spending categories sorted by amount (for horizontal bar chart).
-final topCategoriesProvider =
-    FutureProvider<List<CategoryTotal>>((ref) async {
+final topCategoriesProvider = FutureProvider<List<CategoryTotal>>((ref) async {
   final allCategories = await ref.watch(categoryBreakdownProvider.future);
   return allCategories.take(8).toList();
 });
