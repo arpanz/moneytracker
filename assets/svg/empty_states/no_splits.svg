@@ -1,1 +1,48 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMTgwIiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE4MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImVtcHR5Qmc1IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGMEZERkEiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjQ0NGQkYxIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE4MCIgcng9IjE2IiBmaWxsPSJ1cmwoI2VtcHR5Qmc1KSIvPgogIDwhLS0gTGVmdCBwZXJzb24gc2lsaG91ZXR0ZSAtLT4KICA8ZyBvcGFjaXR5PSIwLjM1Ij4KICAgIDwhLS0gSGVhZCAtLT4KICAgIDxjaXJjbGUgY3g9Ijc1IiBjeT0iNjAiIHI9IjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1RUVBRDQiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtZGFzaGFycmF5PSI2IDQiLz4KICAgIDwhLS0gQm9keSAtLT4KICAgIDxwYXRoIGQ9Ik00NSAxMzAgUTQ1IDk1IDc1IDkwIFExMDUgOTUgMTA1IDEzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNUVFQUQ0IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgICA8IS0tIFNob3VsZGVycyBsaW5lIC0tPgogICAgPGxpbmUgeDE9IjUwIiB5MT0iMTAwIiB4Mj0iMTAwIiB5Mj0iMTAwIiBzdHJva2U9IiM1RUVBRDQiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSI0IDMiIG9wYWNpdHk9IjAuNSIvPgogIDwvZz4KICA8IS0tIFJpZ2h0IHBlcnNvbiBzaWxob3VldHRlIC0tPgogIDxnIG9wYWNpdHk9IjAuMzUiPgogICAgPCEtLSBIZWFkIC0tPgogICAgPGNpcmNsZSBjeD0iMTY1IiBjeT0iNjAiIHI9IjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiM1RUVBRDQiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtZGFzaGFycmF5PSI2IDQiLz4KICAgIDwhLS0gQm9keSAtLT4KICAgIDxwYXRoIGQ9Ik0xMzUgMTMwIFExMzUgOTUgMTY1IDkwIFExOTUgOTUgMTk1IDEzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNUVFQUQ0IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgICA8IS0tIFNob3VsZGVycyBsaW5lIC0tPgogICAgPGxpbmUgeDE9IjE0MCIgeTE9IjEwMCIgeDI9IjE5MCIgeTI9IjEwMCIgc3Ryb2tlPSIjNUVFQUQ0IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNCAzIiBvcGFjaXR5PSIwLjUiLz4KICA8L2c+CiAgPCEtLSBDb25uZWN0aW9uIGxpbmUgYmV0d2VlbiB0aGVtIChkYXNoZWQpIC0tPgogIDxsaW5lIHgxPSI5NSIgeTE9Ijg1IiB4Mj0iMTM1IiB5Mj0iODUiIHN0cm9rZT0iIzk5RjZFNCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI1IDUiIG9wYWNpdHk9IjAuNSIvPgogIDwhLS0gUXVlc3Rpb24gbWFyayBiZXR3ZWVuIHRoZW0gLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTIwLCA4NSkiPgogICAgPGNpcmNsZSBjeD0iMCIgY3k9IjAiIHI9IjE2IiBmaWxsPSIjQ0NGQkYxIiBzdHJva2U9IiM1RUVBRDQiIHN0cm9rZS13aWR0aD0iMS41IiBvcGFjaXR5PSIwLjUiLz4KICAgIDx0ZXh0IHg9IjAiIHk9IjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMxNEI4QTYiIG9wYWNpdHk9IjAuNSI+PzwvdGV4dD4KICA8L2c+CiAgPCEtLSBGbG9hdGluZyBzcGxpdCBhcnJvd3MgLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTIwLCA0MCkiIG9wYWNpdHk9IjAuMyI+CiAgICA8cGF0aCBkPSJNMCAwIEwtMTIgLTgiIHN0cm9rZT0iIzVFRUFENCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICAgIDxwYXRoIGQ9Ik0wIDAgTDEyIC04IiBzdHJva2U9IiM1RUVBRDQiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8cGF0aCBkPSJNLTkgLTEwIEwtMTIgLTggTC05IC01IiBmaWxsPSJub25lIiBzdHJva2U9IiM1RUVBRDQiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICAgIDxwYXRoIGQ9Ik05IC0xMCBMMTIgLTggTDkgLTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzVFRUFENCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDwvZz4KICA8IS0tIENvaW4gaWNvbnMgKGZhZGVkKSAtLT4KICA8Y2lyY2xlIGN4PSI1NSIgY3k9IjE0MCIgcj0iOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTlGNkU0IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNCAzIiBvcGFjaXR5PSIwLjQiLz4KICA8dGV4dCB4PSI1NSIgeT0iMTQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iOSIgZmlsbD0iIzVFRUFENCIgb3BhY2l0eT0iMC4zIj4kPC90ZXh0PgogIDxjaXJjbGUgY3g9IjE4NSIgY3k9IjE0MCIgcj0iOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTlGNkU0IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNCAzIiBvcGFjaXR5PSIwLjQiLz4KICA8dGV4dCB4PSIxODUiIHk9IjE0NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjkiIGZpbGw9IiM1RUVBRDQiIG9wYWNpdHk9IjAuMyI+JDwvdGV4dD4KICA8dGV4dCB4PSIxMjAiIHk9IjE2NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExIiBmaWxsPSIjNUVFQUQ0IiBvcGFjaXR5PSIwLjYiPk5vIHNwbGl0cyB5ZXQ8L3RleHQ+Cjwvc3ZnPg==
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" width="240" height="180">
+  <defs>
+    <linearGradient id="emptyBg5" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F0FDFA"/>
+      <stop offset="100%" stop-color="#CCFBF1"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="180" rx="16" fill="url(#emptyBg5)"/>
+  <!-- Left person silhouette -->
+  <g opacity="0.35">
+    <!-- Head -->
+    <circle cx="75" cy="60" r="20" fill="none" stroke="#5EEAD4" stroke-width="2.5" stroke-dasharray="6 4"/>
+    <!-- Body -->
+    <path d="M45 130 Q45 95 75 90 Q105 95 105 130" fill="none" stroke="#5EEAD4" stroke-width="2.5" stroke-dasharray="6 4" stroke-linejoin="round"/>
+    <!-- Shoulders line -->
+    <line x1="50" y1="100" x2="100" y2="100" stroke="#5EEAD4" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"/>
+  </g>
+  <!-- Right person silhouette -->
+  <g opacity="0.35">
+    <!-- Head -->
+    <circle cx="165" cy="60" r="20" fill="none" stroke="#5EEAD4" stroke-width="2.5" stroke-dasharray="6 4"/>
+    <!-- Body -->
+    <path d="M135 130 Q135 95 165 90 Q195 95 195 130" fill="none" stroke="#5EEAD4" stroke-width="2.5" stroke-dasharray="6 4" stroke-linejoin="round"/>
+    <!-- Shoulders line -->
+    <line x1="140" y1="100" x2="190" y2="100" stroke="#5EEAD4" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.5"/>
+  </g>
+  <!-- Connection line between them (dashed) -->
+  <line x1="95" y1="85" x2="135" y2="85" stroke="#99F6E4" stroke-width="2" stroke-dasharray="5 5" opacity="0.5"/>
+  <!-- Question mark between them -->
+  <g transform="translate(120, 85)">
+    <circle cx="0" cy="0" r="16" fill="#CCFBF1" stroke="#5EEAD4" stroke-width="1.5" opacity="0.5"/>
+    <text x="0" y="6" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="18" fill="#14B8A6" opacity="0.5">?</text>
+  </g>
+  <!-- Floating split arrows -->
+  <g transform="translate(120, 40)" opacity="0.3">
+    <path d="M0 0 L-12 -8" stroke="#5EEAD4" stroke-width="2" stroke-linecap="round"/>
+    <path d="M0 0 L12 -8" stroke="#5EEAD4" stroke-width="2" stroke-linecap="round"/>
+    <path d="M-9 -10 L-12 -8 L-9 -5" fill="none" stroke="#5EEAD4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M9 -10 L12 -8 L9 -5" fill="none" stroke="#5EEAD4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- Coin icons (faded) -->
+  <circle cx="55" cy="140" r="8" fill="none" stroke="#99F6E4" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
+  <text x="55" y="144" text-anchor="middle" font-family="Arial" font-size="9" fill="#5EEAD4" opacity="0.3">$</text>
+  <circle cx="185" cy="140" r="8" fill="none" stroke="#99F6E4" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
+  <text x="185" y="144" text-anchor="middle" font-family="Arial" font-size="9" fill="#5EEAD4" opacity="0.3">$</text>
+  <text x="120" y="165" text-anchor="middle" font-family="Arial" font-size="11" fill="#5EEAD4" opacity="0.6">No splits yet</text>
+</svg>
