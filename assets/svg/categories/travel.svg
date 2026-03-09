@@ -1,1 +1,31 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ic2t5R3JhZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjQkFFNkZEIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0UwRjJGRSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0icGxhbmVHcmFkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMzOEJERjgiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDI4NEM3Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8IS0tIFNreSBiZyBjaXJjbGUgLS0+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzAiIGZpbGw9InVybCgjc2t5R3JhZCkiLz4KICA8IS0tIEFpcnBsYW5lIGJvZHkgLS0+CiAgPHBhdGggZD0iTTEwIDM2IEwyMiAzNCBMMjggMjggTDM4IDI2IEwzMiAzNCBMNTAgMzAgUTU2IDI4IDU2IDMyIFE1NiAzNiA1MCAzNiBMMzIgMzYgTDM4IDQ0IEwyOCA0MCBMMjIgMzYgWiIgZmlsbD0idXJsKCNwbGFuZUdyYWQpIiBzdHJva2U9IiMwMzY5QTEiIHN0cm9rZS13aWR0aD0iMS4yIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSBXaW5nIGRldGFpbCAtLT4KICA8cGF0aCBkPSJNMjYgMzAgTDM0IDI4IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC41Ii8+CiAgPCEtLSBUYWlsIGZpbiAtLT4KICA8cGF0aCBkPSJNMTIgMzYgTDEwIDI4IEwxOCAzMiIgZmlsbD0iIzBFQTVFOSIgc3Ryb2tlPSIjMDM2OUExIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8IS0tIFdpbmRvdyBkb3RzIC0tPgogIDxjaXJjbGUgY3g9IjM2IiBjeT0iMzIiIHI9IjEuMiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuNyIvPgogIDxjaXJjbGUgY3g9IjQwIiBjeT0iMzEuNSIgcj0iMS4yIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC43Ii8+CiAgPGNpcmNsZSBjeD0iNDQiIGN5PSIzMSIgcj0iMS4yIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC43Ii8+CiAgPCEtLSBDb250cmFpbCAtLT4KICA8cGF0aCBkPSJNMTAgMzYgUTQgMzggMiA0MCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9IjAuNCIvPgogIDxwYXRoIGQ9Ik0xMCAzOCBRNSA0MiAyIDQ2IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIwLjMiLz4KICA8IS0tIENsb3VkIHB1ZmZzIC0tPgogIDxlbGxpcHNlIGN4PSI0OCIgY3k9IjQ4IiByeD0iOCIgcnk9IjQiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjYiLz4KICA8ZWxsaXBzZSBjeD0iMTQiIGN5PSI1MCIgcng9IjYiIHJ5PSIzIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC41Ii8+Cjwvc3ZnPg==
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#BAE6FD"/>
+      <stop offset="100%" stop-color="#E0F2FE"/>
+    </linearGradient>
+    <linearGradient id="planeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+  </defs>
+  <!-- Sky bg circle -->
+  <circle cx="32" cy="32" r="30" fill="url(#skyGrad)"/>
+  <!-- Airplane body -->
+  <path d="M10 36 L22 34 L28 28 L38 26 L32 34 L50 30 Q56 28 56 32 Q56 36 50 36 L32 36 L38 44 L28 40 L22 36 Z" fill="url(#planeGrad)" stroke="#0369A1" stroke-width="1.2" stroke-linejoin="round"/>
+  <!-- Wing detail -->
+  <path d="M26 30 L34 28" stroke="white" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+  <!-- Tail fin -->
+  <path d="M12 36 L10 28 L18 32" fill="#0EA5E9" stroke="#0369A1" stroke-width="1" stroke-linejoin="round"/>
+  <!-- Window dots -->
+  <circle cx="36" cy="32" r="1.2" fill="white" opacity="0.7"/>
+  <circle cx="40" cy="31.5" r="1.2" fill="white" opacity="0.7"/>
+  <circle cx="44" cy="31" r="1.2" fill="white" opacity="0.7"/>
+  <!-- Contrail -->
+  <path d="M10 36 Q4 38 2 40" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+  <path d="M10 38 Q5 42 2 46" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+  <!-- Cloud puffs -->
+  <ellipse cx="48" cy="48" rx="8" ry="4" fill="white" opacity="0.6"/>
+  <ellipse cx="14" cy="50" rx="6" ry="3" fill="white" opacity="0.5"/>
+</svg>
