@@ -1,1 +1,25 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZm9vZEdyYWQiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0ZGOUE1NiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNFODcyMkEiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDwhLS0gUGxhdGUgLS0+CiAgPGVsbGlwc2UgY3g9IjMyIiBjeT0iMzUiIHJ4PSIyNiIgcnk9IjI0IiBmaWxsPSIjRkZGM0U4IiBzdHJva2U9IiNGRkQ0QTgiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxlbGxpcHNlIGN4PSIzMiIgY3k9IjM1IiByeD0iMTgiIHJ5PSIxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZFMEJFIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDwhLS0gRm9yayAobGVmdCkgLS0+CiAgPGcgc3Ryb2tlPSJ1cmwoI2Zvb2RHcmFkKSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0icm90YXRlKC0yMCwgMjQsIDMyKSI+CiAgICA8bGluZSB4MT0iMjAiIHkxPSI0OCIgeDI9IjIwIiB5Mj0iMTgiLz4KICAgIDxsaW5lIHgxPSIxNSIgeTE9IjE4IiB4Mj0iMTUiIHkyPSIyNiIvPgogICAgPGxpbmUgeDE9IjIwIiB5MT0iMTgiIHgyPSIyMCIgeTI9IjI2Ii8+CiAgICA8bGluZSB4MT0iMjUiIHkxPSIxOCIgeDI9IjI1IiB5Mj0iMjYiLz4KICAgIDxsaW5lIHgxPSIxNSIgeTE9IjI2IiB4Mj0iMjUiIHkyPSIyNiIvPgogIDwvZz4KICA8IS0tIEtuaWZlIChyaWdodCkgLS0+CiAgPGcgc3Ryb2tlPSJ1cmwoI2Zvb2RHcmFkKSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHRyYW5zZm9ybT0icm90YXRlKDIwLCA0MiwgMzIpIj4KICAgIDxsaW5lIHgxPSI0NCIgeTE9IjQ4IiB4Mj0iNDQiIHkyPSIyNCIvPgogICAgPHBhdGggZD0iTTQ0IDI0IFE0NCAxNiA0MCAxNiBRMzggMTYgMzggMjAgTDM4IDI4IFEzOCAzMCA0MCAzMCBMNDQgMzAiLz4KICA8L2c+Cjwvc3ZnPg==
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="foodGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF9A56"/>
+      <stop offset="100%" stop-color="#E8722A"/>
+    </linearGradient>
+  </defs>
+  <!-- Plate -->
+  <ellipse cx="32" cy="35" rx="26" ry="24" fill="#FFF3E8" stroke="#FFD4A8" stroke-width="2"/>
+  <ellipse cx="32" cy="35" rx="18" ry="16" fill="none" stroke="#FFE0BE" stroke-width="1.5"/>
+  <!-- Fork (left) -->
+  <g stroke="url(#foodGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="rotate(-20, 24, 32)">
+    <line x1="20" y1="48" x2="20" y2="18"/>
+    <line x1="15" y1="18" x2="15" y2="26"/>
+    <line x1="20" y1="18" x2="20" y2="26"/>
+    <line x1="25" y1="18" x2="25" y2="26"/>
+    <line x1="15" y1="26" x2="25" y2="26"/>
+  </g>
+  <!-- Knife (right) -->
+  <g stroke="url(#foodGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="rotate(20, 42, 32)">
+    <line x1="44" y1="48" x2="44" y2="24"/>
+    <path d="M44 24 Q44 16 40 16 Q38 16 38 20 L38 28 Q38 30 40 30 L44 30"/>
+  </g>
+</svg>
