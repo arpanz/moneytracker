@@ -110,7 +110,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/transaction/:id',
         name: RouteNames.transactionDetail,
         builder: (context, state) => TransactionDetailScreen(
-          transactionId: state.pathParameters['id']!,
+          transactionId: int.parse(state.pathParameters['id']!),
         ),
       ),
       GoRoute(
@@ -139,7 +139,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/goal/:id',
         name: RouteNames.goalDetail,
         builder: (context, state) => GoalDetailScreen(
-          goalId: state.pathParameters['id']!,
+          goalId: int.parse(state.pathParameters['id']!),
         ),
       ),
       GoRoute(
@@ -176,7 +176,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/account/:id',
         name: RouteNames.accountDetail,
         builder: (context, state) => AccountDetailScreen(
-          accountId: state.pathParameters['id']!,
+          accountId: int.parse(state.pathParameters['id']!),
         ),
       ),
       GoRoute(

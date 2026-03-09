@@ -338,7 +338,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
       ),
     )
         .animate(onPlay: (c) => c.repeat())
-        .shimmer(duration: Durations.shimmer, color: colors.shimmerHighlight);
+        .shimmer(duration: AppDurations.shimmer, color: colors.shimmerHighlight);
   }
 
   // ── Section 1: Spending Trend ───────────────────────────────────────────
@@ -480,7 +480,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                 ),
               ],
             ),
-            duration: Durations.medium,
+            duration: AppDurations.medium,
           );
         },
       ),
@@ -566,7 +566,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       );
                     }).toList(),
                   ),
-                  duration: Durations.medium,
+                  duration: AppDurations.medium,
                 ),
               ),
               const SizedBox(height: Spacing.md),
@@ -753,7 +753,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                 );
               }).toList(),
             ),
-            duration: Durations.medium,
+            duration: AppDurations.medium,
           );
         },
       ),
@@ -873,7 +873,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                               ),
                               // Filled bar.
                               AnimatedContainer(
-                                duration: Durations.medium,
+                                duration: AppDurations.medium,
                                 curve: Curves.easeOutCubic,
                                 height: 24,
                                 width:

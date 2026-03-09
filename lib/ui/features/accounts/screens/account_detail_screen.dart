@@ -99,7 +99,7 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
               gradient: LinearGradient(
                 colors: [colors.primaryContainer, colors.secondaryContainer],
               ),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              borderRadius: BorderRadius.circular(Radii.lg),
             ),
             child: Column(
               children: [
