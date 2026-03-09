@@ -1,1 +1,26 @@
-PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZXJyb3JHcmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRjcwNDMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRTUzOTM1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8IS0tIFggbWFya3MgLS0+CiAgPGcgb3BhY2l0eT0iMC40IiBzdHJva2U9IiNFRjUzNTAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj4KICAgIDxsaW5lIHgxPSIxOCIgeTE9IjE4IiB4Mj0iMjQiIHkyPSIyNCIvPjxsaW5lIHgxPSIyNCIgeTE9IjE4IiB4Mj0iMTgiIHkyPSIyNCIvPgogICAgPGxpbmUgeDE9Ijk2IiB5MT0iMTQiIHgyPSIxMDIiIHkyPSIyMCIvPjxsaW5lIHgxPSIxMDIiIHkxPSIxNCIgeDI9Ijk2IiB5Mj0iMjAiLz4KICAgIDxsaW5lIHgxPSIxMCIgeTE9Ijg1IiB4Mj0iMTYiIHkyPSI5MSIvPjxsaW5lIHgxPSIxNiIgeTE9Ijg1IiB4Mj0iMTAiIHkyPSI5MSIvPgogICAgPGxpbmUgeDE9IjEwNCIgeTE9IjkwIiB4Mj0iMTEwIiB5Mj0iOTYiLz48bGluZSB4MT0iMTEwIiB5MT0iOTAiIHgyPSIxMDQiIHkyPSI5NiIvPgogIDwvZz4KICA8IS0tIFRyaWFuZ2xlIC0tPgogIDxwYXRoIGQ9Ik02MCAyMiBMMTA1IDk1IFExMDggMTAwIDEwMyAxMDUgTDE3IDEwNSBRMTIgMTAwIDE1IDk1IFoiIGZpbGw9InVybCgjZXJyb3JHcmFkKSIvPgogIDwhLS0gSW5uZXIgdHJpYW5nbGUgYm9yZGVyIC0tPgogIDxwYXRoIGQ9Ik02MCAzNSBMOTUgOTMgTDI1IDkzIFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4xNSIvPgogIDwhLS0gRXhjbGFtYXRpb24gbWFyayAtLT4KICA8cmVjdCB4PSI1NiIgeT0iNDgiIHdpZHRoPSI4IiBoZWlnaHQ9IjI4IiByeD0iNCIgZmlsbD0id2hpdGUiLz4KICA8Y2lyY2xlIGN4PSI2MCIgY3k9Ijg4IiByPSI1IiBmaWxsPSJ3aGl0ZSIvPgogIDwhLS0gU21hbGwgZG90cyAtLT4KICA8Y2lyY2xlIGN4PSIzMCIgY3k9IjEwOCIgcj0iMiIgZmlsbD0iI0ZGQUI5MSIgb3BhY2l0eT0iMC41Ii8+CiAgPGNpcmNsZSBjeD0iOTAiIGN5PSIxMTAiIHI9IjEuNSIgZmlsbD0iI0ZGQUI5MSIgb3BhY2l0eT0iMC40Ii8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSIxMTIiIHI9IjIiIGZpbGw9IiNGRkFCOTEiIG9wYWNpdHk9IjAuMyIvPgo8L3N2Zz4=
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="errorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF7043"/>
+      <stop offset="100%" stop-color="#E53935"/>
+    </linearGradient>
+  </defs>
+  <!-- X marks -->
+  <g opacity="0.4" stroke="#EF5350" stroke-width="2" stroke-linecap="round">
+    <line x1="18" y1="18" x2="24" y2="24"/><line x1="24" y1="18" x2="18" y2="24"/>
+    <line x1="96" y1="14" x2="102" y2="20"/><line x1="102" y1="14" x2="96" y2="20"/>
+    <line x1="10" y1="85" x2="16" y2="91"/><line x1="16" y1="85" x2="10" y2="91"/>
+    <line x1="104" y1="90" x2="110" y2="96"/><line x1="110" y1="90" x2="104" y2="96"/>
+  </g>
+  <!-- Triangle -->
+  <path d="M60 22 L105 95 Q108 100 103 105 L17 105 Q12 100 15 95 Z" fill="url(#errorGrad)"/>
+  <!-- Inner triangle border -->
+  <path d="M60 35 L95 93 L25 93 Z" fill="none" stroke="white" stroke-width="1" opacity="0.15"/>
+  <!-- Exclamation mark -->
+  <rect x="56" y="48" width="8" height="28" rx="4" fill="white"/>
+  <circle cx="60" cy="88" r="5" fill="white"/>
+  <!-- Small dots -->
+  <circle cx="30" cy="108" r="2" fill="#FFAB91" opacity="0.5"/>
+  <circle cx="90" cy="110" r="1.5" fill="#FFAB91" opacity="0.4"/>
+  <circle cx="60" cy="112" r="2" fill="#FFAB91" opacity="0.3"/>
+</svg>
