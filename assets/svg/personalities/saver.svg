@@ -1,1 +1,89 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InNhdmVyQmciIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0YwRkZGNCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNEQ0ZDRTciLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImNoZWVzZVN2IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGN0Q5NEUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRThBODI4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwaWdneUdyYWQiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0ZEQTRBRiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNGNDcyQjYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImNvaW5TdiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkNEMzREIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0Q5NzcwNiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iY2hlZWtTdiIgY3g9IjAuNSIgY3k9IjAuNSIgcj0iMC41Ij4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0ZGQjA4OCIgc3RvcC1vcGFjaXR5PSIwLjYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZCMDg4IiBzdG9wLW9wYWNpdHk9IjAiLz4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiByeD0iMjAiIGZpbGw9InVybCgjc2F2ZXJCZykiLz4KICA8IS0tIEZsb29yIHNoYWRvdyAtLT4KICA8ZWxsaXBzZSBjeD0iMTUwIiBjeT0iMTgyIiByeD0iNzUiIHJ5PSI4IiBmaWxsPSIjMjJDNTVFIiBvcGFjaXR5PSIwLjEiLz4KICA8IS0tIFBpZ2d5IGJhbmsgYm9keSAtLT4KICA8ZWxsaXBzZSBjeD0iMTcwIiBjeT0iMTM4IiByeD0iNDUiIHJ5PSIzMiIgZmlsbD0idXJsKCNwaWdneUdyYWQpIiBzdHJva2U9IiNFMTFENDgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPCEtLSBQaWdneSBzbm91dCAtLT4KICA8ZWxsaXBzZSBjeD0iMjEyIiBjeT0iMTM4IiByeD0iMTIiIHJ5PSI5IiBmaWxsPSIjRkVDREQzIiBzdHJva2U9IiNGNDcyQjYiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgPCEtLSBQaWdneSBub3N0cmlscyAtLT4KICA8Y2lyY2xlIGN4PSIyMDkiIGN5PSIxMzYiIHI9IjIiIGZpbGw9IiNFMTFENDgiIG9wYWNpdHk9IjAuNSIvPgogIDxjaXJjbGUgY3g9IjIxNSIgY3k9IjEzNiIgcj0iMiIgZmlsbD0iI0UxMUQ0OCIgb3BhY2l0eT0iMC41Ii8+CiAgPCEtLSBQaWdneSBleWUgLS0+CiAgPGNpcmNsZSBjeD0iMTk4IiBjeT0iMTI2IiByPSIzLjUiIGZpbGw9IndoaXRlIi8+CiAgPGNpcmNsZSBjeD0iMTk5IiBjeT0iMTI2LjUiIHI9IjIiIGZpbGw9IiMyRDJEMkQiLz4KICA8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxMjUiIHI9IjAuOCIgZmlsbD0id2hpdGUiLz4KICA8IS0tIFBpZ2d5IGVhciAtLT4KICA8cGF0aCBkPSJNMTg1IDExMCBRMTgwIDk4IDE5MCAxMDIgUTE5NiAxMDYgMTkyIDExNCIgZmlsbD0iI0ZEQTRBRiIgc3Ryb2tlPSIjRTExRDQ4IiBzdHJva2Utd2lkdGg9IjEiLz4KICA8IS0tIFBpZ2d5IGxlZ3MgLS0+CiAgPHJlY3QgeD0iMTQ1IiB5PSIxNjIiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxNCIgcng9IjQiIGZpbGw9IiNGREE0QUYiIHN0cm9rZT0iI0UxMUQ0OCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPHJlY3QgeD0iMTY1IiB5PSIxNjIiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxNCIgcng9IjQiIGZpbGw9IiNGREE0QUYiIHN0cm9rZT0iI0UxMUQ0OCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPHJlY3QgeD0iMTg1IiB5PSIxNjIiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxNCIgcng9IjQiIGZpbGw9IiNGREE0QUYiIHN0cm9rZT0iI0UxMUQ0OCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPCEtLSBQaWdneSBjb2luIHNsb3QgLS0+CiAgPHJlY3QgeD0iMTYyIiB5PSIxMDgiIHdpZHRoPSIxOCIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iI0UxMUQ0OCIgb3BhY2l0eT0iMC42Ii8+CiAgPCEtLSBQaWdneSB0YWlsIGN1cmwgLS0+CiAgPHBhdGggZD0iTTEyNiAxMzAgUTExOCAxMjUgMTIwIDEzNSBRMTIyIDE0MiAxMjYgMTM4IiBmaWxsPSJub25lIiBzdHJva2U9IiNFMTFENDgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBDaGVlc2UgYm9keSAoYmVoaW5kL2h1Z2dpbmcgcGlnZ3kpIC0tPgogIDxwYXRoIGQ9Ik0xMjAgNTUgTDE2MCAxNDggUTE2MiAxNTQgMTU4IDE1NiBMODIgMTU2IFE3OCAxNTQgODAgMTQ4IFoiIGZpbGw9InVybCgjY2hlZXNlU3YpIiBzdHJva2U9IiNENDk0MUMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDwhLS0gQ2hlZXNlIGhvbGVzIC0tPgogIDxlbGxpcHNlIGN4PSIxMDgiIGN5PSIxMjUiIHJ4PSI3IiByeT0iNSIgZmlsbD0iI0Q0OTQxQyIgb3BhY2l0eT0iMC40Ii8+CiAgPGVsbGlwc2UgY3g9IjEzMiIgY3k9IjExMCIgcng9IjUiIHJ5PSI0IiBmaWxsPSIjRDQ5NDFDIiBvcGFjaXR5PSIwLjM1Ii8+CiAgPGVsbGlwc2UgY3g9IjExNSIgY3k9IjE0MiIgcng9IjUiIHJ5PSI0IiBmaWxsPSIjRDQ5NDFDIiBvcGFjaXR5PSIwLjQiLz4KICA8IS0tIEV5ZXMgKGhhcHB5IGNsb3NlZCwgY29udGVudCkgLS0+CiAgPHBhdGggZD0iTTEwNiA5MiBRMTEwIDg2IDExNCA5MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMkQyRDJEIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTEyNiA5MiBRMTMwIDg2IDEzNCA5MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMkQyRDJEIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBDaGVla3MgLS0+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI2IiBmaWxsPSJ1cmwoI2NoZWVrU3YpIi8+CiAgPGNpcmNsZSBjeD0iMTQwIiBjeT0iMTAwIiByPSI2IiBmaWxsPSJ1cmwoI2NoZWVrU3YpIi8+CiAgPCEtLSBDb250ZW50IHNtaWxlIC0tPgogIDxwYXRoIGQ9Ik0xMTIgMTA2IFExMjAgMTE2IDEyOCAxMDYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzJEMkQyRCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8IS0tIEFybXMgaHVnZ2luZyBwaWdneSAtLT4KICA8cGF0aCBkPSJNMTU4IDEyMCBRMTc1IDEwOCAxODUgMTEyIiBmaWxsPSJub25lIiBzdHJva2U9IiNFOEE4MjgiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTgyIDEyNSBRNzAgMTQwIDc4IDE1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRThBODI4IiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwhLS0gTGVncyAtLT4KICA8cGF0aCBkPSJNMTAyIDE1NiBMOTggMTcyIFE5NiAxNzYgMTAyIDE3NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRThBODI4IiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0xMzAgMTU2IEwxMzQgMTcyIFExMzYgMTc2IDEzMCAxNzYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0U4QTgyOCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8IS0tIEZsb2F0aW5nIGNvaW5zIC0tPgogIDxnPgogICAgPGNpcmNsZSBjeD0iNTUiIGN5PSI1MCIgcj0iMTIiIGZpbGw9InVybCgjY29pblN2KSIgc3Ryb2tlPSIjQjQ1MzA5IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogICAgPHRleHQgeD0iNTUiIHk9IjU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXNpemU9IjEyIiBmaWxsPSIjOTI0MDBFIj4kPC90ZXh0PgogIDwvZz4KICA8ZyBvcGFjaXR5PSIwLjgiPgogICAgPGNpcmNsZSBjeD0iODUiIGN5PSIzMCIgcj0iOSIgZmlsbD0idXJsKCNjb2luU3YpIiBzdHJva2U9IiNCNDUzMDkiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgICA8dGV4dCB4PSI4NSIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iOSIgZmlsbD0iIzkyNDAwRSI+JDwvdGV4dD4KICA8L2c+CiAgPGcgb3BhY2l0eT0iMC43Ij4KICAgIDxjaXJjbGUgY3g9IjI0NSIgY3k9IjU1IiByPSIxMCIgZmlsbD0idXJsKCNjb2luU3YpIiBzdHJva2U9IiNCNDUzMDkiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgICA8dGV4dCB4PSIyNDUiIHk9IjU5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXNpemU9IjEwIiBmaWxsPSIjOTI0MDBFIj4kPC90ZXh0PgogIDwvZz4KICA8ZyBvcGFjaXR5PSIwLjYiPgogICAgPGNpcmNsZSBjeD0iMjY1IiBjeT0iODUiIHI9IjgiIGZpbGw9InVybCgjY29pblN2KSIgc3Ryb2tlPSIjQjQ1MzA5IiBzdHJva2Utd2lkdGg9IjEiLz4KICAgIDx0ZXh0IHg9IjI2NSIgeT0iODkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iOCIgZmlsbD0iIzkyNDAwRSI+JDwvdGV4dD4KICA8L2c+CiAgPCEtLSBTcGFya2xlcyAtLT4KICA8cGF0aCBkPSJNNTAgODAgTDUyIDc0IEw1NCA4MCBMNjAgODIgTDU0IDg0IEw1MiA5MCBMNTAgODQgTDQ0IDgyIFoiIGZpbGw9IiMyMkM1NUUiIG9wYWNpdHk9IjAuNSIvPgogIDxwYXRoIGQ9Ik0yNjAgNDAgTDI2MSAzNiBMMjYyIDQwIEwyNjYgNDEgTDI2MiA0MiBMMjYxIDQ2IEwyNjAgNDIgTDI1NiA0MSBaIiBmaWxsPSIjRkNEMzREIiBvcGFjaXR5PSIwLjYiLz4KPC9zdmc+
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="300" height="200">
+  <defs>
+    <linearGradient id="saverBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F0FFF4"/>
+      <stop offset="100%" stop-color="#DCFCE7"/>
+    </linearGradient>
+    <linearGradient id="cheeseSv" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7D94E"/>
+      <stop offset="100%" stop-color="#E8A828"/>
+    </linearGradient>
+    <linearGradient id="piggyGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FDA4AF"/>
+      <stop offset="100%" stop-color="#F472B6"/>
+    </linearGradient>
+    <linearGradient id="coinSv" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <radialGradient id="cheekSv" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#FFB088" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#FFB088" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="300" height="200" rx="20" fill="url(#saverBg)"/>
+  <!-- Floor shadow -->
+  <ellipse cx="150" cy="182" rx="75" ry="8" fill="#22C55E" opacity="0.1"/>
+  <!-- Piggy bank body -->
+  <ellipse cx="170" cy="138" rx="45" ry="32" fill="url(#piggyGrad)" stroke="#E11D48" stroke-width="1.5"/>
+  <!-- Piggy snout -->
+  <ellipse cx="212" cy="138" rx="12" ry="9" fill="#FECDD3" stroke="#F472B6" stroke-width="1.2"/>
+  <!-- Piggy nostrils -->
+  <circle cx="209" cy="136" r="2" fill="#E11D48" opacity="0.5"/>
+  <circle cx="215" cy="136" r="2" fill="#E11D48" opacity="0.5"/>
+  <!-- Piggy eye -->
+  <circle cx="198" cy="126" r="3.5" fill="white"/>
+  <circle cx="199" cy="126.5" r="2" fill="#2D2D2D"/>
+  <circle cx="200" cy="125" r="0.8" fill="white"/>
+  <!-- Piggy ear -->
+  <path d="M185 110 Q180 98 190 102 Q196 106 192 114" fill="#FDA4AF" stroke="#E11D48" stroke-width="1"/>
+  <!-- Piggy legs -->
+  <rect x="145" y="162" width="10" height="14" rx="4" fill="#FDA4AF" stroke="#E11D48" stroke-width="1"/>
+  <rect x="165" y="162" width="10" height="14" rx="4" fill="#FDA4AF" stroke="#E11D48" stroke-width="1"/>
+  <rect x="185" y="162" width="10" height="14" rx="4" fill="#FDA4AF" stroke="#E11D48" stroke-width="1"/>
+  <!-- Piggy coin slot -->
+  <rect x="162" y="108" width="18" height="4" rx="2" fill="#E11D48" opacity="0.6"/>
+  <!-- Piggy tail curl -->
+  <path d="M126 130 Q118 125 120 135 Q122 142 126 138" fill="none" stroke="#E11D48" stroke-width="2" stroke-linecap="round"/>
+  <!-- Cheese body (behind/hugging piggy) -->
+  <path d="M120 55 L160 148 Q162 154 158 156 L82 156 Q78 154 80 148 Z" fill="url(#cheeseSv)" stroke="#D4941C" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Cheese holes -->
+  <ellipse cx="108" cy="125" rx="7" ry="5" fill="#D4941C" opacity="0.4"/>
+  <ellipse cx="132" cy="110" rx="5" ry="4" fill="#D4941C" opacity="0.35"/>
+  <ellipse cx="115" cy="142" rx="5" ry="4" fill="#D4941C" opacity="0.4"/>
+  <!-- Eyes (happy closed, content) -->
+  <path d="M106 92 Q110 86 114 92" fill="none" stroke="#2D2D2D" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M126 92 Q130 86 134 92" fill="none" stroke="#2D2D2D" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Cheeks -->
+  <circle cx="100" cy="100" r="6" fill="url(#cheekSv)"/>
+  <circle cx="140" cy="100" r="6" fill="url(#cheekSv)"/>
+  <!-- Content smile -->
+  <path d="M112 106 Q120 116 128 106" fill="none" stroke="#2D2D2D" stroke-width="2" stroke-linecap="round"/>
+  <!-- Arms hugging piggy -->
+  <path d="M158 120 Q175 108 185 112" fill="none" stroke="#E8A828" stroke-width="5" stroke-linecap="round"/>
+  <path d="M82 125 Q70 140 78 150" fill="none" stroke="#E8A828" stroke-width="5" stroke-linecap="round"/>
+  <!-- Legs -->
+  <path d="M102 156 L98 172 Q96 176 102 176" fill="none" stroke="#E8A828" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M130 156 L134 172 Q136 176 130 176" fill="none" stroke="#E8A828" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Floating coins -->
+  <g>
+    <circle cx="55" cy="50" r="12" fill="url(#coinSv)" stroke="#B45309" stroke-width="1.5"/>
+    <text x="55" y="55" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="12" fill="#92400E">$</text>
+  </g>
+  <g opacity="0.8">
+    <circle cx="85" cy="30" r="9" fill="url(#coinSv)" stroke="#B45309" stroke-width="1.2"/>
+    <text x="85" y="34" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="9" fill="#92400E">$</text>
+  </g>
+  <g opacity="0.7">
+    <circle cx="245" cy="55" r="10" fill="url(#coinSv)" stroke="#B45309" stroke-width="1.2"/>
+    <text x="245" y="59" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="10" fill="#92400E">$</text>
+  </g>
+  <g opacity="0.6">
+    <circle cx="265" cy="85" r="8" fill="url(#coinSv)" stroke="#B45309" stroke-width="1"/>
+    <text x="265" y="89" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="8" fill="#92400E">$</text>
+  </g>
+  <!-- Sparkles -->
+  <path d="M50 80 L52 74 L54 80 L60 82 L54 84 L52 90 L50 84 L44 82 Z" fill="#22C55E" opacity="0.5"/>
+  <path d="M260 40 L261 36 L262 40 L266 41 L262 42 L261 46 L260 42 L256 41 Z" fill="#FCD34D" opacity="0.6"/>
+</svg>
