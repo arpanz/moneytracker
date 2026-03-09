@@ -1,0 +1,29 @@
+abstract class RouteNames {
+  static const onboarding = 'onboarding';
+  static const lock = 'lock';
+  static const home = 'home';
+  static const transactions = 'transactions';
+  static const addTransaction = 'add-transaction';
+  static const transactionDetail = 'transaction-detail';
+  static const stats = 'stats';
+  static const budget = 'budget';
+  static const addBudget = 'add-budget';
+  static const budgetDetail = 'budget-detail';
+  static const goals = 'goals';
+  static const addGoal = 'add-goal';
+  static const goalDetail = 'goal-detail';
+  static const subscriptions = 'subscriptions';
+  static const addSubscription = 'add-subscription';
+  static const split = 'split';
+  static const addSplit = 'add-split';
+  static const accounts = 'accounts';
+  static const addAccount = 'add-account';
+  static const accountDetail = 'account-detail';
+  static const settings = 'settings';
+  static const themePicker = 'theme-picker';
+  static const scanner = 'scanner';
+  static const personality = 'personality';
+  static const weeklyWrap = 'weekly-wrap';
+  static const pendingTransactions = 'pending-transactions';
+  static const more = 'more';
+}
