@@ -1,1 +1,32 @@
-PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNTAgMTUwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0id2FsbGV0IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM4RDZFNjMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNUQ0MDM3Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8IS0tIFdhbGxldCBib2R5IC0tPgogIDxyZWN0IHg9IjIwIiB5PSI0MCIgd2lkdGg9IjExMCIgaGVpZ2h0PSI3NSIgcng9IjEyIiBmaWxsPSJ1cmwoI3dhbGxldCkiIHN0cm9rZT0iIzRFMzQyRSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPCEtLSBXYWxsZXQgZmxhcCAtLT4KICA8cGF0aCBkPSJNMjAgNTUgUTIwIDQwIDM1IDQwIEwxMTUgNDAgUTEzMCA0MCAxMzAgNTUgTDEzMCA2MiBMMjAgNjIgWiIgZmlsbD0iI0ExODg3RiIgc3Ryb2tlPSIjNEUzNDJFIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8IS0tIFdhbGxldCBjbGFzcCAtLT4KICA8Y2lyY2xlIGN4PSI3NSIgY3k9IjYyIiByPSI2IiBmaWxsPSIjRkZENTRGIiBzdHJva2U9IiNGOUE4MjUiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPCEtLSBTYWQgZXllcyAtLT4KICA8ZWxsaXBzZSBjeD0iNTUiIGN5PSI4NSIgcng9IjciIHJ5PSI4IiBmaWxsPSJ3aGl0ZSIvPgogIDxlbGxpcHNlIGN4PSI5NSIgY3k9Ijg1IiByeD0iNyIgcnk9IjgiIGZpbGw9IndoaXRlIi8+CiAgPGVsbGlwc2UgY3g9IjU2IiBjeT0iODciIHJ4PSIzLjUiIHJ5PSI0IiBmaWxsPSIjMkQyRDJEIi8+CiAgPGVsbGlwc2UgY3g9Ijk2IiBjeT0iODciIHJ4PSIzLjUiIHJ5PSI0IiBmaWxsPSIjMkQyRDJEIi8+CiAgPCEtLSBFeWVicm93cyAoc2FkLCBhbmdsZWQgdXApIC0tPgogIDxwYXRoIGQ9Ik00NSA3NiBRNTUgNzIgNjMgNzYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRFMzQyRSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNODcgNzYgUTk1IDcyIDEwNSA3NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNEUzNDJFIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwhLS0gU2FkIG1vdXRoIC0tPgogIDxwYXRoIGQ9Ik02MiAxMDIgUTc1IDk0IDg4IDEwMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNEUzNDJFIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBUZWFycyAtLT4KICA8cGF0aCBkPSJNNDggOTIgUTQ1IDEwMiA0OCAxMTIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzY0QjVGNiIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC44Ii8+CiAgPGVsbGlwc2UgY3g9IjQ4IiBjeT0iMTE0IiByeD0iMyIgcnk9IjQiIGZpbGw9IiM2NEI1RjYiIG9wYWNpdHk9IjAuNiIvPgogIDxwYXRoIGQ9Ik0xMDIgOTIgUTEwNSAxMDQgMTAyIDExNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjRCNUY2IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIwLjgiLz4KICA8ZWxsaXBzZSBjeD0iMTAyIiBjeT0iMTE3IiByeD0iMyIgcnk9IjQiIGZpbGw9IiM2NEI1RjYiIG9wYWNpdHk9IjAuNiIvPgogIDwhLS0gU21hbGwgdGVhciBkcm9wcyBmYWxsaW5nIC0tPgogIDxlbGxpcHNlIGN4PSI0NCIgY3k9IjEyNSIgcng9IjIiIHJ5PSIzIiBmaWxsPSIjNjRCNUY2IiBvcGFjaXR5PSIwLjQiLz4KICA8ZWxsaXBzZSBjeD0iMTA2IiBjeT0iMTI4IiByeD0iMiIgcnk9IjMiIGZpbGw9IiM2NEI1RjYiIG9wYWNpdHk9IjAuNCIvPgo8L3N2Zz4=
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150">
+  <defs>
+    <linearGradient id="wallet" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8D6E63"/>
+      <stop offset="100%" stop-color="#5D4037"/>
+    </linearGradient>
+  </defs>
+  <!-- Wallet body -->
+  <rect x="20" y="40" width="110" height="75" rx="12" fill="url(#wallet)" stroke="#4E342E" stroke-width="2"/>
+  <!-- Wallet flap -->
+  <path d="M20 55 Q20 40 35 40 L115 40 Q130 40 130 55 L130 62 L20 62 Z" fill="#A1887F" stroke="#4E342E" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Wallet clasp -->
+  <circle cx="75" cy="62" r="6" fill="#FFD54F" stroke="#F9A825" stroke-width="1.5"/>
+  <!-- Sad eyes -->
+  <ellipse cx="55" cy="85" rx="7" ry="8" fill="white"/>
+  <ellipse cx="95" cy="85" rx="7" ry="8" fill="white"/>
+  <ellipse cx="56" cy="87" rx="3.5" ry="4" fill="#2D2D2D"/>
+  <ellipse cx="96" cy="87" rx="3.5" ry="4" fill="#2D2D2D"/>
+  <!-- Eyebrows (sad, angled up) -->
+  <path d="M45 76 Q55 72 63 76" fill="none" stroke="#4E342E" stroke-width="2" stroke-linecap="round"/>
+  <path d="M87 76 Q95 72 105 76" fill="none" stroke="#4E342E" stroke-width="2" stroke-linecap="round"/>
+  <!-- Sad mouth -->
+  <path d="M62 102 Q75 94 88 102" fill="none" stroke="#4E342E" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Tears -->
+  <path d="M48 92 Q45 102 48 112" fill="none" stroke="#64B5F6" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+  <ellipse cx="48" cy="114" rx="3" ry="4" fill="#64B5F6" opacity="0.6"/>
+  <path d="M102 92 Q105 104 102 115" fill="none" stroke="#64B5F6" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+  <ellipse cx="102" cy="117" rx="3" ry="4" fill="#64B5F6" opacity="0.6"/>
+  <!-- Small tear drops falling -->
+  <ellipse cx="44" cy="125" rx="2" ry="3" fill="#64B5F6" opacity="0.4"/>
+  <ellipse cx="106" cy="128" rx="2" ry="3" fill="#64B5F6" opacity="0.4"/>
+</svg>
