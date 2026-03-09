@@ -1,1 +1,21 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0icGF3R3JhZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkRCQTc0Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0VBNTgwQyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBNYWluIHBhZCAtLT4KICA8ZWxsaXBzZSBjeD0iMzIiIGN5PSI0MCIgcng9IjE0IiByeT0iMTIiIGZpbGw9InVybCgjcGF3R3JhZCkiLz4KICA8IS0tIFRvZSBiZWFucyAtLT4KICA8ZWxsaXBzZSBjeD0iMjAiIGN5PSIyMiIgcng9IjYiIHJ5PSI4IiBmaWxsPSJ1cmwoI3Bhd0dyYWQpIiB0cmFuc2Zvcm09InJvdGF0ZSgtMjAsIDIwLCAyMikiLz4KICA8ZWxsaXBzZSBjeD0iMzIiIGN5PSIxOCIgcng9IjYiIHJ5PSI4IiBmaWxsPSJ1cmwoI3Bhd0dyYWQpIi8+CiAgPGVsbGlwc2UgY3g9IjQ0IiBjeT0iMjIiIHJ4PSI2IiByeT0iOCIgZmlsbD0idXJsKCNwYXdHcmFkKSIgdHJhbnNmb3JtPSJyb3RhdGUoMjAsIDQ0LCAyMikiLz4KICA8IS0tIEhpZ2hsaWdodHMgLS0+CiAgPGVsbGlwc2UgY3g9IjI4IiBjeT0iMzYiIHJ4PSI1IiByeT0iMyIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuMjUiLz4KICA8ZWxsaXBzZSBjeD0iMjAiIGN5PSIyMCIgcng9IjMiIHJ5PSIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4yIiB0cmFuc2Zvcm09InJvdGF0ZSgtMjAsIDIwLCAyMCkiLz4KICA8ZWxsaXBzZSBjeD0iMzIiIGN5PSIxNiIgcng9IjMiIHJ5PSIyIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC4yIi8+CiAgPGVsbGlwc2UgY3g9IjQ0IiBjeT0iMjAiIHJ4PSIzIiByeT0iMiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuMiIgdHJhbnNmb3JtPSJyb3RhdGUoMjAsIDQ0LCAyMCkiLz4KPC9zdmc+
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="pawGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#92400E"/>
+    </linearGradient>
+  </defs>
+  <!-- Main pad -->
+  <path d="M32 38 Q22 32 18 38 Q14 44 20 50 Q24 54 32 54 Q40 54 44 50 Q50 44 46 38 Q42 32 32 38 Z" fill="url(#pawGrad)"/>
+  <!-- Top left toe -->
+  <ellipse cx="18" cy="24" rx="6" ry="7" fill="url(#pawGrad)" transform="rotate(-15, 18, 24)"/>
+  <!-- Top right toe -->
+  <ellipse cx="46" cy="24" rx="6" ry="7" fill="url(#pawGrad)" transform="rotate(15, 46, 24)"/>
+  <!-- Middle left toe -->
+  <ellipse cx="26" cy="18" rx="5.5" ry="7" fill="url(#pawGrad)" transform="rotate(-5, 26, 18)"/>
+  <!-- Middle right toe -->
+  <ellipse cx="38" cy="18" rx="5.5" ry="7" fill="url(#pawGrad)" transform="rotate(5, 38, 18)"/>
+  <!-- Highlight on main pad -->
+  <ellipse cx="30" cy="42" rx="5" ry="4" fill="white" opacity="0.15"/>
+</svg>
