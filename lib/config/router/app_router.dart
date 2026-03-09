@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/di/providers.dart';
-import '../../config/constants/app_constants.dart';
 import '../../ui/features/onboarding/screens/onboarding_screen.dart';
 import '../../ui/features/lock/screens/lock_screen.dart';
 import '../../ui/features/home/screens/home_screen.dart';
@@ -33,56 +31,10 @@ import '../../ui/features/notifications/screens/pending_transactions_screen.dart
 import '../../ui/core/shell/app_shell.dart';
 import 'route_names.dart';
 
-/// FIX: Track whether the user has authenticated through the lock screen
-/// in the current app session. This is reset on cold start.
-/// Using a simple global flag since GoRouter redirect doesn't support async
-/// and we need a synchronous check.
-bool _isSessionAuthenticated = false;
-
-/// Called by LockScreen after successful authentication.
-void markSessionAuthenticated() {
-  _isSessionAuthenticated = true;
-}
-
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-
   return GoRouter(
     initialLocation: '/',
     debugLogDiagnostics: false,
-
-    // FIX: Added redirect guard for onboarding completion and biometric lock.
-    // This ensures:
-    // 1. Users who haven't completed onboarding always see the onboarding screen.
-    // 2. Users with app lock enabled must authenticate before accessing the app.
-    // 3. Users who completed onboarding and don't have lock skip straight to /home.
-    redirect: (context, state) {
-      final onboardingComplete =
-          prefs.getBool(AppConstants.prefOnboardingComplete) ?? false;
-      final lockEnabled =
-          prefs.getBool(AppConstants.prefAppLockEnabled) ?? false;
-      final currentPath = state.uri.path;
-
-      // Not onboarded yet -- force to onboarding.
-      if (!onboardingComplete) {
-        if (currentPath == '/') return null; // already there
-        return '/';
-      }
-
-      // Onboarded but lock is enabled and not yet authenticated this session.
-      if (lockEnabled && !_isSessionAuthenticated) {
-        if (currentPath == '/lock') return null; // already there
-        return '/lock';
-      }
-
-      // Onboarded (+ authenticated if needed) but still on onboarding/lock page.
-      if (currentPath == '/' || currentPath == '/lock') {
-        return '/home';
-      }
-
-      return null; // no redirect needed
-    },
-
     routes: [
       // ── Onboarding ──
       GoRoute(
@@ -169,8 +121,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/budget/:id',
         name: RouteNames.budgetDetail,
-        // FIX: BudgetDetailScreen.budgetId is declared as String.
-        // Pass the raw path parameter directly instead of int.parse().
         builder: (context, state) => BudgetDetailScreen(
           budgetId: state.pathParameters['id']!,
         ),

@@ -7,16 +7,13 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/di/providers.dart';
 import '../../../../config/constants/app_constants.dart';
 import '../../../../config/constants/asset_paths.dart';
-import '../../../../config/router/app_router.dart' show markSessionAuthenticated;
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../providers/lock_provider.dart' as app_lock;
 
 /// Biometric authentication screen displayed when app lock is enabled.
 ///
-/// Auto-triggers authentication on mount. On success, marks the session
-/// as authenticated (so the router redirect stops looping back here)
-/// and navigates to /home.
+/// Auto-triggers authentication on mount. On success, navigates to /home.
 /// On failure, shows a "Try again" button with a shake animation.
 class LockScreen extends ConsumerStatefulWidget {
   const LockScreen({super.key});
@@ -63,9 +60,6 @@ class _LockScreenState extends ConsumerState<LockScreen>
     final available = await notifier.checkBiometricAvailability();
     if (!available) {
       // Biometrics not available -- navigate straight through.
-      // FIX: Mark session as authenticated so the router redirect
-      // doesn't loop back to /lock.
-      markSessionAuthenticated();
       if (mounted) context.goNamed(RouteNames.home);
       return;
     }
@@ -87,9 +81,6 @@ class _LockScreenState extends ConsumerState<LockScreen>
     // Navigate to home on successful authentication.
     ref.listen<app_lock.LockState>(app_lock.lockProvider, (previous, next) {
       if (next.isAuthenticated && !(previous?.isAuthenticated ?? false)) {
-        // FIX: Mark the session as authenticated so the GoRouter redirect
-        // guard knows not to send the user back to /lock.
-        markSessionAuthenticated();
         context.goNamed(RouteNames.home);
       }
       if (next.error != null && previous?.error == null) {
