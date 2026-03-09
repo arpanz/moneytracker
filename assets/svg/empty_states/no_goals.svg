@@ -1,1 +1,35 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMTgwIiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE4MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImVtcHR5QmcyIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGMEZERjQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRUNGREY1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE4MCIgcng9IjE2IiBmaWxsPSJ1cmwoI2VtcHR5QmcyKSIvPgogIDwhLS0gSmFyIGJvZHkgb3V0bGluZSAoZGFzaGVkKSAtLT4KICA8cGF0aCBkPSJNODUgNTAgTDg1IDE0MCBRODUgMTUyIDEwMCAxNTIgTDE0MCAxNTIgUTE1NSAxNTIgMTU1IDE0MCBMMTU1IDUwIiBmaWxsPSJub25lIiBzdHJva2U9IiM4NkVGQUMiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtZGFzaGFycmF5PSI4IDUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8IS0tIEphciBsaWQgLS0+CiAgPHJlY3QgeD0iODAiIHk9IjQwIiB3aWR0aD0iODAiIGhlaWdodD0iMTQiIHJ4PSI1IiBmaWxsPSJub25lIiBzdHJva2U9IiM4NkVGQUMiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtZGFzaGFycmF5PSI2IDQiLz4KICA8IS0tIExpZCBrbm9iIC0tPgogIDxyZWN0IHg9IjExMiIgeT0iMzQiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxMCIgcng9IjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzg2RUZBQyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI0IDMiLz4KICA8IS0tIERhc2hlZCBmaWxsIGxpbmUgKGdvYWwgbGluZSkgLS0+CiAgPGxpbmUgeDE9IjkwIiB5MT0iOTUiIHgyPSIxNTAiIHkyPSI5NSIgc3Ryb2tlPSIjMjJDNTVFIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNSA0IiBvcGFjaXR5PSIwLjUiLz4KICA8IS0tIEFycm93IHBvaW50aW5nIHRvIGZpbGwgbGluZSAtLT4KICA8cGF0aCBkPSJNMTYwIDk1IEwxNjggOTUiIHN0cm9rZT0iIzIyQzU1RSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC41Ii8+CiAgPHBhdGggZD0iTTE2NSA5MSBMMTcwIDk1IEwxNjUgOTkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIyQzU1RSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgb3BhY2l0eT0iMC41Ii8+CiAgPCEtLSBNZWFzdXJlbWVudCBsaW5lcyBvbiBqYXIgc2lkZSAtLT4KICA8bGluZSB4MT0iODIiIHkxPSI3MCIgeDI9Ijg2IiB5Mj0iNzAiIHN0cm9rZT0iI0E3RjNEMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxsaW5lIHgxPSI4MiIgeTE9Ijk1IiB4Mj0iODYiIHkyPSI5NSIgc3Ryb2tlPSIjQTdGM0QwIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGxpbmUgeDE9IjgyIiB5MT0iMTIwIiB4Mj0iODYiIHkyPSIxMjAiIHN0cm9rZT0iI0E3RjNEMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwhLS0gVGFyZ2V0L2J1bGxzZXllIGljb24gLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTg1LCA2MCkiPgogICAgPGNpcmNsZSBjeD0iMCIgY3k9IjAiIHI9IjE4IiBmaWxsPSJub25lIiBzdHJva2U9IiM4NkVGQUMiIHN0cm9rZS13aWR0aD0iMS41IiBvcGFjaXR5PSIwLjUiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIxMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjODZFRkFDIiBzdHJva2Utd2lkdGg9IjEuNSIgb3BhY2l0eT0iMC41Ii8+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjODZFRkFDIiBzdHJva2Utd2lkdGg9IjEuNSIgb3BhY2l0eT0iMC41Ii8+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iMiIgZmlsbD0iIzIyQzU1RSIgb3BhY2l0eT0iMC41Ii8+CiAgPC9nPgogIDwhLS0gU3BhcmtsZSBoaW50IC0tPgogIDxwYXRoIGQ9Ik02NSA2NSBMNjcgNTkgTDY5IDY1IEw3NSA2NyBMNjkgNjkgTDY3IDc1IEw2NSA2OSBMNTkgNjcgWiIgZmlsbD0iIzg2RUZBQyIgb3BhY2l0eT0iMC4zIi8+CiAgPHRleHQgeD0iMTIwIiB5PSIxNzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzZFRTdCNyIgb3BhY2l0eT0iMC44Ij5ObyBnb2FscyBzZXQ8L3RleHQ+Cjwvc3ZnPg==
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" width="240" height="180">
+  <defs>
+    <linearGradient id="emptyBg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F0FDF4"/>
+      <stop offset="100%" stop-color="#ECFDF5"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="180" rx="16" fill="url(#emptyBg2)"/>
+  <!-- Jar body outline (dashed) -->
+  <path d="M85 50 L85 140 Q85 152 100 152 L140 152 Q155 152 155 140 L155 50" fill="none" stroke="#86EFAC" stroke-width="2.5" stroke-dasharray="8 5" stroke-linejoin="round"/>
+  <!-- Jar lid -->
+  <rect x="80" y="40" width="80" height="14" rx="5" fill="none" stroke="#86EFAC" stroke-width="2.5" stroke-dasharray="6 4"/>
+  <!-- Lid knob -->
+  <rect x="112" y="34" width="16" height="10" rx="5" fill="none" stroke="#86EFAC" stroke-width="2" stroke-dasharray="4 3"/>
+  <!-- Dashed fill line (goal line) -->
+  <line x1="90" y1="95" x2="150" y2="95" stroke="#22C55E" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.5"/>
+  <!-- Arrow pointing to fill line -->
+  <path d="M160 95 L168 95" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+  <path d="M165 91 L170 95 L165 99" fill="none" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+  <!-- Measurement lines on jar side -->
+  <line x1="82" y1="70" x2="86" y2="70" stroke="#A7F3D0" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="82" y1="95" x2="86" y2="95" stroke="#A7F3D0" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="82" y1="120" x2="86" y2="120" stroke="#A7F3D0" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Target/bullseye icon -->
+  <g transform="translate(185, 60)">
+    <circle cx="0" cy="0" r="18" fill="none" stroke="#86EFAC" stroke-width="1.5" opacity="0.5"/>
+    <circle cx="0" cy="0" r="12" fill="none" stroke="#86EFAC" stroke-width="1.5" opacity="0.5"/>
+    <circle cx="0" cy="0" r="6" fill="none" stroke="#86EFAC" stroke-width="1.5" opacity="0.5"/>
+    <circle cx="0" cy="0" r="2" fill="#22C55E" opacity="0.5"/>
+  </g>
+  <!-- Sparkle hint -->
+  <path d="M65 65 L67 59 L69 65 L75 67 L69 69 L67 75 L65 69 L59 67 Z" fill="#86EFAC" opacity="0.3"/>
+  <text x="120" y="170" text-anchor="middle" font-family="Arial" font-size="11" fill="#6EE7B7" opacity="0.8">No goals set</text>
+</svg>
