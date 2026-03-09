@@ -80,27 +80,27 @@ class SubscriptionInsight {
 // ── Providers ───────────────────────────────────────────────────────────────
 
 /// Stream of all active subscriptions, kept in sync with the DB.
-final subscriptionListProvider =
-    StreamProvider<List<SubscriptionModel>>((ref) {
+final subscriptionListProvider = StreamProvider<List<SubscriptionModel>>((ref) {
   final repo = ref.watch(subscriptionRepositoryProvider);
   return repo.watchAll();
 });
 
 /// Enriched subscription list with computed costs and days-until-bill.
-final subscriptionsWithCostProvider =
-    Provider<List<SubscriptionWithCost>>((ref) {
+final subscriptionsWithCostProvider = Provider<List<SubscriptionWithCost>>((
+  ref,
+) {
   final subs = ref.watch(subscriptionListProvider).valueOrNull ?? [];
   final now = DateTime.now();
 
   return subs.map((s) {
-    final monthly = _normaliseMonthlyCost(s.amount, s.frequency);
-    final daysUntil = s.nextBillDate.difference(now).inDays;
-    return SubscriptionWithCost(
-      subscription: s,
-      monthlyCost: monthly,
-      daysUntilNextBill: daysUntil,
-    );
-  }).toList()
+      final monthly = _normaliseMonthlyCost(s.amount, s.frequency);
+      final daysUntil = s.nextBillDate.difference(now).inDays;
+      return SubscriptionWithCost(
+        subscription: s,
+        monthlyCost: monthly,
+        daysUntilNextBill: daysUntil,
+      );
+    }).toList()
     ..sort((a, b) => a.daysUntilNextBill.compareTo(b.daysUntilNextBill));
 });
 
@@ -109,8 +109,7 @@ final subscriptionSummaryProvider = Provider<SubscriptionSummary>((ref) {
   final items = ref.watch(subscriptionsWithCostProvider);
   if (items.isEmpty) return SubscriptionSummary.empty;
 
-  final totalMonthly =
-      items.fold<double>(0, (sum, i) => sum + i.monthlyCost);
+  final totalMonthly = items.fold<double>(0, (sum, i) => sum + i.monthlyCost);
   final upcoming = items.where((i) => i.daysUntilNextBill <= 7).length;
 
   return SubscriptionSummary(
@@ -123,8 +122,7 @@ final subscriptionSummaryProvider = Provider<SubscriptionSummary>((ref) {
 });
 
 /// Subscriptions with the next bill coming up within 7 days.
-final upcomingBillsProvider =
-    Provider<List<SubscriptionWithCost>>((ref) {
+final upcomingBillsProvider = Provider<List<SubscriptionWithCost>>((ref) {
   return ref
       .watch(subscriptionsWithCostProvider)
       .where((i) => i.daysUntilNextBill >= 0 && i.daysUntilNextBill <= 7)
@@ -134,8 +132,7 @@ final upcomingBillsProvider =
 /// Potentially wasteful subscriptions.
 /// Heuristic: high-cost subs that were auto-detected, or subs costing
 /// more than the average monthly cost.
-final subscriptionInsightsProvider =
-    Provider<List<SubscriptionInsight>>((ref) {
+final subscriptionInsightsProvider = Provider<List<SubscriptionInsight>>((ref) {
   final items = ref.watch(subscriptionsWithCostProvider);
   final summary = ref.watch(subscriptionSummaryProvider);
   if (items.isEmpty) return [];
@@ -145,22 +142,27 @@ final subscriptionInsightsProvider =
   for (final item in items) {
     // Flag auto-detected subs the user hasn't explicitly confirmed.
     if (item.subscription.isAutoDetected) {
-      insights.add(SubscriptionInsight(
-        subscription: item.subscription,
-        reason: 'Auto-detected — verify this is still needed',
-        potentialSavings: item.monthlyCost,
-      ));
+      insights.add(
+        SubscriptionInsight(
+          subscription: item.subscription,
+          reason: 'Auto-detected — verify this is still needed',
+          potentialSavings: item.monthlyCost,
+        ),
+      );
       continue;
     }
 
     // Flag subs that cost more than 2x the average.
     if (summary.avgMonthlyCost > 0 &&
         item.monthlyCost > summary.avgMonthlyCost * 2) {
-      insights.add(SubscriptionInsight(
-        subscription: item.subscription,
-        reason: 'Costs ${(item.monthlyCost / summary.avgMonthlyCost).toStringAsFixed(1)}x your average subscription',
-        potentialSavings: item.monthlyCost - summary.avgMonthlyCost,
-      ));
+      insights.add(
+        SubscriptionInsight(
+          subscription: item.subscription,
+          reason:
+              'Costs ${(item.monthlyCost / summary.avgMonthlyCost).toStringAsFixed(1)}x your average subscription',
+          potentialSavings: item.monthlyCost - summary.avgMonthlyCost,
+        ),
+      );
     }
   }
 
@@ -168,13 +170,14 @@ final subscriptionInsightsProvider =
 });
 
 /// Auto-detection trigger: scans recent transactions for recurring patterns.
-final autoDetectSubscriptionsProvider =
-    FutureProvider<List<SubscriptionModel>>((ref) async {
-  final repo = ref.watch(subscriptionRepositoryProvider);
-  return repo.detectFromTransactions(
-    ref.watch(transactionRepositoryProvider),
-  );
-});
+final autoDetectSubscriptionsProvider = FutureProvider<List<SubscriptionModel>>(
+  (ref) async {
+    final repo = ref.watch(subscriptionRepositoryProvider);
+    return repo.detectFromTransactions(
+      ref.watch(transactionRepositoryProvider),
+    );
+  },
+);
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
