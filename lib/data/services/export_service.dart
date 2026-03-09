@@ -69,7 +69,6 @@ class ExportService {
         'Amount',
         'Note',
         'Account ID',
-        'From Notification',
       ],
       // Data rows
       ...filtered.map((t) => [
@@ -78,8 +77,7 @@ class ExportService {
             t.category,
             t.amount.toStringAsFixed(2),
             t.note ?? '',
-            t.accountId?.toString() ?? '',
-            t.isFromNotification ? 'Yes' : 'No',
+            t.accountId,
           ]),
     ];
 
@@ -256,8 +254,8 @@ class ExportService {
         'note': t.note,
         'date': t.date.toIso8601String(),
         'accountId': t.accountId,
-        'receiptPath': t.receiptPath,
-        'isFromNotification': t.isFromNotification,
+        'receiptImagePath': t.receiptImagePath,
+        
         'createdAt': t.createdAt.toIso8601String(),
       };
 
@@ -267,21 +265,20 @@ class ExportService {
     ..category = j['category'] as String
     ..note = j['note'] as String?
     ..date = DateTime.parse(j['date'] as String)
-    ..accountId = j['accountId'] as int?
-    ..receiptPath = j['receiptPath'] as String?
-    ..isFromNotification = j['isFromNotification'] as bool? ?? false
-    ..createdAt = DateTime.parse(j['createdAt'] as String);
+    ..accountId = j['accountId'] as String
+    ..receiptImagePath = j['receiptImagePath'] as String?
+        ..createdAt = DateTime.parse(j['createdAt'] as String);
 
   Map<String, dynamic> _accountToJson(AccountModel a) => {
         'name': a.name,
-        'type': a.type,
+        'accountType': a.accountType,
         'balance': a.balance,
         'createdAt': a.createdAt.toIso8601String(),
       };
 
   AccountModel _accountFromJson(Map<String, dynamic> j) => AccountModel()
     ..name = j['name'] as String
-    ..type = j['type'] as int
+    ..accountType = j['accountType'] as int
     ..balance = (j['balance'] as num).toDouble()
     ..createdAt = DateTime.parse(j['createdAt'] as String);
 
@@ -302,9 +299,9 @@ class ExportService {
         'name': g.name,
         'targetAmount': g.targetAmount,
         'currentAmount': g.currentAmount,
-        'deadline': g.deadline.toIso8601String(),
-        'iconName': g.iconName,
-        'colorValue': g.colorValue,
+        'deadline': g.deadline?.toIso8601String(),
+        'icon': g.icon,
+        'color': g.color,
         'linkedAccountId': g.linkedAccountId,
         'createdAt': g.createdAt.toIso8601String(),
       };
@@ -314,9 +311,9 @@ class ExportService {
     ..targetAmount = (j['targetAmount'] as num).toDouble()
     ..currentAmount = (j['currentAmount'] as num).toDouble()
     ..deadline = DateTime.parse(j['deadline'] as String)
-    ..iconName = j['iconName'] as String?
-    ..colorValue = j['colorValue'] as int?
-    ..linkedAccountId = j['linkedAccountId'] as int?
+    ..icon = j['icon'] as String
+    ..color = j['color'] as int
+    ..linkedAccountId = j['linkedAccountId'] as String?
     ..createdAt = DateTime.parse(j['createdAt'] as String);
 
   Map<String, dynamic> _subscriptionToJson(SubscriptionModel s) => {
