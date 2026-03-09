@@ -1,1 +1,67 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJhcjEiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzM0RDM5OSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwNTk2NjkiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJhcjIiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzZFRTdCNyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMzNEQzOTkiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJhcjMiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0ZDRDM0RCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNGNTlFMEIiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9Im1hZ0dsYXNzIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGMEMwNDAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRDQ5NDFDIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJiZ0luc2lnaHQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0YwRkZGNCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNGRUY5RTciLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDwhLS0gQmFja2dyb3VuZCAtLT4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9Ijk1IiBmaWxsPSJ1cmwoI2JnSW5zaWdodCkiLz4KICA8IS0tIENoYXJ0IGJhc2UgbGluZSAtLT4KICA8bGluZSB4MT0iMzAiIHkxPSIxNTUiIHgyPSIxNDAiIHkyPSIxNTUiIHN0cm9rZT0iI0NCRDVFMSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8bGluZSB4MT0iMzAiIHkxPSIxNTUiIHgyPSIzMCIgeTI9IjU1IiBzdHJva2U9IiNDQkQ1RTEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBHcmlkIGxpbmVzIC0tPgogIDxsaW5lIHgxPSIzMCIgeTE9IjEzMCIgeDI9IjE0MCIgeTI9IjEzMCIgc3Ryb2tlPSIjRTJFOEYwIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPgogIDxsaW5lIHgxPSIzMCIgeTE9IjEwNSIgeDI9IjE0MCIgeTI9IjEwNSIgc3Ryb2tlPSIjRTJFOEYwIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPgogIDxsaW5lIHgxPSIzMCIgeTE9IjgwIiB4Mj0iMTQwIiB5Mj0iODAiIHN0cm9rZT0iI0UyRThGMCIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtZGFzaGFycmF5PSI0IDMiLz4KICA8IS0tIEJhciAxIC0tPgogIDxyZWN0IHg9IjQwIiB5PSIxMDAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI1NSIgcng9IjQiIGZpbGw9InVybCgjYmFyMSkiLz4KICA8IS0tIEJhciAyIC0tPgogIDxyZWN0IHg9IjYyIiB5PSI3NSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjgwIiByeD0iNCIgZmlsbD0idXJsKCNiYXIyKSIvPgogIDwhLS0gQmFyIDMgLS0+CiAgPHJlY3QgeD0iODQiIHk9IjExMCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjQ1IiByeD0iNCIgZmlsbD0idXJsKCNiYXIzKSIvPgogIDwhLS0gQmFyIDQgLS0+CiAgPHJlY3QgeD0iMTA2IiB5PSI2NSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjkwIiByeD0iNCIgZmlsbD0idXJsKCNiYXIxKSIvPgogIDwhLS0gQmFyIDUgLS0+CiAgPHJlY3QgeD0iMTI4IiB5PSI4OCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjY3IiByeD0iNCIgZmlsbD0idXJsKCNiYXIyKSIvPgogIDwhLS0gVHJlbmQgbGluZSBvdmVybGF5IC0tPgogIDxwb2x5bGluZSBwb2ludHM9IjQ4LDk1IDcwLDcwIDkyLDEwNSAxMTQsNjAgMTM2LDgzIiBmaWxsPSJub25lIiBzdHJva2U9IiNGNTlFMEIiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIG9wYWNpdHk9IjAuOCIvPgogIDwhLS0gVHJlbmQgZG90cyAtLT4KICA8Y2lyY2xlIGN4PSI0OCIgY3k9Ijk1IiByPSIzIiBmaWxsPSIjRjU5RTBCIi8+CiAgPGNpcmNsZSBjeD0iNzAiIGN5PSI3MCIgcj0iMyIgZmlsbD0iI0Y1OUUwQiIvPgogIDxjaXJjbGUgY3g9IjkyIiBjeT0iMTA1IiByPSIzIiBmaWxsPSIjRjU5RTBCIi8+CiAgPGNpcmNsZSBjeD0iMTE0IiBjeT0iNjAiIHI9IjMiIGZpbGw9IiNGNTlFMEIiLz4KICA8Y2lyY2xlIGN4PSIxMzYiIGN5PSI4MyIgcj0iMyIgZmlsbD0iI0Y1OUUwQiIvPgogIDwhLS0gTWFnbmlmeWluZyBnbGFzcyAtLT4KICA8Y2lyY2xlIGN4PSIxNTIiIGN5PSI2MiIgcj0iMjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0idXJsKCNtYWdHbGFzcykiIHN0cm9rZS13aWR0aD0iNSIvPgogIDxjaXJjbGUgY3g9IjE1MiIgY3k9IjYyIiByPSIxOCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuMyIvPgogIDwhLS0gR2xhc3MgaGFuZGxlIC0tPgogIDxsaW5lIHgxPSIxNjgiIHkxPSI3OCIgeDI9IjE4MiIgeTI9Ijk1IiBzdHJva2U9IiNENDk0MUMiIHN0cm9rZS13aWR0aD0iNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBTcGFya2xlIDEgLS0+CiAgPHBhdGggZD0iTTE1MiAzOCBMMTU0IDMwIEwxNTYgMzggTDE2NCA0MCBMMTU2IDQyIEwxNTQgNTAgTDE1MiA0MiBMMTQ0IDQwIFoiIGZpbGw9IiNGMEMwNDAiIG9wYWNpdHk9IjAuOCIvPgogIDwhLS0gU3BhcmtsZSAyIC0tPgogIDxwYXRoIGQ9Ik0xNzIgNDggTDE3MyA0NCBMMTc0IDQ4IEwxNzggNDkgTDE3NCA1MCBMMTczIDU0IEwxNzIgNTAgTDE2OCA0OSBaIiBmaWxsPSIjMzREMzk5IiBvcGFjaXR5PSIwLjciLz4KICA8IS0tIFNwYXJrbGUgMyAtLT4KICA8cGF0aCBkPSJNMjIgNDUgTDI0IDM4IEwyNiA0NSBMMzMgNDcgTDI2IDQ5IEwyNCA1NiBMMjIgNDkgTDE1IDQ3IFoiIGZpbGw9IiNGMEMwNDAiIG9wYWNpdHk9IjAuNiIvPgogIDwhLS0gU21hbGwgc3BhcmtsZSBkb3RzIC0tPgogIDxjaXJjbGUgY3g9IjE2MCIgY3k9IjMwIiByPSIyIiBmaWxsPSIjRjU5RTBCIiBvcGFjaXR5PSIwLjYiLz4KICA8Y2lyY2xlIGN4PSIxNzUiIGN5PSIzOCIgcj0iMS41IiBmaWxsPSIjMzREMzk5IiBvcGFjaXR5PSIwLjUiLz4KICA8Y2lyY2xlIGN4PSIxOCIgY3k9IjYwIiByPSIyIiBmaWxsPSIjRjBDMDQwIiBvcGFjaXR5PSIwLjUiLz4KPC9zdmc+
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bar1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="bar2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6EE7B7"/>
+      <stop offset="100%" stop-color="#34D399"/>
+    </linearGradient>
+    <linearGradient id="bar3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="magGlass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F0C040"/>
+      <stop offset="100%" stop-color="#D4941C"/>
+    </linearGradient>
+    <linearGradient id="bgInsight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F0FFF4"/>
+      <stop offset="100%" stop-color="#FEF9E7"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <circle cx="100" cy="100" r="95" fill="url(#bgInsight)"/>
+  <!-- Chart base line -->
+  <line x1="30" y1="155" x2="140" y2="155" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
+  <line x1="30" y1="155" x2="30" y2="55" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
+  <!-- Grid lines -->
+  <line x1="30" y1="130" x2="140" y2="130" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4 3"/>
+  <line x1="30" y1="105" x2="140" y2="105" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4 3"/>
+  <line x1="30" y1="80" x2="140" y2="80" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- Bar 1 -->
+  <rect x="40" y="100" width="16" height="55" rx="4" fill="url(#bar1)"/>
+  <!-- Bar 2 -->
+  <rect x="62" y="75" width="16" height="80" rx="4" fill="url(#bar2)"/>
+  <!-- Bar 3 -->
+  <rect x="84" y="110" width="16" height="45" rx="4" fill="url(#bar3)"/>
+  <!-- Bar 4 -->
+  <rect x="106" y="65" width="16" height="90" rx="4" fill="url(#bar1)"/>
+  <!-- Bar 5 -->
+  <rect x="128" y="88" width="16" height="67" rx="4" fill="url(#bar2)"/>
+  <!-- Trend line overlay -->
+  <polyline points="48,95 70,70 92,105 114,60 136,83" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+  <!-- Trend dots -->
+  <circle cx="48" cy="95" r="3" fill="#F59E0B"/>
+  <circle cx="70" cy="70" r="3" fill="#F59E0B"/>
+  <circle cx="92" cy="105" r="3" fill="#F59E0B"/>
+  <circle cx="114" cy="60" r="3" fill="#F59E0B"/>
+  <circle cx="136" cy="83" r="3" fill="#F59E0B"/>
+  <!-- Magnifying glass -->
+  <circle cx="152" cy="62" r="22" fill="none" stroke="url(#magGlass)" stroke-width="5"/>
+  <circle cx="152" cy="62" r="18" fill="white" opacity="0.3"/>
+  <!-- Glass handle -->
+  <line x1="168" y1="78" x2="182" y2="95" stroke="#D4941C" stroke-width="6" stroke-linecap="round"/>
+  <!-- Sparkle 1 -->
+  <path d="M152 38 L154 30 L156 38 L164 40 L156 42 L154 50 L152 42 L144 40 Z" fill="#F0C040" opacity="0.8"/>
+  <!-- Sparkle 2 -->
+  <path d="M172 48 L173 44 L174 48 L178 49 L174 50 L173 54 L172 50 L168 49 Z" fill="#34D399" opacity="0.7"/>
+  <!-- Sparkle 3 -->
+  <path d="M22 45 L24 38 L26 45 L33 47 L26 49 L24 56 L22 49 L15 47 Z" fill="#F0C040" opacity="0.6"/>
+  <!-- Small sparkle dots -->
+  <circle cx="160" cy="30" r="2" fill="#F59E0B" opacity="0.6"/>
+  <circle cx="175" cy="38" r="1.5" fill="#34D399" opacity="0.5"/>
+  <circle cx="18" cy="60" r="2" fill="#F0C040" opacity="0.5"/>
+</svg>
