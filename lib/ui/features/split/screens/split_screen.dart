@@ -103,15 +103,15 @@ class _SummaryHeader extends StatelessWidget {
     final colors = theme.colorScheme;
 
     return Container(
-      margin: const EdgeInsets.all(AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      margin: const EdgeInsets.all(Spacing.md),
+      padding: const EdgeInsets.all(Spacing.lg),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [colors.primaryContainer, colors.secondaryContainer],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        borderRadius: Radii.borderLg,
       ),
       child: Row(
         children: [
@@ -125,7 +125,7 @@ class _SummaryHeader extends StatelessWidget {
                     color: colors.onPrimaryContainer.withOpacity(0.7),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xs),
+                const SizedBox(height: Spacing.xs),
                 Text(
                   '\$${summary.totalOwedToYou.toStringAsFixed(2)}',
                   style: theme.textTheme.headlineMedium?.copyWith(
@@ -143,7 +143,7 @@ class _SummaryHeader extends StatelessWidget {
                 label: '${summary.activeSplits} active',
                 color: colors.primary,
               ),
-              const SizedBox(height: AppSpacing.xs),
+              const SizedBox(height: Spacing.xs),
               _StatChip(
                 label: '${summary.totalSplits} total',
                 color: colors.secondary,
@@ -165,12 +165,12 @@ class _StatChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xxs,
+        horizontal: Spacing.sm,
+        vertical: Spacing.xs,
       ),
       decoration: BoxDecoration(
         color: color.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        borderRadius: Radii.borderSm,
       ),
       child: Text(
         label,
@@ -197,7 +197,7 @@ class _ActiveSplitsTab extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
       itemCount: splits.length,
       itemBuilder: (context, index) {
         final split = splits[index];
@@ -223,12 +223,12 @@ class _SplitCard extends ConsumerWidget {
     final progress = total > 0 ? settled / total : 0.0;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      margin: const EdgeInsets.only(bottom: Spacing.sm),
       child: InkWell(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: Radii.borderMd,
         onTap: () => _showSplitDetail(context, ref, split),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: const EdgeInsets.all(Spacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -239,7 +239,7 @@ class _SplitCard extends ConsumerWidget {
                     color: colors.primary,
                     size: 20,
                   ),
-                  const SizedBox(width: AppSpacing.sm),
+                  const SizedBox(width: Spacing.sm),
                   Expanded(
                     child: Text(
                       split.description,
@@ -256,7 +256,7 @@ class _SplitCard extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: Spacing.sm),
               // Participant avatars
               Row(
                 children: [
@@ -295,7 +295,7 @@ class _SplitCard extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: Spacing.sm),
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
@@ -337,8 +337,7 @@ class _SplitCard extends ConsumerWidget {
       isScrollControlled: true,
       backgroundColor: colors.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusLg)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.lg)),
       ),
       builder: (ctx) => DraggableScrollableSheet(
         initialChildSize: 0.6,
@@ -347,7 +346,7 @@ class _SplitCard extends ConsumerWidget {
         expand: false,
         builder: (_, controller) => ListView(
           controller: controller,
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: const EdgeInsets.all(Spacing.lg),
           children: [
             Center(
               child: Container(
@@ -359,17 +358,17 @@ class _SplitCard extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: Spacing.lg),
             Text(split.description,
                 style: theme.textTheme.headlineSmall),
-            const SizedBox(height: AppSpacing.xs),
+            const SizedBox(height: Spacing.xs),
             Text(
               'Total: \$${split.totalAmount.toStringAsFixed(2)} | ${_splitMethodLabel(split.splitMethod)}',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colors.onSurfaceVariant,
               ),
             ),
-            const Divider(height: AppSpacing.xl),
+            const Divider(height: Spacing.xl),
             ...split.participants.map((p) => _ParticipantTile(
                   participant: p,
                   splitId: split.id,
@@ -444,7 +443,7 @@ class _ParticipantTile extends StatelessWidget {
             ),
           ),
           if (!participant.isSettled) ...[
-            const SizedBox(width: AppSpacing.xs),
+            const SizedBox(width: Spacing.xs),
             IconButton(
               icon: Icon(Icons.check_circle_outline_rounded,
                   color: colors.primary, size: 22),
@@ -491,14 +490,14 @@ class _BalancesTab extends StatelessWidget {
 
     final theme = Theme.of(context);
     return ListView.separated(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.all(Spacing.md),
       itemCount: balances.length,
       separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final b = balances[index];
         return ListTile(
           contentPadding:
-              const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+              const EdgeInsets.symmetric(vertical: Spacing.xs),
           leading: CircleAvatar(
             backgroundColor: b.isSettled
                 ? Colors.green.withOpacity(0.15)
@@ -562,13 +561,13 @@ class _HistoryTab extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.all(Spacing.md),
       itemCount: splits.length,
       itemBuilder: (context, index) {
         final split = splits[index];
         final theme = Theme.of(context);
         return Card(
-          margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+          margin: const EdgeInsets.only(bottom: Spacing.sm),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: Colors.green.withOpacity(0.15),
@@ -619,14 +618,14 @@ class _EmptyState extends StatelessWidget {
     final theme = Theme.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xxl),
+        padding: const EdgeInsets.all(Spacing.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SvgPicture.asset(svg, height: 120),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: Spacing.lg),
             Text(title, style: theme.textTheme.titleMedium),
-            const SizedBox(height: AppSpacing.xs),
+            const SizedBox(height: Spacing.xs),
             Text(
               subtitle,
               style: theme.textTheme.bodyMedium?.copyWith(

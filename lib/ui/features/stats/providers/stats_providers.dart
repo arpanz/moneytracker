@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/di/providers.dart';
 import '../../../../config/theme/theme_extensions.dart';
 import '../../../../config/theme/theme_provider.dart';
-import '../../../../config/theme/vibe_themes.dart';
 
 // ── Enums ───────────────────────────────────────────────────────────────────
 
@@ -95,8 +94,7 @@ final categoryBreakdownProvider = FutureProvider<List<CategoryTotal>>((
   if (totals.isEmpty) return [];
 
   final grandTotal = totals.values.fold<double>(0.0, (sum, v) => sum + v);
-  final vibeData = vibeThemes[themeState.vibeTheme]!;
-  final chartColors = vibeData.chartColors;
+  final chartColors = themeState.vibeTheme.data.chartColors;
 
   final categories = totals.entries.toList()
     ..sort((a, b) => b.value.compareTo(a.value));
