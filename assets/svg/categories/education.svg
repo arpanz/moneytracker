@@ -1,1 +1,22 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZWR1R3JhZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMUU0MEFGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFFM0E1RiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBDYXAgdG9wIChtb3J0YXJib2FyZCkgLS0+CiAgPHBvbHlnb24gcG9pbnRzPSIzMiwxMiA0LDI4IDMyLDM4IDYwLDI4IiBmaWxsPSJ1cmwoI2VkdUdyYWQpIiBzdHJva2U9IiMxRTNBNUYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSBDYXAgYmFuZCBiZWxvdyAtLT4KICA8cGF0aCBkPSJNMTYgMzIgTDE2IDQ0IFExNiA1MCAzMiA1MiBRNDggNTAgNDggNDQgTDQ4IDMyIEwzMiAzOCBMMTYgMzIgWiIgZmlsbD0iIzI1NjNFQiIgc3Ryb2tlPSIjMUU0MEFGIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDwhLS0gQnV0dG9uIG9uIHRvcCAtLT4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjE0IiByPSIyLjUiIGZpbGw9IiNGQ0QzNEQiLz4KICA8IS0tIFRhc3NlbCBzdHJpbmcgLS0+CiAgPHBhdGggZD0iTTMyIDE0IFEzOCAxNiA1MCAxOCBMNTAgMjAgUTUwIDI0IDUyIDMyIEw1MiAzOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkNEMzREIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwhLS0gVGFzc2VsIGVuZCAtLT4KICA8cGF0aCBkPSJNNTAgMzYgTDU0IDM2IEw1MyA0NCBMNTEgNDQgWiIgZmlsbD0iI0ZDRDM0RCIvPgogIDxsaW5lIHgxPSI1MCIgeTE9IjQ0IiB4Mj0iNTAiIHkyPSI0OCIgc3Ryb2tlPSIjRkNEMzREIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxsaW5lIHgxPSI1MiIgeTE9IjQ0IiB4Mj0iNTIiIHkyPSI0OSIgc3Ryb2tlPSIjRkNEMzREIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxsaW5lIHgxPSI1NCIgeTE9IjQ0IiB4Mj0iNTQiIHkyPSI0NyIgc3Ryb2tlPSIjRkNEMzREIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="eduGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1E40AF"/>
+      <stop offset="100%" stop-color="#1E3A5F"/>
+    </linearGradient>
+  </defs>
+  <!-- Cap top (mortarboard) -->
+  <polygon points="32,12 4,28 32,38 60,28" fill="url(#eduGrad)" stroke="#1E3A5F" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Cap band below -->
+  <path d="M16 32 L16 44 Q16 50 32 52 Q48 50 48 44 L48 32 L32 38 L16 32 Z" fill="#2563EB" stroke="#1E40AF" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Button on top -->
+  <circle cx="32" cy="14" r="2.5" fill="#FCD34D"/>
+  <!-- Tassel string -->
+  <path d="M32 14 Q38 16 50 18 L50 20 Q50 24 52 32 L52 38" fill="none" stroke="#FCD34D" stroke-width="2" stroke-linecap="round"/>
+  <!-- Tassel end -->
+  <path d="M50 36 L54 36 L53 44 L51 44 Z" fill="#FCD34D"/>
+  <line x1="50" y1="44" x2="50" y2="48" stroke="#FCD34D" stroke-width="1" stroke-linecap="round"/>
+  <line x1="52" y1="44" x2="52" y2="49" stroke="#FCD34D" stroke-width="1" stroke-linecap="round"/>
+  <line x1="54" y1="44" x2="54" y2="47" stroke="#FCD34D" stroke-width="1" stroke-linecap="round"/>
+</svg>
