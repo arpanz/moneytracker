@@ -45,21 +45,26 @@ class TransactionRepository {
   /// Returns all transactions with optional pagination.
   ///
   /// Results are ordered by [date] descending (newest first).
+  ///
+  /// FIX: Removed `dynamic` typing that caused NoSuchMethodError at runtime.
+  /// Isar's `.offset()`, `.limit()`, and `.findAll()` are extension methods
+  /// on specific generic QueryBuilder types. Casting to `dynamic` strips
+  /// those extensions, making them invisible at runtime. Instead, we use
+  /// explicit branches to keep the full type chain intact.
   Future<List<TransactionModel>> getAll({int? limit, int? offset}) async {
-    // Use dynamic to avoid QueryBuilder type-parameter mismatch when
-    // chaining offset/limit after sortByDateDesc.
-    dynamic query = _isar.transactionModels
+    final baseQuery = _isar.transactionModels
         .where()
         .sortByDateDesc();
 
-    if (offset != null && offset > 0) {
-      query = query.offset(offset);
-    }
-    if (limit != null && limit > 0) {
-      query = query.limit(limit);
+    if (offset != null && offset > 0 && limit != null && limit > 0) {
+      return baseQuery.offset(offset).limit(limit).findAll();
+    } else if (limit != null && limit > 0) {
+      return baseQuery.limit(limit).findAll();
+    } else if (offset != null && offset > 0) {
+      return baseQuery.offset(offset).findAll();
     }
 
-    return (query as dynamic).findAll() as Future<List<TransactionModel>>;
+    return baseQuery.findAll();
   }
 
   // -- FILTERED QUERIES ------------------------------------------------------
