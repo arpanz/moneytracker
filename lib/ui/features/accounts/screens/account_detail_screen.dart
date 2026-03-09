@@ -10,7 +10,7 @@ import '../../../../domain/models/transaction_model.dart';
 
 /// Account detail screen showing balance, recent transactions, and actions.
 class AccountDetailScreen extends ConsumerStatefulWidget {
-  final String accountId;
+  final int accountId;
   const AccountDetailScreen({super.key, required this.accountId});
 
   @override
@@ -29,8 +29,7 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
   }
 
   Future<void> _load() async {
-    final id = int.tryParse(widget.accountId);
-    if (id == null) return;
+    final id = widget.accountId;
 
     final accountRepo = ref.read(accountRepositoryProvider);
     final txnRepo = ref.read(transactionRepositoryProvider);
@@ -104,9 +103,9 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
             ),
             child: Column(
               children: [
-                Text(_accountTypeLabel(account.type),
+                Text(_accountTypeLabel(account.accountType),
                     style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onPrimaryContainer.withOpacity(0.7))),
+                        color: colors.onPrimaryContainer.withValues(alpha: 0.7))),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   '\$${account.balance.toStringAsFixed(2)}',
@@ -125,14 +124,14 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
                       color: Colors.green,
                     ),
                     Container(width: 1, height: 30,
-                        color: colors.onPrimaryContainer.withOpacity(0.2)),
+                        color: colors.onPrimaryContainer.withValues(alpha: 0.2)),
                     _MiniStat(
                       label: 'Expenses',
                       value: '\$${expenses.toStringAsFixed(0)}',
                       color: colors.error,
                     ),
                     Container(width: 1, height: 30,
-                        color: colors.onPrimaryContainer.withOpacity(0.2)),
+                        color: colors.onPrimaryContainer.withValues(alpha: 0.2)),
                     _MiniStat(
                       label: 'Transactions',
                       value: '${_transactions.length}',
@@ -169,7 +168,7 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
                   contentPadding: EdgeInsets.zero,
                   leading: CircleAvatar(
                     backgroundColor: isIncome
-                        ? Colors.green.withOpacity(0.15)
+                        ? Colors.green.withValues(alpha: 0.15)
                         : colors.errorContainer,
                     child: Icon(
                       isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
@@ -264,7 +263,7 @@ class _MiniStat extends StatelessWidget {
             fontWeight: FontWeight.bold, color: color)),
         const SizedBox(height: 2),
         Text(label, style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onPrimaryContainer.withOpacity(0.6))),
+            color: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.6))),
       ],
     );
   }
