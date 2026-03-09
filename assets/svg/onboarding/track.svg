@@ -1,1 +1,66 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InBob25lQmciIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzZDNjNGRiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMzRjNEOUUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InNjcmVlbkdyYWQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0U4RjVGRiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNGMEVFRkYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImhhbmRHcmFkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkRCQjUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRjBCODhBIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJjb2luR3JhZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkZENzAwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0U4QTgyOCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBCYWNrZ3JvdW5kIC0tPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iOTUiIGZpbGw9IiNGM0YwRkYiIG9wYWNpdHk9IjAuNiIvPgogIDwhLS0gSGFuZCAtLT4KICA8cGF0aCBkPSJNNjAgMTgwIFE1MCAxNzAgNTUgMTQwIEw2MCAxMTAgUTYyIDEwMCA3MiA5OCBMODAgOTYgUTkwIDk0IDkyIDEwNCBMOTIgMTMwIFE5MiAxNDAgODggMTUwIEw4MCAxNzUgUTc1IDE4NSA2NSAxODIgWiIgZmlsbD0idXJsKCNoYW5kR3JhZCkiIHN0cm9rZT0iI0Q0OTU2QSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8IS0tIFRodW1iIC0tPgogIDxwYXRoIGQ9Ik02MCAxMzAgUTQ4IDEyNSA0NiAxMTUgUTQ0IDEwOCA1MiAxMDYgUTU4IDEwNSA2MiAxMTIiIGZpbGw9InVybCgjaGFuZEdyYWQpIiBzdHJva2U9IiNENDk1NkEiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSBQaG9uZSBib2R5IC0tPgogIDxyZWN0IHg9IjY4IiB5PSIzNSIgd2lkdGg9IjY0IiBoZWlnaHQ9IjEyMCIgcng9IjEyIiByeT0iMTIiIGZpbGw9InVybCgjcGhvbmVCZykiIHN0cm9rZT0iIzJEMjg3MCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8IS0tIFBob25lIHNjcmVlbiAtLT4KICA8cmVjdCB4PSI3MyIgeT0iNDUiIHdpZHRoPSI1NCIgaGVpZ2h0PSIxMDAiIHJ4PSI2IiByeT0iNiIgZmlsbD0idXJsKCNzY3JlZW5HcmFkKSIvPgogIDwhLS0gU2NyZWVuIGNvbnRlbnQ6IG1pbmkgZXhwZW5zZSBsaW5lcyAtLT4KICA8cmVjdCB4PSI3OCIgeT0iNTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzZDNjNGRiIgb3BhY2l0eT0iMC40Ii8+CiAgPHJlY3QgeD0iNzgiIHk9IjYyIiB3aWR0aD0iNDQiIGhlaWdodD0iMyIgcng9IjEuNSIgZmlsbD0iIzk5OSIgb3BhY2l0eT0iMC4zIi8+CiAgPHJlY3QgeD0iNzgiIHk9IjcwIiB3aWR0aD0iMzgiIGhlaWdodD0iMyIgcng9IjEuNSIgZmlsbD0iIzk5OSIgb3BhY2l0eT0iMC4zIi8+CiAgPHJlY3QgeD0iNzgiIHk9Ijc4IiB3aWR0aD0iNDIiIGhlaWdodD0iMyIgcng9IjEuNSIgZmlsbD0iIzk5OSIgb3BhY2l0eT0iMC4zIi8+CiAgPCEtLSBNaW5pIGNoYXJ0IGJhcnMgb24gc2NyZWVuIC0tPgogIDxyZWN0IHg9IjgwIiB5PSI5NSIgd2lkdGg9IjYiIGhlaWdodD0iMTgiIHJ4PSIyIiBmaWxsPSIjMEQ5NDg4IiBvcGFjaXR5PSIwLjYiLz4KICA8cmVjdCB4PSI4OSIgeT0iMTAwIiB3aWR0aD0iNiIgaGVpZ2h0PSIxMyIgcng9IjIiIGZpbGw9IiMwRDk0ODgiIG9wYWNpdHk9IjAuNSIvPgogIDxyZWN0IHg9Ijk4IiB5PSI4OCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIHJ4PSIyIiBmaWxsPSIjMEQ5NDg4IiBvcGFjaXR5PSIwLjciLz4KICA8cmVjdCB4PSIxMDciIHk9IjkzIiB3aWR0aD0iNiIgaGVpZ2h0PSIyMCIgcng9IjIiIGZpbGw9IiMwRDk0ODgiIG9wYWNpdHk9IjAuNTUiLz4KICA8cmVjdCB4PSIxMTYiIHk9Ijk4IiB3aWR0aD0iNiIgaGVpZ2h0PSIxNSIgcng9IjIiIGZpbGw9IiMwRDk0ODgiIG9wYWNpdHk9IjAuNDUiLz4KICA8IS0tIEZsb2F0aW5nIGNvaW4gMSAtLT4KICA8Y2lyY2xlIGN4PSIxNTAiIGN5PSI0NSIgcj0iMTQiIGZpbGw9InVybCgjY29pbkdyYWQpIiBzdHJva2U9IiNCODg2MEIiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMTUwIiB5PSI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzhCNjkxNCI+JDwvdGV4dD4KICA8IS0tIEZsb2F0aW5nIGNvaW4gMiAoc21hbGxlcikgLS0+CiAgPGNpcmNsZSBjeD0iNDIiIGN5PSI1NSIgcj0iMTAiIGZpbGw9InVybCgjY29pbkdyYWQpIiBzdHJva2U9IiNCODg2MEIiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC44Ii8+CiAgPHRleHQgeD0iNDIiIHk9IjU5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXNpemU9IjEwIiBmaWxsPSIjOEI2OTE0Ij4kPC90ZXh0PgogIDwhLS0gRmxvYXRpbmcgcmVjZWlwdCAtLT4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNDgsIDc4KSByb3RhdGUoMTIpIj4KICAgIDxwYXRoIGQ9Ik0wIDAgTDI0IDAgTDI0IDMyIEwyMSAyOCBMMTggMzIgTDE1IDI4IEwxMiAzMiBMOSAyOCBMNiAzMiBMMyAyOCBMMCAzMiBaIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjQ0NDIiBzdHJva2Utd2lkdGg9IjEiLz4KICAgIDxsaW5lIHgxPSI1IiB5MT0iOCIgeDI9IjE5IiB5Mj0iOCIgc3Ryb2tlPSIjREREIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8bGluZSB4MT0iNSIgeTE9IjE0IiB4Mj0iMTYiIHkyPSIxNCIgc3Ryb2tlPSIjREREIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8bGluZSB4MT0iNSIgeTE9IjIwIiB4Mj0iMTkiIHkyPSIyMCIgc3Ryb2tlPSIjREREIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPC9nPgogIDwhLS0gRmxvYXRpbmcgY2FydCBpY29uIC0tPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI4LCA4NSkiPgogICAgPHBhdGggZD0iTTIgMiBMOCAyIEwxMiAxOCBMMjggMTggTDMwIDggTDEwIDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBEOTQ4OCIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogICAgPGNpcmNsZSBjeD0iMTQiIGN5PSIyNCIgcj0iMyIgZmlsbD0iIzBEOTQ4OCIvPgogICAgPGNpcmNsZSBjeD0iMjYiIGN5PSIyNCIgcj0iMyIgZmlsbD0iIzBEOTQ4OCIvPgogIDwvZz4KICA8IS0tIFNwYXJrbGVzIC0tPgogIDxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzZDNjNGRiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC41Ij4KICAgIDxwYXRoIGQ9Ik0xNjAgMjggTDE2MiAyMiBMMTY0IDI4IEwxNzAgMzAgTDE2NCAzMiBMMTYyIDM4IEwxNjAgMzIgTDE1NCAzMCBaIi8+CiAgICA8cGF0aCBkPSJNMzAgNDAgTDMxIDM2IEwzMiA0MCBMMzYgNDEgTDMyIDQyIEwzMSA0NiBMMzAgNDIgTDI2IDQxIFoiLz4KICA8L2c+Cjwvc3ZnPg==
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="phoneBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6C63FF"/>
+      <stop offset="100%" stop-color="#3F3D9E"/>
+    </linearGradient>
+    <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E8F5FF"/>
+      <stop offset="100%" stop-color="#F0EEFF"/>
+    </linearGradient>
+    <linearGradient id="handGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFDBB5"/>
+      <stop offset="100%" stop-color="#F0B88A"/>
+    </linearGradient>
+    <linearGradient id="coinGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD700"/>
+      <stop offset="100%" stop-color="#E8A828"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <circle cx="100" cy="100" r="95" fill="#F3F0FF" opacity="0.6"/>
+  <!-- Hand -->
+  <path d="M60 180 Q50 170 55 140 L60 110 Q62 100 72 98 L80 96 Q90 94 92 104 L92 130 Q92 140 88 150 L80 175 Q75 185 65 182 Z" fill="url(#handGrad)" stroke="#D4956A" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Thumb -->
+  <path d="M60 130 Q48 125 46 115 Q44 108 52 106 Q58 105 62 112" fill="url(#handGrad)" stroke="#D4956A" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Phone body -->
+  <rect x="68" y="35" width="64" height="120" rx="12" ry="12" fill="url(#phoneBg)" stroke="#2D2870" stroke-width="1.5"/>
+  <!-- Phone screen -->
+  <rect x="73" y="45" width="54" height="100" rx="6" ry="6" fill="url(#screenGrad)"/>
+  <!-- Screen content: mini expense lines -->
+  <rect x="78" y="52" width="30" height="4" rx="2" fill="#6C63FF" opacity="0.4"/>
+  <rect x="78" y="62" width="44" height="3" rx="1.5" fill="#999" opacity="0.3"/>
+  <rect x="78" y="70" width="38" height="3" rx="1.5" fill="#999" opacity="0.3"/>
+  <rect x="78" y="78" width="42" height="3" rx="1.5" fill="#999" opacity="0.3"/>
+  <!-- Mini chart bars on screen -->
+  <rect x="80" y="95" width="6" height="18" rx="2" fill="#0D9488" opacity="0.6"/>
+  <rect x="89" y="100" width="6" height="13" rx="2" fill="#0D9488" opacity="0.5"/>
+  <rect x="98" y="88" width="6" height="25" rx="2" fill="#0D9488" opacity="0.7"/>
+  <rect x="107" y="93" width="6" height="20" rx="2" fill="#0D9488" opacity="0.55"/>
+  <rect x="116" y="98" width="6" height="15" rx="2" fill="#0D9488" opacity="0.45"/>
+  <!-- Floating coin 1 -->
+  <circle cx="150" cy="45" r="14" fill="url(#coinGrad)" stroke="#B8860B" stroke-width="1.5"/>
+  <text x="150" y="50" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="14" fill="#8B6914">$</text>
+  <!-- Floating coin 2 (smaller) -->
+  <circle cx="42" cy="55" r="10" fill="url(#coinGrad)" stroke="#B8860B" stroke-width="1" opacity="0.8"/>
+  <text x="42" y="59" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="10" fill="#8B6914">$</text>
+  <!-- Floating receipt -->
+  <g transform="translate(148, 78) rotate(12)">
+    <path d="M0 0 L24 0 L24 32 L21 28 L18 32 L15 28 L12 32 L9 28 L6 32 L3 28 L0 32 Z" fill="white" stroke="#CCC" stroke-width="1"/>
+    <line x1="5" y1="8" x2="19" y2="8" stroke="#DDD" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="5" y1="14" x2="16" y2="14" stroke="#DDD" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="5" y1="20" x2="19" y2="20" stroke="#DDD" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  <!-- Floating cart icon -->
+  <g transform="translate(28, 85)">
+    <path d="M2 2 L8 2 L12 18 L28 18 L30 8 L10 8" fill="none" stroke="#0D9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="14" cy="24" r="3" fill="#0D9488"/>
+    <circle cx="26" cy="24" r="3" fill="#0D9488"/>
+  </g>
+  <!-- Sparkles -->
+  <g fill="none" stroke="#6C63FF" stroke-width="1.5" stroke-linecap="round" opacity="0.5">
+    <path d="M160 28 L162 22 L164 28 L170 30 L164 32 L162 38 L160 32 L154 30 Z"/>
+    <path d="M30 40 L31 36 L32 40 L36 41 L32 42 L31 46 L30 42 L26 41 Z"/>
+  </g>
+</svg>
