@@ -1,1 +1,19 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ic2hvcEdyYWQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0Y0NzJCNiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNEQjI3NzciLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDwhLS0gQmFnIGJvZHkgLS0+CiAgPHBhdGggZD0iTTE0IDIyIEwxMiA1NCBRMTIgNTYgMTQgNTYgTDUwIDU2IFE1MiA1NiA1MiA1NCBMNTAgMjIgWiIgZmlsbD0idXJsKCNzaG9wR3JhZCkiIHN0cm9rZT0iI0JFMTg1RCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8IS0tIEJhZyBmb2xkL3RvcCAtLT4KICA8cGF0aCBkPSJNMTQgMjIgTDUwIDIyIiBzdHJva2U9IiNCRTE4NUQiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBIYW5kbGVzIC0tPgogIDxwYXRoIGQ9Ik0yMiAyMiBRMjIgMTAgMzIgMTAgUTQyIDEwIDQyIDIyIiBmaWxsPSJub25lIiBzdHJva2U9IiNCRTE4NUQiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBIZWFydCAtLT4KICA8cGF0aCBkPSJNMzIgMzYgUTMyIDMwIDI3IDMwIFEyMiAzMCAyMiAzNiBRMjIgNDIgMzIgNDggUTQyIDQyIDQyIDM2IFE0MiAzMCAzNyAzMCBRMzIgMzAgMzIgMzYgWiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPgogIDwhLS0gU2hpbmUgb24gYmFnIC0tPgogIDxwYXRoIGQ9Ik0xNiAyNiBMMTcgNDgiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9IjAuMyIvPgo8L3N2Zz4=
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="shopGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F472B6"/>
+      <stop offset="100%" stop-color="#DB2777"/>
+    </linearGradient>
+  </defs>
+  <!-- Bag body -->
+  <path d="M14 22 L12 54 Q12 56 14 56 L50 56 Q52 56 52 54 L50 22 Z" fill="url(#shopGrad)" stroke="#BE185D" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Bag fold/top -->
+  <path d="M14 22 L50 22" stroke="#BE185D" stroke-width="2" stroke-linecap="round"/>
+  <!-- Handles -->
+  <path d="M22 22 Q22 10 32 10 Q42 10 42 22" fill="none" stroke="#BE185D" stroke-width="3" stroke-linecap="round"/>
+  <!-- Heart -->
+  <path d="M32 36 Q32 30 27 30 Q22 30 22 36 Q22 42 32 48 Q42 42 42 36 Q42 30 37 30 Q32 30 32 36 Z" fill="white" opacity="0.9"/>
+  <!-- Shine on bag -->
+  <path d="M16 26 L17 48" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+</svg>
