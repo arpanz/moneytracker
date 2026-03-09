@@ -30,10 +30,13 @@ class AddBudgetScreen extends ConsumerStatefulWidget {
 class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
   double _amount = 0.0;
   String? _selectedCategory;
-  int _period = 1; // default: monthly
+  // FIX #8: default is 1 (Monthly) — confirmed to match _periodLabel mapping
+  // in budget_screen.dart where 1 → 'Monthly'. Previously was already correct
+  // but the comment and mapping are now explicit.
+  int _period = 1;
   DateTime _startDate = DateTime.now();
   bool _isSaving = false;
-  int _currentStep = 0; // 0 = category, 1 = amount, 2 = period
+  int _currentStep = 0;
 
   bool get _isEditing => widget.existingBudget != null;
 
@@ -46,7 +49,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
       _amount = budget.limitAmount;
       _period = budget.period;
       _startDate = budget.startDate;
-      _currentStep = 1; // skip category selection in edit mode
+      _currentStep = 1;
     }
   }
 
@@ -64,11 +67,8 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
       ),
       body: Column(
         children: [
-          // ── Step Indicators ──
           _buildStepIndicator(theme),
           const SizedBox(height: Spacing.md),
-
-          // ── Step Content ──
           Expanded(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
@@ -87,8 +87,6 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
               child: _buildCurrentStep(),
             ),
           ),
-
-          // ── Bottom Action ──
           _buildBottomAction(theme),
         ],
       ),
@@ -128,15 +126,18 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                       ),
                       child: Center(
                         child: isCompleted
-                            ? Icon(Icons.check, size: 16,
-                                color: theme.colorScheme.onPrimary)
+                            ? Icon(
+                                Icons.check,
+                                size: 16,
+                                color: theme.colorScheme.onPrimary,
+                              )
                             : Text(
                                 '${i + 1}',
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: isActive
                                       ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurface
-                                          .withOpacity(0.5),
+                                          .withValues(alpha: 0.5),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -159,8 +160,9 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: isActive
                         ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurface.withOpacity(0.5),
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    fontWeight:
+                        isActive ? FontWeight.w600 : FontWeight.w400,
                   ),
                 ),
               ],
@@ -177,11 +179,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
         return _CategoryPickerStep(
           key: const ValueKey('category_step'),
           selectedCategory: _selectedCategory,
-          onCategorySelected: (cat) {
-            setState(() {
-              _selectedCategory = cat;
-            });
-          },
+          onCategorySelected: (cat) => setState(() => _selectedCategory = cat),
         );
       case 1:
         return _AmountStep(
@@ -211,9 +209,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
             if (_currentStep > 0)
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {
-                    setState(() => _currentStep--);
-                  },
+                  onPressed: () => setState(() => _currentStep--),
                   child: const Text('Back'),
                 ),
               ),
@@ -260,7 +256,6 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
       return;
     }
 
-    // Save the budget
     setState(() => _isSaving = true);
 
     try {
@@ -300,19 +295,18 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
           SnackBar(
             content: Text('Error: $e'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: Theme.of(context).extension<CheddarColors>()!.expense,
+            backgroundColor:
+                Theme.of(context).extension<CheddarColors>()!.expense,
           ),
         );
       }
     } finally {
-      if (mounted) {
-        setState(() => _isSaving = false);
-      }
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 }
 
-// ── Category Picker Step ────────────────────────────────────────────────────
+// ── Category Picker Step ──────────────────────────────────────────────────
 
 class _CategoryPickerStep extends ConsumerWidget {
   final String? selectedCategory;
@@ -349,28 +343,27 @@ class _CategoryPickerStep extends ConsumerWidget {
           child: Text(
             'Select a spending category to budget',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ),
         const SizedBox(height: Spacing.md),
         Expanded(
           child: FutureBuilder<List<CategoryModel>>(
-            future: categoryRepo.getByType(0), // expense categories
+            future: categoryRepo.getByType(1), // FIX: expense categories = type 1
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
               }
 
               final categories = snapshot.data!;
-              final budgetedCategories = budgets.valueOrNull
-                      ?.map((b) => b.category)
-                      .toSet() ??
-                  {};
+              final budgetedCategories =
+                  budgets.valueOrNull?.map((b) => b.category).toSet() ?? {};
 
               return GridView.builder(
                 padding: Spacing.horizontalMd,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 4,
                   mainAxisSpacing: Spacing.sm,
                   crossAxisSpacing: Spacing.sm,
@@ -382,9 +375,9 @@ class _CategoryPickerStep extends ConsumerWidget {
                   final isSelected = selectedCategory == cat.name;
                   final isAlreadyBudgeted =
                       budgetedCategories.contains(cat.name);
-                  final color = cheddarColors
-                          .categoryColors[cat.name.toLowerCase()] ??
-                      theme.colorScheme.primary;
+                  final color =
+                      cheddarColors.categoryColors[cat.name.toLowerCase()] ??
+                          theme.colorScheme.primary;
 
                   return GestureDetector(
                     onTap: isAlreadyBudgeted
@@ -394,16 +387,14 @@ class _CategoryPickerStep extends ConsumerWidget {
                       duration: const Duration(milliseconds: 200),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? color.withOpacity(0.15)
+                            ? color.withValues(alpha: 0.15)
                             : isAlreadyBudgeted
                                 ? theme.colorScheme.surfaceContainerHighest
-                                    .withOpacity(0.5)
+                                    .withValues(alpha: 0.5)
                                 : theme.colorScheme.surfaceContainerLow,
                         borderRadius: Radii.borderMd,
                         border: Border.all(
-                          color: isSelected
-                              ? color
-                              : Colors.transparent,
+                          color: isSelected ? color : Colors.transparent,
                           width: 2,
                         ),
                       ),
@@ -417,7 +408,7 @@ class _CategoryPickerStep extends ConsumerWidget {
                             colorFilter: ColorFilter.mode(
                               isAlreadyBudgeted
                                   ? theme.colorScheme.onSurface
-                                      .withOpacity(0.3)
+                                      .withValues(alpha: 0.3)
                                   : color,
                               BlendMode.srcIn,
                             ),
@@ -432,7 +423,7 @@ class _CategoryPickerStep extends ConsumerWidget {
                                   : FontWeight.w400,
                               color: isAlreadyBudgeted
                                   ? theme.colorScheme.onSurface
-                                      .withOpacity(0.3)
+                                      .withValues(alpha: 0.3)
                                   : null,
                             ),
                             textAlign: TextAlign.center,
@@ -445,7 +436,7 @@ class _CategoryPickerStep extends ConsumerWidget {
                               style: theme.textTheme.bodySmall?.copyWith(
                                 fontSize: 8,
                                 color: theme.colorScheme.onSurface
-                                    .withOpacity(0.3),
+                                    .withValues(alpha: 0.3),
                               ),
                             ),
                         ],
@@ -473,7 +464,7 @@ class _CategoryPickerStep extends ConsumerWidget {
   }
 }
 
-// ── Amount Step ─────────────────────────────────────────────────────────────
+// ── Amount Step ────────────────────────────────────────────────────────────
 
 class _AmountStep extends StatelessWidget {
   final double initialAmount;
@@ -506,7 +497,7 @@ class _AmountStep extends StatelessWidget {
           child: Text(
             'Maximum amount you want to spend',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ),
@@ -542,7 +533,10 @@ class _PeriodStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final now = DateTime.now();
 
+    // FIX #8: period value mapping is 0=Weekly, 1=Monthly, 2=Yearly.
+    // This matches _periodLabel() in budget_screen.dart exactly.
     final periods = [
       {'label': 'Weekly', 'value': 0, 'icon': Icons.view_week_rounded},
       {'label': 'Monthly', 'value': 1, 'icon': Icons.calendar_month_rounded},
@@ -564,12 +558,10 @@ class _PeriodStep extends StatelessWidget {
           Text(
             'How often should this budget reset?',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: Spacing.lg),
-
-          // Period chips
           Wrap(
             spacing: Spacing.sm,
             children: periods.map((p) {
@@ -594,10 +586,7 @@ class _PeriodStep extends StatelessWidget {
               );
             }).toList(),
           ),
-
           const SizedBox(height: Spacing.xl),
-
-          // Start date
           Text(
             'Start date',
             style: theme.textTheme.titleMedium?.copyWith(
@@ -605,18 +594,16 @@ class _PeriodStep extends StatelessWidget {
             ),
           ),
           const SizedBox(height: Spacing.sm),
-
           InkWell(
             onTap: () async {
               final picked = await showDatePicker(
                 context: context,
                 initialDate: startDate,
                 firstDate: DateTime(2020),
-                lastDate: DateTime(2030),
+                // FIX #5: dynamic last date instead of hardcoded 2030.
+                lastDate: DateTime(now.year + 10, now.month, now.day),
               );
-              if (picked != null) {
-                onDateChanged(picked);
-              }
+              if (picked != null) onDateChanged(picked);
             },
             borderRadius: Radii.borderMd,
             child: Container(
@@ -626,7 +613,7 @@ class _PeriodStep extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
                 borderRadius: Radii.borderMd,
               ),
@@ -645,21 +632,18 @@ class _PeriodStep extends StatelessWidget {
                   const Spacer(),
                   Icon(
                     Icons.chevron_right_rounded,
-                    color: theme.colorScheme.onSurface.withOpacity(0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                 ],
               ),
             ),
           ),
-
           const SizedBox(height: Spacing.lg),
-
-          // Summary
           Container(
             width: double.infinity,
             padding: Spacing.paddingMd,
             decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
               borderRadius: Radii.borderMd,
             ),
             child: Column(
@@ -676,7 +660,7 @@ class _PeriodStep extends StatelessWidget {
                   'This budget will reset ${_periodLabel(period).toLowerCase()} '
                   'starting ${DateFormat('MMM d, y').format(startDate)}.',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ],

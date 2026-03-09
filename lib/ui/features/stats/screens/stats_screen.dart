@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/di/providers.dart';
 import '../../../../config/constants/asset_paths.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_extensions.dart';
@@ -27,7 +28,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
   @override
   void initState() {
     super.initState();
-    // Listen for transaction changes to refresh stats.
     ref.listenManual(statsTransactionStreamProvider, (_, __) {
       ref.invalidate(spendingTrendProvider);
       ref.invalidate(categoryBreakdownProvider);
@@ -37,7 +37,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     });
   }
 
-  // ── Period Selection Helpers ─────────────────────────────────────────────
+  // ── Period Selection Helpers ──
 
   void _onPeriodChanged(PeriodType type) {
     ref.read(periodTypeProvider.notifier).state = type;
@@ -69,22 +69,27 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     final now = DateTime.now();
     final currentRange = ref.read(dateRangeProvider);
 
+    // FIX #11: snapshot the period BEFORE showing the picker.
+    // If the user cancels we revert to this snapshot so the chip snaps back
+    // to whatever was selected before (not always "Month").
+    final previousPeriod = ref.read(periodTypeProvider);
+
     final picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(now.year - 5),
       lastDate: now,
       initialDateRange: currentRange,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(
-            context,
-          ).copyWith(colorScheme: Theme.of(context).colorScheme),
-          child: child!,
-        );
-      },
+      builder: (context, child) => Theme(
+        data: Theme.of(context)
+            .copyWith(colorScheme: Theme.of(context).colorScheme),
+        child: child!,
+      ),
     );
 
-    if (picked != null && mounted) {
+    if (!mounted) return;
+
+    if (picked != null) {
+      // User confirmed a range — apply it.
       ref.read(dateRangeProvider.notifier).state = DateTimeRange(
         start: picked.start,
         end: DateTime(
@@ -96,13 +101,15 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
           59,
         ),
       );
+      // periodTypeProvider is already set to custom, leave it.
     } else {
-      // Revert to month if user cancelled.
-      ref.read(periodTypeProvider.notifier).state = PeriodType.month;
+      // FIX #11: user cancelled — revert to the period that was active
+      // BEFORE they tapped "Custom", not hardcoded to Month.
+      ref.read(periodTypeProvider.notifier).state = previousPeriod;
     }
   }
 
-  // ── Number Formatting ───────────────────────────────────────────────────
+  // ── Number Formatting ──
 
   String _formatAmount(double amount) {
     if (amount >= 10000000) {
@@ -117,10 +124,12 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
 
   String _formatFullAmount(double amount) {
     final formatter = NumberFormat('#,##,##0.00', 'en_IN');
-    return 'Rs.${formatter.format(amount)}';
+    // FIX #16: use runtime currency symbol.
+    final currencySymbol = ref.read(currencySymbolProvider);
+    return '$currencySymbol${formatter.format(amount)}';
   }
 
-  // ── Build ───────────────────────────────────────────────────────────────
+  // ── Build ──
 
   @override
   Widget build(BuildContext context) {
@@ -129,14 +138,12 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     final periodType = ref.watch(periodTypeProvider);
     final dateRange = ref.watch(dateRangeProvider);
 
-    // Watch all async data providers.
     final spendingTrend = ref.watch(spendingTrendProvider);
     final categoryBreakdown = ref.watch(categoryBreakdownProvider);
     final incomeVsExpense = ref.watch(incomeVsExpenseProvider);
     final dailySpending = ref.watch(dailySpendingMapProvider);
     final topCategories = ref.watch(topCategoriesProvider);
 
-    // Determine if everything is empty (all loaded with no data).
     final allEmpty =
         spendingTrend.valueOrNull?.every((s) => s.y == 0) == true &&
         (categoryBreakdown.valueOrNull?.isEmpty ?? true) &&
@@ -148,7 +155,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // ── SliverAppBar ──
           SliverAppBar(
             floating: true,
             snap: true,
@@ -159,7 +165,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             ),
           ),
 
-          // ── Content ──
           if (allEmpty && !spendingTrend.isLoading)
             SliverFillRemaining(
               hasScrollBody: false,
@@ -169,41 +174,16 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             SliverList(
               delegate: SliverChildListDelegate([
                 const SizedBox(height: Spacing.sm),
-
-                // Section 1: Spending Trend
                 _buildSpendingTrendSection(
-                  theme,
-                  cheddarColors,
-                  spendingTrend,
-                  dateRange,
-                ),
-
-                // Section 2: Category Breakdown
+                    theme, cheddarColors, spendingTrend, dateRange),
                 _buildCategoryBreakdownSection(
-                  theme,
-                  cheddarColors,
-                  categoryBreakdown,
-                ),
-
-                // Section 3: Income vs Expense
+                    theme, cheddarColors, categoryBreakdown),
                 _buildIncomeVsExpenseSection(
-                  theme,
-                  cheddarColors,
-                  incomeVsExpense,
-                ),
-
-                // Section 4: Spending Heatmap
+                    theme, cheddarColors, incomeVsExpense),
                 _buildHeatmapSection(
-                  theme,
-                  cheddarColors,
-                  dailySpending,
-                  dateRange,
-                ),
-
-                // Section 5: Top Categories
-                _buildTopCategoriesSection(theme, cheddarColors, topCategories),
-
-                // Bottom padding for nav bar.
+                    theme, cheddarColors, dailySpending, dateRange),
+                _buildTopCategoriesSection(
+                    theme, cheddarColors, topCategories),
                 const SizedBox(height: 100),
               ]),
             ),
@@ -212,7 +192,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     );
   }
 
-  // ── Period Selector ─────────────────────────────────────────────────────
+  // ── Period Selector ──
 
   Widget _buildPeriodSelector(
     ThemeData theme,
@@ -238,7 +218,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             final isSelected = type == selectedPeriod;
             String label = labels[type]!;
 
-            // Show date range for custom period.
             if (type == PeriodType.custom && isSelected) {
               final fmt = DateFormat('dd MMM');
               label =
@@ -256,14 +235,15 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                   color: isSelected
                       ? theme.colorScheme.onPrimary
                       : theme.colorScheme.onSurface,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  fontWeight:
+                      isSelected ? FontWeight.w600 : FontWeight.normal,
                   fontSize: 13,
                 ),
                 backgroundColor: theme.colorScheme.surface,
                 side: BorderSide(
                   color: isSelected
                       ? Colors.transparent
-                      : theme.colorScheme.outline.withOpacity(0.3),
+                      : theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
                 shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
                 padding: const EdgeInsets.symmetric(
@@ -278,7 +258,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     );
   }
 
-  // ── Empty State ─────────────────────────────────────────────────────────
+  // ── Empty State ──
 
   Widget _buildEmptyState(ThemeData theme) {
     return Center(
@@ -304,7 +284,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                   'Start adding transactions to see your\nspending insights and trends here.',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -316,7 +296,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         .slideY(begin: 0.1, end: 0, duration: 500.ms);
   }
 
-  // ── Shimmer Placeholder ─────────────────────────────────────────────────
+  // ── Shimmer Placeholder ──
 
   Widget _buildShimmerPlaceholder(CheddarColors colors, {double height = 200}) {
     return Container(
@@ -337,7 +317,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         );
   }
 
-  // ── Section 1: Spending Trend ───────────────────────────────────────────
+  // ── Section 1: Spending Trend ──
 
   Widget _buildSpendingTrendSection(
     ThemeData theme,
@@ -368,7 +348,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                 drawVerticalLine: false,
                 horizontalInterval: maxY > 0 ? maxY / 4 : 1,
                 getDrawingHorizontalLine: (value) => FlLine(
-                  color: theme.colorScheme.outline.withOpacity(0.1),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.1),
                   strokeWidth: 1,
                 ),
               ),
@@ -391,7 +371,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         child: Text(
                           _formatAmount(value),
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.5),
                             fontSize: 10,
                           ),
                         ),
@@ -414,7 +395,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         child: Text(
                           DateFormat('d').format(date),
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.5),
                             fontSize: 10,
                           ),
                         ),
@@ -465,8 +447,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        theme.colorScheme.primary.withOpacity(0.3),
-                        theme.colorScheme.primary.withOpacity(0.0),
+                        theme.colorScheme.primary.withValues(alpha: 0.3),
+                        theme.colorScheme.primary.withValues(alpha: 0.0),
                       ],
                     ),
                   ),
@@ -488,7 +470,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     return 30;
   }
 
-  // ── Section 2: Category Breakdown ───────────────────────────────────────
+  // ── Section 2: Category Breakdown ──
 
   Widget _buildCategoryBreakdownSection(
     ThemeData theme,
@@ -509,7 +491,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
 
           return Column(
             children: [
-              // ── Pie Chart ──
               SizedBox(
                 height: 220,
                 child: PieChart(
@@ -560,8 +541,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                 ),
               ),
               const SizedBox(height: Spacing.md),
-
-              // ── Legend ──
               Wrap(
                 spacing: Spacing.md,
                 runSpacing: Spacing.sm,
@@ -588,7 +567,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       Text(
                         _formatFullAmount(cat.amount),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.5),
                         ),
                       ),
                     ],
@@ -602,7 +582,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     );
   }
 
-  // ── Section 3: Income vs Expense ────────────────────────────────────────
+  // ── Section 3: Income vs Expense ──
 
   Widget _buildIncomeVsExpenseSection(
     ThemeData theme,
@@ -669,7 +649,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         child: Text(
                           _formatAmount(value),
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.5),
                             fontSize: 10,
                           ),
                         ),
@@ -691,7 +672,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         child: Text(
                           months[index].monthLabel,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.5),
                             fontSize: 10,
                           ),
                         ),
@@ -706,7 +688,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                 drawVerticalLine: false,
                 horizontalInterval: maxY > 0 ? maxY / 4 : 1,
                 getDrawingHorizontalLine: (value) => FlLine(
-                  color: theme.colorScheme.outline.withOpacity(0.1),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.1),
                   strokeWidth: 1,
                 ),
               ),
@@ -745,7 +727,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     );
   }
 
-  // ── Section 4: Spending Heatmap ─────────────────────────────────────────
+  // ── Section 4: Spending Heatmap ──
 
   Widget _buildHeatmapSection(
     ThemeData theme,
@@ -765,8 +747,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             return _buildNoDataPlaceholder(theme, 'No spending data');
           }
 
-          // Show heatmap for current month of the date range.
-          final month = DateTime(dateRange.start.year, dateRange.start.month);
+          final month =
+              DateTime(dateRange.start.year, dateRange.start.month);
 
           return HeatmapCalendar(
             dailySpending: spendingMap,
@@ -791,7 +773,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     );
   }
 
-  // ── Section 5: Top Categories ───────────────────────────────────────────
+  // ── Section 5: Top Categories ──
 
   Widget _buildTopCategoriesSection(
     ThemeData theme,
@@ -816,13 +798,13 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             children: categories.asMap().entries.map((entry) {
               final i = entry.key;
               final cat = entry.value;
-              final fraction = maxAmount > 0 ? cat.amount / maxAmount : 0.0;
+              final fraction =
+                  maxAmount > 0 ? cat.amount / maxAmount : 0.0;
 
               return Padding(
                     padding: const EdgeInsets.only(bottom: Spacing.sm),
                     child: Row(
                       children: [
-                        // ── Category Label ──
                         SizedBox(
                           width: 80,
                           child: Text(
@@ -836,28 +818,25 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                           ),
                         ),
                         const SizedBox(width: Spacing.sm),
-
-                        // ── Horizontal Bar ──
                         Expanded(
                           child: LayoutBuilder(
                             builder: (context, constraints) {
                               return Stack(
                                 children: [
-                                  // Background track.
                                   Container(
                                     height: 24,
                                     decoration: BoxDecoration(
                                       color: theme.colorScheme.outline
-                                          .withOpacity(0.08),
+                                          .withValues(alpha: 0.08),
                                       borderRadius: Radii.borderSm,
                                     ),
                                   ),
-                                  // Filled bar.
                                   AnimatedContainer(
                                     duration: AppDurations.medium,
                                     curve: Curves.easeOutCubic,
                                     height: 24,
-                                    width: constraints.maxWidth * fraction,
+                                    width:
+                                        constraints.maxWidth * fraction,
                                     decoration: BoxDecoration(
                                       color: cat.color,
                                       borderRadius: Radii.borderSm,
@@ -869,8 +848,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                           ),
                         ),
                         const SizedBox(width: Spacing.sm),
-
-                        // ── Amount Label ──
                         SizedBox(
                           width: 56,
                           child: Text(
@@ -900,7 +877,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     );
   }
 
-  // ── Shared Widgets ──────────────────────────────────────────────────────
+  // ── Shared Widgets ──
 
   Widget _buildNoDataPlaceholder(ThemeData theme, String message) {
     return SizedBox(
@@ -912,13 +889,13 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             Icon(
               Icons.bar_chart_rounded,
               size: 40,
-              color: theme.colorScheme.outline.withOpacity(0.3),
+              color: theme.colorScheme.outline.withValues(alpha: 0.3),
             ),
             const SizedBox(height: Spacing.sm),
             Text(
               message,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ),
           ],
