@@ -1,1 +1,49 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMTgwIiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE4MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImVtcHR5QmczIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGQUY1RkYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRjNFOEZGIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE4MCIgcng9IjE2IiBmaWxsPSJ1cmwoI2VtcHR5QmczKSIvPgogIDwhLS0gQ2FsZW5kYXIgcGFnZSBvdXRsaW5lIC0tPgogIDxyZWN0IHg9IjcwIiB5PSIzMCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMTUiIHJ4PSI4IiBmaWxsPSJub25lIiBzdHJva2U9IiNDNEI1RkQiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtZGFzaGFycmF5PSI3IDQiLz4KICA8IS0tIENhbGVuZGFyIGhlYWRlciBiYXIgLS0+CiAgPHJlY3QgeD0iNzAiIHk9IjMwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjI4IiByeD0iOCIgZmlsbD0iI0M0QjVGRCIgb3BhY2l0eT0iMC4yIi8+CiAgPHJlY3QgeD0iNzAiIHk9IjUwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjgiIHJ4PSIwIiBmaWxsPSIjQzRCNUZEIiBvcGFjaXR5PSIwLjIiLz4KICA8IS0tIENhbGVuZGFyIGJpbmRpbmcgcmluZ3MgLS0+CiAgPHJlY3QgeD0iOTAiIHk9IjI0IiB3aWR0aD0iNiIgaGVpZ2h0PSIxNCIgcng9IjMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0E3OEJGQSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHJlY3QgeD0iMTE3IiB5PSIyNCIgd2lkdGg9IjYiIGhlaWdodD0iMTQiIHJ4PSIzIiBmaWxsPSJub25lIiBzdHJva2U9IiNBNzhCRkEiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxyZWN0IHg9IjE0NCIgeT0iMjQiIHdpZHRoPSI2IiBoZWlnaHQ9IjE0IiByeD0iMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQTc4QkZBIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8IS0tIENhbGVuZGFyIGdyaWQgZG90cyAocmVwcmVzZW50aW5nIGRheXMpIC0tPgogIDxnIGZpbGw9IiNEOEI0RkUiIG9wYWNpdHk9IjAuNCI+CiAgICA8Y2lyY2xlIGN4PSI4OCIgY3k9IjcyIiByPSIzIi8+CiAgICA8Y2lyY2xlIGN4PSIxMDQiIGN5PSI3MiIgcj0iMyIvPgogICAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iNzIiIHI9IjMiLz4KICAgIDxjaXJjbGUgY3g9IjEzNiIgY3k9IjcyIiByPSIzIi8+CiAgICA8Y2lyY2xlIGN4PSIxNTIiIGN5PSI3MiIgcj0iMyIvPgogICAgPGNpcmNsZSBjeD0iODgiIGN5PSI4OCIgcj0iMyIvPgogICAgPGNpcmNsZSBjeD0iMTA0IiBjeT0iODgiIHI9IjMiLz4KICAgIDxjaXJjbGUgY3g9IjEzNiIgY3k9Ijg4IiByPSIzIi8+CiAgICA8Y2lyY2xlIGN4PSIxNTIiIGN5PSI4OCIgcj0iMyIvPgogICAgPGNpcmNsZSBjeD0iODgiIGN5PSIxMDQiIHI9IjMiLz4KICAgIDxjaXJjbGUgY3g9IjEwNCIgY3k9IjEwNCIgcj0iMyIvPgogICAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iMTA0IiByPSIzIi8+CiAgICA8Y2lyY2xlIGN4PSIxMzYiIGN5PSIxMDQiIHI9IjMiLz4KICAgIDxjaXJjbGUgY3g9IjE1MiIgY3k9IjEwNCIgcj0iMyIvPgogICAgPGNpcmNsZSBjeD0iODgiIGN5PSIxMjAiIHI9IjMiLz4KICAgIDxjaXJjbGUgY3g9IjEwNCIgY3k9IjEyMCIgcj0iMyIvPgogICAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iMTIwIiByPSIzIi8+CiAgPC9nPgogIDwhLS0gQmlnIHF1ZXN0aW9uIG1hcmsgaW4gY2VudGVyIG9mIGNhbGVuZGFyIC0tPgogIDx0ZXh0IHg9IjEyMCIgeT0iOTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iMzIiIGZpbGw9IiNBNzhCRkEiIG9wYWNpdHk9IjAuMzUiPj88L3RleHQ+CiAgPCEtLSBSZWN1cnJpbmcgYXJyb3dzIGljb24gKHRvcCByaWdodCkgLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTkwLCA1NSkiPgogICAgPHBhdGggZD0iTTAgLTEyIEExMiAxMiAwIDAgMSAxMCA1IiBmaWxsPSJub25lIiBzdHJva2U9IiNDNEI1RkQiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBvcGFjaXR5PSIwLjUiLz4KICAgIDxwYXRoIGQ9Ik03IDIgTDEwIDUgTDEzIDEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0M0QjVGRCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIG9wYWNpdHk9IjAuNSIvPgogICAgPHBhdGggZD0iTTAgMTIgQTEyIDEyIDAgMCAxIC0xMCAtNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzRCNUZEIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC41Ii8+CiAgICA8cGF0aCBkPSJNLTcgLTIgTC0xMCAtNSBMLTEzIC0xIiBmaWxsPSJub25lIiBzdHJva2U9IiNDNEI1RkQiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBvcGFjaXR5PSIwLjUiLz4KICA8L2c+CiAgPHRleHQgeD0iMTIwIiB5PSIxNjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMSIgZmlsbD0iI0E3OEJGQSIgb3BhY2l0eT0iMC43Ij5ObyBzdWJzY3JpcHRpb25zIHRyYWNrZWQ8L3RleHQ+Cjwvc3ZnPg==
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" width="240" height="180">
+  <defs>
+    <linearGradient id="emptyBg3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FAF5FF"/>
+      <stop offset="100%" stop-color="#F3E8FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="180" rx="16" fill="url(#emptyBg3)"/>
+  <!-- Calendar page outline -->
+  <rect x="70" y="30" width="100" height="115" rx="8" fill="none" stroke="#C4B5FD" stroke-width="2.5" stroke-dasharray="7 4"/>
+  <!-- Calendar header bar -->
+  <rect x="70" y="30" width="100" height="28" rx="8" fill="#C4B5FD" opacity="0.2"/>
+  <rect x="70" y="50" width="100" height="8" rx="0" fill="#C4B5FD" opacity="0.2"/>
+  <!-- Calendar binding rings -->
+  <rect x="90" y="24" width="6" height="14" rx="3" fill="none" stroke="#A78BFA" stroke-width="2"/>
+  <rect x="117" y="24" width="6" height="14" rx="3" fill="none" stroke="#A78BFA" stroke-width="2"/>
+  <rect x="144" y="24" width="6" height="14" rx="3" fill="none" stroke="#A78BFA" stroke-width="2"/>
+  <!-- Calendar grid dots (representing days) -->
+  <g fill="#D8B4FE" opacity="0.4">
+    <circle cx="88" cy="72" r="3"/>
+    <circle cx="104" cy="72" r="3"/>
+    <circle cx="120" cy="72" r="3"/>
+    <circle cx="136" cy="72" r="3"/>
+    <circle cx="152" cy="72" r="3"/>
+    <circle cx="88" cy="88" r="3"/>
+    <circle cx="104" cy="88" r="3"/>
+    <circle cx="136" cy="88" r="3"/>
+    <circle cx="152" cy="88" r="3"/>
+    <circle cx="88" cy="104" r="3"/>
+    <circle cx="104" cy="104" r="3"/>
+    <circle cx="120" cy="104" r="3"/>
+    <circle cx="136" cy="104" r="3"/>
+    <circle cx="152" cy="104" r="3"/>
+    <circle cx="88" cy="120" r="3"/>
+    <circle cx="104" cy="120" r="3"/>
+    <circle cx="120" cy="120" r="3"/>
+  </g>
+  <!-- Big question mark in center of calendar -->
+  <text x="120" y="98" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="32" fill="#A78BFA" opacity="0.35">?</text>
+  <!-- Recurring arrows icon (top right) -->
+  <g transform="translate(190, 55)">
+    <path d="M0 -12 A12 12 0 0 1 10 5" fill="none" stroke="#C4B5FD" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <path d="M7 2 L10 5 L13 1" fill="none" stroke="#C4B5FD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+    <path d="M0 12 A12 12 0 0 1 -10 -5" fill="none" stroke="#C4B5FD" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <path d="M-7 -2 L-10 -5 L-13 -1" fill="none" stroke="#C4B5FD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+  </g>
+  <text x="120" y="162" text-anchor="middle" font-family="Arial" font-size="11" fill="#A78BFA" opacity="0.7">No subscriptions tracked</text>
+</svg>
