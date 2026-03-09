@@ -1,1 +1,80 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9Im5vbWFkQmciIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0UwRjdGQSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNCMkVCRjIiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImNoZWVzZU4iIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0Y3RDk0RSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNFOEE4MjgiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9Imdsb2JlR3JhZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNjBBNUZBIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzI1NjNFQiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iY2hlZWtOIiBjeD0iMC41IiBjeT0iMC41IiByPSIwLjUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkZCMDg4IiBzdG9wLW9wYWNpdHk9IjAuNiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNGRkIwODgiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIyMDAiIHJ4PSIyMCIgZmlsbD0idXJsKCNub21hZEJnKSIvPgogIDwhLS0gQWlycGxhbmUgdHJhaWwgaW4gYmFja2dyb3VuZCAtLT4KICA8cGF0aCBkPSJNMjAgMzAgUTgwIDUwIDEyMCAyNSBRMTcwIDAgMjIwIDQwIFEyNjAgNjUgMjgwIDM1IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWRhc2hhcnJheT0iOCA1IiBvcGFjaXR5PSIwLjciLz4KICA8IS0tIFRpbnkgYWlycGxhbmUgYXQgdHJhaWwgZW5kIC0tPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI3OCwgMzQpIHJvdGF0ZSgzMzApIj4KICAgIDxwYXRoIGQ9Ik0wIDAgTC04IDMgTC02IDAgTC04IC0zIFoiIGZpbGw9IiMwRUE1RTkiLz4KICAgIDxwYXRoIGQ9Ik0tNCAwIEwtNiA1IEwtNSAwIEwtNiAtNSBaIiBmaWxsPSIjMzhCREY4Ii8+CiAgPC9nPgogIDwhLS0gR2xvYmUgb24gcmlnaHQgc2lkZSAtLT4KICA8Y2lyY2xlIGN4PSIyMzAiIGN5PSIxMjAiIHI9IjQwIiBmaWxsPSJ1cmwoI2dsb2JlR3JhZCkiIG9wYWNpdHk9IjAuMyIgc3Ryb2tlPSIjNjBBNUZBIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDwhLS0gR2xvYmUgbGluZXMgLS0+CiAgPGVsbGlwc2UgY3g9IjIzMCIgY3k9IjEyMCIgcng9IjQwIiByeT0iMTgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzkzQzVGRCIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjUiLz4KICA8ZWxsaXBzZSBjeD0iMjMwIiBjeT0iMTIwIiByeD0iMTgiIHJ5PSI0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTNDNUZEIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9IjAuNSIvPgogIDxsaW5lIHgxPSIxOTAiIHkxPSIxMjAiIHgyPSIyNzAiIHkyPSIxMjAiIHN0cm9rZT0iIzkzQzVGRCIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjQiLz4KICA8IS0tIExhbmQgYmxvYnMgb24gZ2xvYmUgLS0+CiAgPHBhdGggZD0iTTIxOCAxMDAgUTIyNSA5NSAyMzUgMTAwIFEyNDAgMTA1IDIzMyAxMDggUTIyNiAxMDYgMjE4IDEwMCBaIiBmaWxsPSIjNEFERTgwIiBvcGFjaXR5PSIwLjUiLz4KICA8cGF0aCBkPSJNMjEwIDEyMCBRMjE1IDExOCAyMjIgMTIyIFEyMTggMTI4IDIxMCAxMjUgWiIgZmlsbD0iIzRBREU4MCIgb3BhY2l0eT0iMC40Ii8+CiAgPHBhdGggZD0iTTI0MCAxMzAgUTI0OCAxMjUgMjU1IDEzMiBRMjUwIDEzOCAyNDIgMTM1IFoiIGZpbGw9IiM0QURFODAiIG9wYWNpdHk9IjAuNDUiLz4KICA8IS0tIEZsb29yIHNoYWRvdyAtLT4KICA8ZWxsaXBzZSBjeD0iMTMwIiBjeT0iMTgwIiByeD0iNTUiIHJ5PSI3IiBmaWxsPSIjMEQ5NDg4IiBvcGFjaXR5PSIwLjEyIi8+CiAgPCEtLSBCYWNrcGFjayBvbiBiYWNrIChiZWhpbmQgY2hlZXNlKSAtLT4KICA8cmVjdCB4PSI4OCIgeT0iOTUiIHdpZHRoPSIyOCIgaGVpZ2h0PSI0MCIgcng9IjgiIGZpbGw9IiMwRDk0ODgiIHN0cm9rZT0iIzA0Nzg1NyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8cmVjdCB4PSI5MiIgeT0iMTAwIiB3aWR0aD0iMjAiIGhlaWdodD0iMTIiIHJ4PSI0IiBmaWxsPSIjMTRCOEE2IiBzdHJva2U9IiMwRDk0ODgiIHN0cm9rZS13aWR0aD0iMC44Ii8+CiAgPCEtLSBCYWNrcGFjayBzdHJhcHMgLS0+CiAgPHBhdGggZD0iTTEwMCA5NSBRMTA0IDg1IDExMCA4OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDQ3ODU3IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0xMDggOTUgUTExMiA4OCAxMTggOTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzA0Nzg1NyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8IS0tIENoZWVzZSBib2R5IC0tPgogIDxwYXRoIGQ9Ik0xMzAgNjAgTDE3NSAxNTUgUTE3OCAxNjIgMTcyIDE2NCBMODggMTY0IFE4MiAxNjIgODUgMTU1IFoiIGZpbGw9InVybCgjY2hlZXNlTikiIHN0cm9rZT0iI0Q0OTQxQyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSBDaGVlc2UgaG9sZXMgLS0+CiAgPGVsbGlwc2UgY3g9IjExOCIgY3k9IjEzMCIgcng9IjciIHJ5PSI1LjUiIGZpbGw9IiNENDk0MUMiIG9wYWNpdHk9IjAuNCIvPgogIDxlbGxpcHNlIGN4PSIxNDgiIGN5PSIxMTUiIHJ4PSI1LjUiIHJ5PSI0LjUiIGZpbGw9IiNENDk0MUMiIG9wYWNpdHk9IjAuMzUiLz4KICA8ZWxsaXBzZSBjeD0iMTMyIiBjeT0iMTQ4IiByeD0iNSIgcnk9IjQiIGZpbGw9IiNENDk0MUMiIG9wYWNpdHk9IjAuNCIvPgogIDwhLS0gU3VuZ2xhc3NlcyAtLT4KICA8cmVjdCB4PSIxMTQiIHk9Ijg4IiB3aWR0aD0iMTQiIGhlaWdodD0iMTAiIHJ4PSI0IiBmaWxsPSIjMUUyOTNCIi8+CiAgPHJlY3QgeD0iMTM0IiB5PSI4OCIgd2lkdGg9IjE0IiBoZWlnaHQ9IjEwIiByeD0iNCIgZmlsbD0iIzFFMjkzQiIvPgogIDxsaW5lIHgxPSIxMjgiIHkxPSI5MyIgeDI9IjEzNCIgeTI9IjkzIiBzdHJva2U9IiMxRTI5M0IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGxpbmUgeDE9IjExNCIgeTE9IjkxIiB4Mj0iMTA4IiB5Mj0iODgiIHN0cm9rZT0iIzFFMjkzQiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxsaW5lIHgxPSIxNDgiIHkxPSI5MSIgeDI9IjE1NCIgeTI9Ijg4IiBzdHJva2U9IiMxRTI5M0IiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8IS0tIExlbnMgZ2xhcmUgLS0+CiAgPHBhdGggZD0iTTExOCA5MCBMMTIyIDkyIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC41Ii8+CiAgPHBhdGggZD0iTTEzOCA5MCBMMTQyIDkyIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iMC41Ii8+CiAgPCEtLSBTbWlsZSAtLT4KICA8cGF0aCBkPSJNMTIwIDEwOCBRMTMwIDEyMCAxNDAgMTA4IiBmaWxsPSJub25lIiBzdHJva2U9IiMyRDJEMkQiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPCEtLSBDaGVla3MgLS0+CiAgPGNpcmNsZSBjeD0iMTEwIiBjeT0iMTA2IiByPSI2IiBmaWxsPSJ1cmwoI2NoZWVrTikiLz4KICA8Y2lyY2xlIGN4PSIxNTAiIGN5PSIxMDYiIHI9IjYiIGZpbGw9InVybCgjY2hlZWtOKSIvPgogIDwhLS0gUmlnaHQgYXJtIHBvaW50aW5nIGF0IGdsb2JlIC0tPgogIDxwYXRoIGQ9Ik0xNzIgMTI1IFExOTAgMTE1IDIwNSAxMTgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0U4QTgyOCIgc3Ryb2tlLXdpZHRoPSI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8IS0tIExlZnQgYXJtIGhvbGRpbmcgYmFja3BhY2sgc3RyYXAgLS0+CiAgPHBhdGggZD0iTTg4IDEyNSBRNzggMTIwIDc2IDEyOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRThBODI4IiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwhLS0gTGVncyAtLT4KICA8cGF0aCBkPSJNMTE4IDE2NCBMMTEyIDE3OCBRMTEwIDE4MiAxMTYgMTgyIiBmaWxsPSJub25lIiBzdHJva2U9IiNFOEE4MjgiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTE0MiAxNjQgTDE0OCAxNzggUTE1MCAxODIgMTQ0IDE4MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRThBODI4IiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDwhLS0gRmxvYXRpbmcgY2xvdWRzIC0tPgogIDxnIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjUiPgogICAgPGVsbGlwc2UgY3g9IjU1IiBjeT0iNjUiIHJ4PSIxOCIgcnk9IjgiLz4KICAgIDxlbGxpcHNlIGN4PSI0NSIgY3k9IjYwIiByeD0iMTAiIHJ5PSI3Ii8+CiAgICA8ZWxsaXBzZSBjeD0iNjUiIGN5PSI2MCIgcng9IjEyIiByeT0iOCIvPgogIDwvZz4KPC9zdmc+
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="300" height="200">
+  <defs>
+    <linearGradient id="nomadBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E0F7FA"/>
+      <stop offset="100%" stop-color="#B2EBF2"/>
+    </linearGradient>
+    <linearGradient id="cheeseN" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7D94E"/>
+      <stop offset="100%" stop-color="#E8A828"/>
+    </linearGradient>
+    <linearGradient id="globeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <radialGradient id="cheekN" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#FFB088" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#FFB088" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="300" height="200" rx="20" fill="url(#nomadBg)"/>
+  <!-- Airplane trail in background -->
+  <path d="M20 30 Q80 50 120 25 Q170 0 220 40 Q260 65 280 35" fill="none" stroke="white" stroke-width="2.5" stroke-dasharray="8 5" opacity="0.7"/>
+  <!-- Tiny airplane at trail end -->
+  <g transform="translate(278, 34) rotate(330)">
+    <path d="M0 0 L-8 3 L-6 0 L-8 -3 Z" fill="#0EA5E9"/>
+    <path d="M-4 0 L-6 5 L-5 0 L-6 -5 Z" fill="#38BDF8"/>
+  </g>
+  <!-- Globe on right side -->
+  <circle cx="230" cy="120" r="40" fill="url(#globeGrad)" opacity="0.3" stroke="#60A5FA" stroke-width="1.5"/>
+  <!-- Globe lines -->
+  <ellipse cx="230" cy="120" rx="40" ry="18" fill="none" stroke="#93C5FD" stroke-width="1" opacity="0.5"/>
+  <ellipse cx="230" cy="120" rx="18" ry="40" fill="none" stroke="#93C5FD" stroke-width="1" opacity="0.5"/>
+  <line x1="190" y1="120" x2="270" y2="120" stroke="#93C5FD" stroke-width="1" opacity="0.4"/>
+  <!-- Land blobs on globe -->
+  <path d="M218 100 Q225 95 235 100 Q240 105 233 108 Q226 106 218 100 Z" fill="#4ADE80" opacity="0.5"/>
+  <path d="M210 120 Q215 118 222 122 Q218 128 210 125 Z" fill="#4ADE80" opacity="0.4"/>
+  <path d="M240 130 Q248 125 255 132 Q250 138 242 135 Z" fill="#4ADE80" opacity="0.45"/>
+  <!-- Floor shadow -->
+  <ellipse cx="130" cy="180" rx="55" ry="7" fill="#0D9488" opacity="0.12"/>
+  <!-- Backpack on back (behind cheese) -->
+  <rect x="88" y="95" width="28" height="40" rx="8" fill="#0D9488" stroke="#047857" stroke-width="1.5"/>
+  <rect x="92" y="100" width="20" height="12" rx="4" fill="#14B8A6" stroke="#0D9488" stroke-width="0.8"/>
+  <!-- Backpack straps -->
+  <path d="M100 95 Q104 85 110 88" fill="none" stroke="#047857" stroke-width="2" stroke-linecap="round"/>
+  <path d="M108 95 Q112 88 118 90" fill="none" stroke="#047857" stroke-width="2" stroke-linecap="round"/>
+  <!-- Cheese body -->
+  <path d="M130 60 L175 155 Q178 162 172 164 L88 164 Q82 162 85 155 Z" fill="url(#cheeseN)" stroke="#D4941C" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Cheese holes -->
+  <ellipse cx="118" cy="130" rx="7" ry="5.5" fill="#D4941C" opacity="0.4"/>
+  <ellipse cx="148" cy="115" rx="5.5" ry="4.5" fill="#D4941C" opacity="0.35"/>
+  <ellipse cx="132" cy="148" rx="5" ry="4" fill="#D4941C" opacity="0.4"/>
+  <!-- Sunglasses -->
+  <rect x="114" y="88" width="14" height="10" rx="4" fill="#1E293B"/>
+  <rect x="134" y="88" width="14" height="10" rx="4" fill="#1E293B"/>
+  <line x1="128" y1="93" x2="134" y2="93" stroke="#1E293B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="114" y1="91" x2="108" y2="88" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="148" y1="91" x2="154" y2="88" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Lens glare -->
+  <path d="M118 90 L122 92" stroke="white" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+  <path d="M138 90 L142 92" stroke="white" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+  <!-- Smile -->
+  <path d="M120 108 Q130 120 140 108" fill="none" stroke="#2D2D2D" stroke-width="2" stroke-linecap="round"/>
+  <!-- Cheeks -->
+  <circle cx="110" cy="106" r="6" fill="url(#cheekN)"/>
+  <circle cx="150" cy="106" r="6" fill="url(#cheekN)"/>
+  <!-- Right arm pointing at globe -->
+  <path d="M172 125 Q190 115 205 118" fill="none" stroke="#E8A828" stroke-width="5" stroke-linecap="round"/>
+  <!-- Left arm holding backpack strap -->
+  <path d="M88 125 Q78 120 76 128" fill="none" stroke="#E8A828" stroke-width="5" stroke-linecap="round"/>
+  <!-- Legs -->
+  <path d="M118 164 L112 178 Q110 182 116 182" fill="none" stroke="#E8A828" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M142 164 L148 178 Q150 182 144 182" fill="none" stroke="#E8A828" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Floating clouds -->
+  <g fill="white" opacity="0.5">
+    <ellipse cx="55" cy="65" rx="18" ry="8"/>
+    <ellipse cx="45" cy="60" rx="10" ry="7"/>
+    <ellipse cx="65" cy="60" rx="12" ry="8"/>
+  </g>
+</svg>
