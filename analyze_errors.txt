@@ -1,0 +1,704 @@
+﻿Analyzing moneytracker...                                       
+
+  error - The argument type 'String' can't be assigned to the parameter type 'int'.  - lib\config\router\app_router.dart:113:26 - argument_type_not_assignable
+  error - The argument type 'String' can't be assigned to the parameter type 'int'.  - lib\config\router\app_router.dart:142:19 - argument_type_not_assignable
+warning - Unused import: 'package:flutter_riverpod/flutter_riverpod.dart' - lib\config\theme\theme_provider.dart:2:8 - unused_import
+  error - Undefined name 'TransactionModelSchema' - lib\data\local\database_service.dart:21:9 - undefined_identifier
+  error - Undefined name 'AccountModelSchema' - lib\data\local\database_service.dart:22:9 - undefined_identifier
+  error - Undefined name 'BudgetModelSchema' - lib\data\local\database_service.dart:23:9 - undefined_identifier
+  error - Undefined name 'GoalModelSchema' - lib\data\local\database_service.dart:24:9 - undefined_identifier
+  error - Undefined name 'CategoryModelSchema' - lib\data\local\database_service.dart:25:9 - undefined_identifier
+  error - Undefined name 'SubscriptionModelSchema' - lib\data\local\database_service.dart:26:9 - undefined_identifier
+  error - Undefined name 'SplitModelSchema' - lib\data\local\database_service.dart:27:9 - undefined_identifier
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:22:20 - undefined_getter
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:29:19 - undefined_getter
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:36:19 - undefined_getter
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:42:18 - undefined_getter
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:47:18 - undefined_getter
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:57:18 - undefined_getter
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:66:18 - undefined_getter
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:104:35 - undefined_getter
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:107:21 - undefined_getter
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:115:35 - undefined_getter
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:118:21 - undefined_getter
+  error - The getter 'accountModels' isn't defined for the type 'Isar' - lib\data\repositories\account_repository.dart:127:18 - undefined_getter
+warning - Unused import: '../../domain/models/transaction_model.dart' - lib\data\repositories\budget_repository.dart:4:8 - unused_import
+  error - The getter 'budgetModels' isn't defined for the type 'Isar' - lib\data\repositories\budget_repository.dart:23:20 - undefined_getter
+  error - The getter 'budgetModels' isn't defined for the type 'Isar' - lib\data\repositories\budget_repository.dart:30:19 - undefined_getter
+  error - The getter 'budgetModels' isn't defined for the type 'Isar' - lib\data\repositories\budget_repository.dart:37:19 - undefined_getter
+  error - The getter 'budgetModels' isn't defined for the type 'Isar' - lib\data\repositories\budget_repository.dart:43:18 - undefined_getter
+  error - The getter 'budgetModels' isn't defined for the type 'Isar' - lib\data\repositories\budget_repository.dart:48:18 - undefined_getter
+  error - The getter 'budgetModels' isn't defined for the type 'Isar' - lib\data\repositories\budget_repository.dart:55:18 - undefined_getter
+  error - The getter 'budgetModels' isn't defined for the type 'Isar' - lib\data\repositories\budget_repository.dart:65:18 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\budget_repository.dart:83:38 - undefined_getter
+  error - The getter 'budgetModels' isn't defined for the type 'Isar' - lib\data\repositories\budget_repository.dart:156:18 - undefined_getter
+  error - The getter 'categoryModels' isn't defined for the type 'Isar' - lib\data\repositories\category_repository.dart:23:20 - undefined_getter
+  error - The getter 'categoryModels' isn't defined for the type 'Isar' - lib\data\repositories\category_repository.dart:30:19 - undefined_getter
+  error - The getter 'categoryModels' isn't defined for the type 'Isar' - lib\data\repositories\category_repository.dart:37:19 - undefined_getter
+  error - The getter 'categoryModels' isn't defined for the type 'Isar' - lib\data\repositories\category_repository.dart:43:18 - undefined_getter
+  error - The getter 'categoryModels' isn't defined for the type 'Isar' - lib\data\repositories\category_repository.dart:48:18 - undefined_getter
+  error - The getter 'categoryModels' isn't defined for the type 'Isar' - lib\data\repositories\category_repository.dart:60:18 - undefined_getter
+  error - The getter 'categoryModels' isn't defined for the type 'Isar' - lib\data\repositories\category_repository.dart:71:18 - undefined_getter
+  error - The getter 'categoryModels' isn't defined for the type 'Isar' - lib\data\repositories\category_repository.dart:85:31 - undefined_getter
+  error - The getter 'categoryModels' isn't defined for the type 'Isar' - lib\data\repositories\category_repository.dart:108:19 - undefined_getter
+  error - The getter 'categoryModels' isn't defined for the type 'Isar' - lib\data\repositories\category_repository.dart:134:18 - undefined_getter
+  error - The getter 'goalModels' isn't defined for the type 'Isar' - lib\data\repositories\goal_repository.dart:22:20 - undefined_getter
+  error - The getter 'goalModels' isn't defined for the type 'Isar' - lib\data\repositories\goal_repository.dart:29:19 - undefined_getter
+  error - The getter 'goalModels' isn't defined for the type 'Isar' - lib\data\repositories\goal_repository.dart:36:19 - undefined_getter
+  error - The getter 'goalModels' isn't defined for the type 'Isar' - lib\data\repositories\goal_repository.dart:42:18 - undefined_getter
+  error - The getter 'goalModels' isn't defined for the type 'Isar' - lib\data\repositories\goal_repository.dart:47:18 - undefined_getter
+  error - The getter 'goalModels' isn't defined for the type 'Isar' - lib\data\repositories\goal_repository.dart:57:18 - undefined_getter
+  error - The getter 'goalModels' isn't defined for the type 'Isar' - lib\data\repositories\goal_repository.dart:66:18 - undefined_getter
+  error - The getter 'goalModels' isn't defined for the type 'Isar' - lib\data\repositories\goal_repository.dart:85:32 - undefined_getter
+  error - The getter 'goalModels' isn't defined for the type 'Isar' - lib\data\repositories\goal_repository.dart:101:19 - undefined_getter
+  error - The getter 'goalModels' isn't defined for the type 'Isar' - lib\data\repositories\goal_repository.dart:117:18 - undefined_getter
+  error - The getter 'splitModels' isn't defined for the type 'Isar' - lib\data\repositories\split_repository.dart:22:20 - undefined_getter
+  error - The getter 'splitModels' isn't defined for the type 'Isar' - lib\data\repositories\split_repository.dart:29:19 - undefined_getter
+  error - The getter 'splitModels' isn't defined for the type 'Isar' - lib\data\repositories\split_repository.dart:36:19 - undefined_getter
+  error - The getter 'splitModels' isn't defined for the type 'Isar' - lib\data\repositories\split_repository.dart:42:18 - undefined_getter
+  error - The getter 'splitModels' isn't defined for the type 'Isar' - lib\data\repositories\split_repository.dart:47:18 - undefined_getter
+  error - The getter 'splitModels' isn't defined for the type 'Isar' - lib\data\repositories\split_repository.dart:57:18 - undefined_getter
+  error - The getter 'splitModels' isn't defined for the type 'Isar' - lib\data\repositories\split_repository.dart:75:33 - undefined_getter
+  error - The getter 'splitModels' isn't defined for the type 'Isar' - lib\data\repositories\split_repository.dart:94:19 - undefined_getter
+  error - The getter 'splitModels' isn't defined for the type 'Isar' - lib\data\repositories\split_repository.dart:127:18 - undefined_getter
+  error - The getter 'subscriptionModels' isn't defined for the type 'Isar' - lib\data\repositories\subscription_repository.dart:23:20 - undefined_getter
+  error - The getter 'subscriptionModels' isn't defined for the type 'Isar' - lib\data\repositories\subscription_repository.dart:30:19 - undefined_getter
+  error - The getter 'subscriptionModels' isn't defined for the type 'Isar' - lib\data\repositories\subscription_repository.dart:37:19 - undefined_getter
+  error - The getter 'subscriptionModels' isn't defined for the type 'Isar' - lib\data\repositories\subscription_repository.dart:43:18 - undefined_getter
+  error - The getter 'subscriptionModels' isn't defined for the type 'Isar' - lib\data\repositories\subscription_repository.dart:48:18 - undefined_getter
+  error - The getter 'subscriptionModels' isn't defined for the type 'Isar' - lib\data\repositories\subscription_repository.dart:58:18 - undefined_getter
+  error - The getter 'subscriptionModels' isn't defined for the type 'Isar' - lib\data\repositories\subscription_repository.dart:70:18 - undefined_getter
+  error - The getter 'subscriptionModels' isn't defined for the type 'Isar' - lib\data\repositories\subscription_repository.dart:182:36 - undefined_getter
+  error - The getter 'subscriptionModels' isn't defined for the type 'Isar' - lib\data\repositories\subscription_repository.dart:207:21 - undefined_getter
+  error - The getter 'subscriptionModels' isn't defined for the type 'Isar' - lib\data\repositories\subscription_repository.dart:216:18 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:22:20 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:29:19 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:36:19 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:42:18 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:49:23 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:70:18 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:79:18 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:88:18 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:97:18 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:107:18 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:128:18 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:145:38 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:162:38 - undefined_getter
+  error - The getter 'transactionModels' isn't defined for the type 'Isar' - lib\data\repositories\transaction_repository.dart:182:18 - undefined_getter
+   info - The imported package 'csv' isn't a dependency of the importing package - lib\data\services\export_service.dart:4:8 - depend_on_referenced_packages
+  error - Target of URI doesn't exist: 'package:csv/csv.dart' - lib\data\services\export_service.dart:4:8 - uri_does_not_exist
+warning - The receiver can't be null, so the null-aware operator '?.' is unnecessary - lib\data\services\export_service.dart:81:24 - invalid_null_aware_operator
+  error - The getter 'isFromNotification' isn't defined for the type 'TransactionModel' - lib\data\services\export_service.dart:82:15 - undefined_getter
+  error - The name 'ListToCsvConverter' isn't a class - lib\data\services\export_service.dart:86:23 - creation_with_non_type
+  error - The getter 'receiptPath' isn't defined for the type 'TransactionModel' - lib\data\services\export_service.dart:259:26 - undefined_getter
+  error - The getter 'isFromNotification' isn't defined for the type 'TransactionModel' - lib\data\services\export_service.dart:260:33 - undefined_getter
+  error - A value of type 'int?' can't be assigned to a variable of type 'String' - lib\data\services\export_service.dart:270:19 - invalid_assignment
+  error - The setter 'receiptPath' isn't defined for the type 'TransactionModel' - lib\data\services\export_service.dart:271:7 - undefined_setter
+  error - The setter 'isFromNotification' isn't defined for the type 'TransactionModel' - lib\data\services\export_service.dart:272:7 - undefined_setter
+  error - The getter 'type' isn't defined for the type 'AccountModel' - lib\data\services\export_service.dart:277:19 - undefined_getter
+  error - The setter 'type' isn't defined for the type 'AccountModel' - lib\data\services\export_service.dart:284:7 - undefined_setter
+  error - The method 'toIso8601String' can't be unconditionally invoked because the receiver can be 'null' - lib\data\services\export_service.dart:305:32 - unchecked_use_of_nullable_value
+  error - The getter 'iconName' isn't defined for the type 'GoalModel' - lib\data\services\export_service.dart:306:23 - undefined_getter
+  error - The getter 'colorValue' isn't defined for the type 'GoalModel' - lib\data\services\export_service.dart:307:25 - undefined_getter
+  error - The setter 'iconName' isn't defined for the type 'GoalModel' - lib\data\services\export_service.dart:317:7 - undefined_setter
+  error - The setter 'colorValue' isn't defined for the type 'GoalModel' - lib\data\services\export_service.dart:318:7 - undefined_setter
+  error - A value of type 'int?' can't be assigned to a variable of type 'String?' - lib\data\services\export_service.dart:319:25 - invalid_assignment
+  error - Target of URI hasn't been generated: 'package:cheddar/domain/models/account_model.g.dart' - lib\domain\models\account_model.dart:3:6 - uri_has_not_been_generated
+  error - Target of URI hasn't been generated: 'package:cheddar/domain/models/budget_model.g.dart' - lib\domain\models\budget_model.dart:3:6 - uri_has_not_been_generated
+  error - Target of URI hasn't been generated: 'package:cheddar/domain/models/category_model.g.dart' - lib\domain\models\category_model.dart:3:6 - uri_has_not_been_generated
+  error - Target of URI hasn't been generated: 'package:cheddar/domain/models/goal_model.g.dart' - lib\domain\models\goal_model.dart:3:6 - uri_has_not_been_generated
+  error - Target of URI hasn't been generated: 'package:cheddar/domain/models/split_model.g.dart' - lib\domain\models\split_model.dart:3:6 - uri_has_not_been_generated
+  error - Target of URI hasn't been generated: 'package:cheddar/domain/models/subscription_model.g.dart' - lib\domain\models\subscription_model.dart:3:6 - uri_has_not_been_generated
+  error - Target of URI hasn't been generated: 'package:cheddar/domain/models/transaction_model.g.dart' - lib\domain\models\transaction_model.dart:3:6 - uri_has_not_been_generated
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\core\shell\app_shell.dart:191:21 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\core\shell\app_shell.dart:205:27 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\core\shell\app_shell.dart:216:27 - ambiguous_import
+  error - The argument type 'int' can't be assigned to the parameter type 'String'.  - lib\ui\features\accounts\screens\account_detail_screen.dart:39:53 - argument_type_not_assignable
+  error - Invalid constant value - lib\ui\features\accounts\screens\account_detail_screen.dart:94:39 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\account_detail_screen.dart:94:39 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\account_detail_screen.dart:98:43 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\account_detail_screen.dart:98:43 - undefined_identifier
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\account_detail_screen.dart:103:51 - undefined_identifier
+  error - The getter 'type' isn't defined for the type 'AccountModel' - lib\ui\features\accounts\screens\account_detail_screen.dart:107:48 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\accounts\screens\account_detail_screen.dart:109:58 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\accounts\screens\account_detail_screen.dart:110:40 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\account_detail_screen.dart:110:40 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\account_detail_screen.dart:118:40 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\account_detail_screen.dart:118:40 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\accounts\screens\account_detail_screen.dart:128:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\accounts\screens\account_detail_screen.dart:135:58 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\accounts\screens\account_detail_screen.dart:147:34 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\account_detail_screen.dart:147:34 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\account_detail_screen.dart:151:34 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\account_detail_screen.dart:151:34 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\account_detail_screen.dart:155:45 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\account_detail_screen.dart:155:45 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\accounts\screens\account_detail_screen.dart:172:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\accounts\screens\account_detail_screen.dart:267:57 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\accounts\screens\accounts_screen.dart:57:45 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\accounts_screen.dart:57:45 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\accounts_screen.dart:61:49 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\accounts_screen.dart:61:49 - undefined_identifier
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\accounts_screen.dart:66:57 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\accounts\screens\accounts_screen.dart:72:64 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\accounts\screens\accounts_screen.dart:73:46 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\accounts_screen.dart:73:46 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\accounts_screen.dart:81:46 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\accounts_screen.dart:81:46 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\accounts\screens\accounts_screen.dart:85:62 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\accounts\screens\accounts_screen.dart:91:40 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\accounts_screen.dart:91:40 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\accounts_screen.dart:96:53 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\accounts_screen.dart:96:53 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\accounts\screens\accounts_screen.dart:100:72 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\accounts\screens\accounts_screen.dart:101:50 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\accounts_screen.dart:101:50 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\accounts_screen.dart:103:50 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\accounts_screen.dart:103:50 - undefined_identifier
+  error - The getter 'type' isn't defined for the type 'AccountModel' - lib\ui\features\accounts\screens\accounts_screen.dart:146:47 - undefined_getter
+  error - Invalid constant value - lib\ui\features\accounts\screens\accounts_screen.dart:149:45 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\accounts_screen.dart:149:45 - undefined_identifier
+  error - The getter 'type' isn't defined for the type 'AccountModel' - lib\ui\features\accounts\screens\accounts_screen.dart:157:50 - undefined_getter
+  error - Invalid constant value - lib\ui\features\accounts\screens\add_account_screen.dart:60:41 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\add_account_screen.dart:60:41 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\add_account_screen.dart:64:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\add_account_screen.dart:64:36 - undefined_identifier
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\add_account_screen.dart:66:24 - undefined_identifier
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\add_account_screen.dart:67:27 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\add_account_screen.dart:80:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\add_account_screen.dart:80:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\add_account_screen.dart:93:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\add_account_screen.dart:93:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\add_account_screen.dart:114:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\add_account_screen.dart:114:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\add_account_screen.dart:118:45 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\add_account_screen.dart:118:45 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\accounts\screens\add_account_screen.dart:120:48 - deprecated_member_use
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\add_account_screen.dart:121:53 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\accounts\screens\add_account_screen.dart:127:41 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\accounts\screens\add_account_screen.dart:127:41 - undefined_identifier
+  error - The setter 'type' isn't defined for the type 'AccountModel' - lib\ui\features\accounts\screens\add_account_screen.dart:152:11 - undefined_setter
+   info - Angle brackets will be interpreted as HTML - lib\ui\features\budget\providers\budget_providers.dart:200:16 - unintended_html_in_doc_comment
+warning - Unused import: '../../../../config/constants/asset_paths.dart' - lib\ui\features\budget\screens\add_budget_screen.dart:10:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:139:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:162:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:352:50 - deprecated_member_use
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<BudgetModel>>' - lib\ui\features\budget\screens\add_budget_screen.dart:366:50 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:397:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:400:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:420:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:435:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:448:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:509:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:567:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:629:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:648:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:662:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\add_budget_screen.dart:679:56 - deprecated_member_use
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<BudgetWithSpending>>' - lib\ui\features\budget\screens\budget_detail_screen.dart:39:47 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_detail_screen.dart:357:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_detail_screen.dart:448:24 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_detail_screen.dart:467:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_detail_screen.dart:504:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_detail_screen.dart:547:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_detail_screen.dart:554:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_detail_screen.dart:581:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_detail_screen.dart:680:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_detail_screen.dart:696:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_detail_screen.dart:714:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_screen.dart:159:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_screen.dart:195:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_screen.dart:239:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_screen.dart:264:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_screen.dart:288:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_screen.dart:302:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_screen.dart:375:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_screen.dart:411:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_screen.dart:423:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_screen.dart:469:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\budget\screens\budget_screen.dart:594:39 - deprecated_member_use
+  error - The returned type 'Stream<void>' isn't returnable from a 'Stream<List<GoalModel>>' function, as required by the closure's context - lib\ui\features\goals\providers\goals_providers.dart:73:10 - return_of_invalid_type_from_closure
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<GoalModel>>' - lib\ui\features\goals\providers\goals_providers.dart:78:45 - undefined_getter
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\goals\screens\add_goal_screen.dart:255:31 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\goals\screens\add_goal_screen.dart:260:51 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\goals\screens\add_goal_screen.dart:297:33 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\goals\screens\add_goal_screen.dart:309:58 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\ui\features\goals\screens\add_goal_screen.dart:341:23 - deprecated_member_use
+warning - Unused import: 'package:font_awesome_flutter/font_awesome_flutter.dart' - lib\ui\features\goals\screens\goal_detail_screen.dart:7:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\goals\screens\goal_detail_screen.dart:368:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\goals\screens\goal_detail_screen.dart:415:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\goals\screens\goal_detail_screen.dart:532:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\goals\screens\goal_detail_screen.dart:558:31 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\goals\screens\goals_screen.dart:146:41 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\goals\screens\goals_screen.dart:179:33 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\goals\screens\goals_screen.dart:313:38 - deprecated_member_use
+warning - The value of the local variable 'jarWidth' isn't used - lib\ui\features\goals\screens\goals_screen.dart:365:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\goals\screens\goals_screen.dart:414:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\goals\screens\goals_screen.dart:449:31 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:214:31 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:218:25 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:229:25 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:250:29 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:254:23 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:280:21 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\home\screens\home_screen.dart:281:38 - deprecated_member_use
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<double>' - lib\ui\features\home\screens\home_screen.dart:305:33 - undefined_getter
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<double>' - lib\ui\features\home\screens\home_screen.dart:316:34 - undefined_getter
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:328:21 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:334:21 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\home\screens\home_screen.dart:367:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\home\screens\home_screen.dart:376:32 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:472:21 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\home\screens\home_screen.dart:496:22 - deprecated_member_use
+  error - The getter 'chartColors' isn't defined for the type 'CheddarColors' - lib\ui\features\home\screens\home_screen.dart:542:40 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\home\screens\home_screen.dart:562:55 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:661:25 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:667:25 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\home\screens\home_screen.dart:725:28 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:782:33 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:788:33 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\home\screens\home_screen.dart:1028:21 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\home\screens\home_screen.dart:1029:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\home\widgets\balance_card.dart:52:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\home\widgets\balance_card.dart:57:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\home\widgets\balance_card.dart:70:39 - deprecated_member_use
+  error - Classes can only extend other classes - lib\ui\features\lock\providers\lock_provider.dart:33:28 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\ui\features\lock\providers\lock_provider.dart:36:36 - extra_positional_arguments
+  error - Undefined name 'state' - lib\ui\features\lock\providers\lock_provider.dart:55:9 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\lock\providers\lock_provider.dart:57:5 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\lock\providers\lock_provider.dart:57:13 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\lock\providers\lock_provider.dart:72:9 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\lock\providers\lock_provider.dart:72:17 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\lock\providers\lock_provider.dart:77:9 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\lock\providers\lock_provider.dart:77:17 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\lock\providers\lock_provider.dart:83:7 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\lock\providers\lock_provider.dart:83:15 - undefined_identifier
+  error - The function 'StateNotifierProvider' isn't defined - lib\ui\features\lock\providers\lock_provider.dart:93:22 - undefined_function
+  error - The name 'LockState' is defined in the libraries 'package:cheddar/ui/features/lock/providers/lock_provider.dart' and 'package:flutter/src/widgets/shortcuts.dart (via package:flutter/material.dart)' - lib\ui\features\lock\screens\lock_screen.dart:84:16 - ambiguous_import
+  error - The property 'isAuthenticated' can't be unconditionally accessed because the receiver can be 'null' - lib\ui\features\lock\screens\lock_screen.dart:85:16 - unchecked_use_of_nullable_value
+  error - The getter 'isAuthenticated' isn't defined for the type 'Object' - lib\ui\features\lock\screens\lock_screen.dart:85:47 - undefined_getter
+  error - The property 'error' can't be unconditionally accessed because the receiver can be 'null' - lib\ui\features\lock\screens\lock_screen.dart:88:16 - unchecked_use_of_nullable_value
+  error - The getter 'error' isn't defined for the type 'Object' - lib\ui\features\lock\screens\lock_screen.dart:88:43 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\lock\screens\lock_screen.dart:103:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\lock\screens\lock_screen.dart:149:48 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\lock\screens\lock_screen.dart:179:39 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\lock\screens\lock_screen.dart:183:33 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\lock\screens\lock_screen.dart:212:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\lock\screens\lock_screen.dart:214:60 - deprecated_member_use
+  error - Can't define a const constructor for a class with non-final fields - lib\ui\features\notifications\providers\notification_provider.dart:86:9 - const_constructor_with_non_final_field
+  error - The expression doesn't evaluate to a function, so it can't be invoked - lib\ui\features\notifications\providers\notification_provider.dart:175:35 - invocation_of_non_function_expression
+  error - The operator '-' isn't defined for the type 'String' - lib\ui\features\notifications\providers\notification_provider.dart:176:50 - undefined_operator
+  error - Expected an identifier - lib\ui\features\notifications\providers\notification_provider.dart:176:51 - missing_identifier
+  error - Expected to find ')' - lib\ui\features\notifications\providers\notification_provider.dart:176:51 - expected_token
+  error - Expected an identifier - lib\ui\features\notifications\providers\notification_provider.dart:176:61 - missing_identifier
+  error - Expected an identifier - lib\ui\features\notifications\providers\notification_provider.dart:176:63 - missing_identifier
+  error - Expected to find ',' - lib\ui\features\notifications\providers\notification_provider.dart:176:64 - expected_token
+  error - Undefined name 's' - lib\ui\features\notifications\providers\notification_provider.dart:176:64 - undefined_identifier
+  error - Undefined name 'on' - lib\ui\features\notifications\providers\notification_provider.dart:176:66 - undefined_identifier
+  error - Expected an identifier - lib\ui\features\notifications\providers\notification_provider.dart:176:69 - missing_identifier
+  error - Expected to find ',' - lib\ui\features\notifications\providers\notification_provider.dart:176:70 - expected_token
+  error - Undefined name 's' - lib\ui\features\notifications\providers\notification_provider.dart:176:70 - undefined_identifier
+  error - Undefined name 'ref' - lib\ui\features\notifications\providers\notification_provider.dart:176:72 - undefined_identifier
+  error - Expected an identifier - lib\ui\features\notifications\providers\notification_provider.dart:176:76 - missing_identifier
+  error - Expected to find ',' - lib\ui\features\notifications\providers\notification_provider.dart:176:77 - expected_token
+  error - Undefined name 's' - lib\ui\features\notifications\providers\notification_provider.dart:176:77 - undefined_identifier
+  error - Undefined name 'txn' - lib\ui\features\notifications\providers\notification_provider.dart:176:79 - undefined_identifier
+  error - Expected an identifier - lib\ui\features\notifications\providers\notification_provider.dart:176:83 - missing_identifier
+  error - Expected to find ',' - lib\ui\features\notifications\providers\notification_provider.dart:176:84 - expected_token
+  error - Undefined name 's' - lib\ui\features\notifications\providers\notification_provider.dart:176:84 - undefined_identifier
+  error - Expected an identifier - lib\ui\features\notifications\providers\notification_provider.dart:176:86 - missing_identifier
+  error - Expected an identifier - lib\ui\features\notifications\providers\notification_provider.dart:176:88 - missing_identifier
+  error - Expected an identifier - lib\ui\features\notifications\providers\notification_provider.dart:176:89 - missing_identifier
+  error - Expected to find ',' - lib\ui\features\notifications\providers\notification_provider.dart:176:90 - expected_token
+  error - Undefined name 's' - lib\ui\features\notifications\providers\notification_provider.dart:176:90 - undefined_identifier
+  error - Undefined name '$' - lib\ui\features\notifications\providers\notification_provider.dart:176:92 - undefined_identifier
+  error - Expected to find ';' - lib\ui\features\notifications\providers\notification_provider.dart:176:93 - expected_token
+  error - Expected a class member - lib\ui\features\notifications\providers\notification_provider.dart:176:94 - expected_class_member
+  error - Unterminated string literal - lib\ui\features\notifications\providers\notification_provider.dart:176:95 - unterminated_string_literal
+   info - An uninitialized field should have an explicit type annotation - lib\ui\features\notifications\providers\notification_provider.dart:177:5 - prefer_typing_uninitialized_variables
+  error - Expected to find ';' - lib\ui\features\notifications\providers\notification_provider.dart:177:5 - expected_token
+  error - Variables must be declared using the keywords 'const', 'final', 'var' or a type name - lib\ui\features\notifications\providers\notification_provider.dart:177:5 - missing_const_final_var_or_type
+  error - Expected a class member - lib\ui\features\notifications\providers\notification_provider.dart:177:18 - expected_class_member
+  error - Expected a class member - lib\ui\features\notifications\providers\notification_provider.dart:177:20 - expected_class_member
+  error - Expected a class member - lib\ui\features\notifications\providers\notification_provider.dart:177:25 - expected_class_member
+  error - Expected a class member - lib\ui\features\notifications\providers\notification_provider.dart:178:3 - expected_class_member
+  error - Expected a class member - lib\ui\features\notifications\providers\notification_provider.dart:178:4 - expected_class_member
+  error - Classes can only extend other classes - lib\ui\features\notifications\providers\notification_provider.dart:376:42 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\ui\features\notifications\providers\notification_provider.dart:382:15 - extra_positional_arguments
+  error - Undefined name 'state' - lib\ui\features\notifications\providers\notification_provider.dart:384:7 - undefined_identifier
+warning - The method doesn't override an inherited method - lib\ui\features\notifications\providers\notification_provider.dart:401:8 - override_on_non_overriding_member
+  error - The method 'dispose' isn't defined in a superclass of 'PendingTransactionNotifier' - lib\ui\features\notifications\providers\notification_provider.dart:403:11 - undefined_super_member
+  error - The function 'StateProvider' isn't defined - lib\ui\features\notifications\providers\notification_provider.dart:418:29 - undefined_function
+  error - The function 'StateNotifierProvider' isn't defined - lib\ui\features\notifications\providers\notification_provider.dart:425:37 - undefined_function
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:106:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:109:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:125:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:147:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:163:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:281:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:306:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:327:64 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:362:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:387:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:393:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:410:70 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\notifications\screens\pending_transactions_screen.dart:412:60 - deprecated_member_use
+warning - The value of the local variable 'fullText' isn't used - lib\ui\features\notifications\services\notification_service.dart:98:11 - unused_local_variable
+  error - Classes can only extend other classes - lib\ui\features\onboarding\providers\onboarding_provider.dart:39:34 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\ui\features\onboarding\providers\onboarding_provider.dart:42:43 - extra_positional_arguments
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:45:5 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:45:13 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:49:5 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:49:13 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:53:5 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:53:13 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:57:5 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:57:13 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:57:47 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:63:55 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:64:55 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\onboarding\providers\onboarding_provider.dart:65:59 - undefined_identifier
+  error - The function 'StateNotifierProvider' isn't defined - lib\ui\features\onboarding\providers\onboarding_provider.dart:72:5 - undefined_function
+warning - The value of the field '_supportedCurrencies' isn't used - lib\ui\features\onboarding\screens\onboarding_screen.dart:32:16 - unused_field
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\onboarding\screens\onboarding_screen.dart:66:17 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\onboarding\screens\onboarding_screen.dart:95:27 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\onboarding\screens\onboarding_screen.dart:158:31 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\onboarding\screens\onboarding_screen.dart:165:51 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\onboarding\screens\onboarding_screen.dart:321:29 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\onboarding\screens\onboarding_screen.dart:325:23 - ambiguous_import
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\ui\features\onboarding\screens\onboarding_screen.dart:410:13 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\onboarding\screens\onboarding_screen.dart:432:60 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\onboarding\screens\onboarding_screen.dart:460:29 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\onboarding\screens\onboarding_screen.dart:464:23 - ambiguous_import
+warning - Unused import: 'dart:typed_data' - lib\ui\features\personality\screens\personality_screen.dart:9:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\personality\screens\personality_screen.dart:191:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\personality\screens\personality_screen.dart:288:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\personality\screens\personality_screen.dart:306:51 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\personality\screens\weekly_wrap_screen.dart:58:21 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\personality\screens\weekly_wrap_screen.dart:71:19 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\personality\screens\weekly_wrap_screen.dart:176:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\personality\screens\weekly_wrap_screen.dart:270:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\personality\screens\weekly_wrap_screen.dart:443:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\personality\screens\weekly_wrap_screen.dart:502:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\personality\screens\weekly_wrap_screen.dart:553:37 - deprecated_member_use
+   info - The imported package 'path' isn't a dependency of the importing package - lib\ui\features\scanner\providers\scanner_provider.dart:6:8 - depend_on_referenced_packages
+  error - Classes can only extend other classes - lib\ui\features\scanner\providers\scanner_provider.dart:308:31 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\ui\features\scanner\providers\scanner_provider.dart:309:29 - extra_positional_arguments
+  error - Undefined name 'state' - lib\ui\features\scanner\providers\scanner_provider.dart:313:5 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\scanner\providers\scanner_provider.dart:313:13 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\scanner\providers\scanner_provider.dart:329:11 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\scanner\providers\scanner_provider.dart:329:19 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\scanner\providers\scanner_provider.dart:337:9 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\scanner\providers\scanner_provider.dart:337:17 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\scanner\providers\scanner_provider.dart:345:7 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\scanner\providers\scanner_provider.dart:345:15 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\scanner\providers\scanner_provider.dart:377:5 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\scanner\providers\scanner_provider.dart:377:13 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\scanner\providers\scanner_provider.dart:382:5 - undefined_identifier
+  error - Undefined name 'StateNotifierProvider' - lib\ui\features\scanner\providers\scanner_provider.dart:389:5 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\screens\scanner_screen.dart:348:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\screens\scanner_screen.dart:355:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\screens\scanner_screen.dart:377:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\screens\scanner_screen.dart:381:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\screens\scanner_screen.dart:452:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\screens\scanner_screen.dart:465:27 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\screens\scanner_screen.dart:486:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\screens\scanner_screen.dart:520:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\screens\scanner_screen.dart:567:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\screens\scanner_screen.dart:568:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\screens\scanner_screen.dart:570:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\widgets\viewfinder_overlay.dart:86:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\widgets\viewfinder_overlay.dart:88:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\widgets\viewfinder_overlay.dart:99:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\widgets\viewfinder_overlay.dart:119:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\widgets\viewfinder_overlay.dart:142:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\scanner\widgets\viewfinder_overlay.dart:156:30 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:50:55 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:50:55 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:55:27 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:55:27 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:56:25 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:56:25 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:66:39 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:66:39 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:73:39 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:73:39 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:80:39 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:80:39 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:91:33 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:91:33 - undefined_identifier
+  error - The getter 'themeName' isn't defined for the type 'ThemeState' - lib\ui\features\settings\screens\settings_screen.dart:99:40 - undefined_getter
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:201:34 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:201:34 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\settings\screens\settings_screen.dart:210:52 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:213:40 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:213:40 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\settings\screens\settings_screen.dart:217:52 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:223:34 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:223:34 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:250:43 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:250:43 - undefined_identifier
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\ui\features\settings\screens\settings_screen.dart:258:17 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\ui\features\settings\screens\settings_screen.dart:259:17 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\ui\features\settings\screens\settings_screen.dart:264:46 - use_build_context_synchronously
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:267:34 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:267:34 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:346:32 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:346:32 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:390:9 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:390:9 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:391:9 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:391:9 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:392:9 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:392:9 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:393:9 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:393:9 - undefined_identifier
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:427:45 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:430:57 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:430:57 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\settings\screens\settings_screen.dart:432:26 - deprecated_member_use
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:433:49 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\settings_screen.dart:438:38 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\settings_screen.dart:438:38 - undefined_identifier
+warning - The value of the local variable 'colors' isn't used - lib\ui\features\settings\screens\theme_picker_screen.dart:16:11 - unused_local_variable
+  error - Undefined name 'VibeThemes' - lib\ui\features\settings\screens\theme_picker_screen.dart:18:23 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\theme_picker_screen.dart:25:39 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\theme_picker_screen.dart:25:39 - undefined_identifier
+  error - Evaluation of this constant expression throws an exception - lib\ui\features\settings\screens\theme_picker_screen.dart:26:23 - const_eval_throws_exception
+  error - Invalid constant value - lib\ui\features\settings\screens\theme_picker_screen.dart:28:28 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\theme_picker_screen.dart:28:28 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\theme_picker_screen.dart:29:29 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\theme_picker_screen.dart:29:29 - undefined_identifier
+  error - The getter 'themeName' isn't defined for the type 'ThemeState' - lib\ui\features\settings\screens\theme_picker_screen.dart:35:43 - undefined_getter
+  error - The method 'setTheme' isn't defined for the type 'ThemeNotifier' - lib\ui\features\settings\screens\theme_picker_screen.dart:41:48 - undefined_method
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\theme_picker_screen.dart:73:47 - undefined_identifier
+  error - The getter 'primaryColor' isn't defined for the type 'VibeTheme' - lib\ui\features\settings\screens\theme_picker_screen.dart:76:24 - undefined_getter
+  error - The getter 'primaryColor' isn't defined for the type 'VibeTheme' - lib\ui\features\settings\screens\theme_picker_screen.dart:83:33 - undefined_getter
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\theme_picker_screen.dart:91:47 - undefined_identifier
+  error - The getter 'primaryColor' isn't defined for the type 'VibeTheme' - lib\ui\features\settings\screens\theme_picker_screen.dart:101:30 - undefined_getter
+  error - The getter 'secondaryColor' isn't defined for the type 'VibeTheme' - lib\ui\features\settings\screens\theme_picker_screen.dart:102:30 - undefined_getter
+  error - The getter 'icon' isn't defined for the type 'VibeTheme' - lib\ui\features\settings\screens\theme_picker_screen.dart:113:32 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\settings\screens\theme_picker_screen.dart:114:47 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\settings\screens\theme_picker_screen.dart:117:48 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\theme_picker_screen.dart:117:48 - undefined_identifier
+  error - The getter 'primaryColor' isn't defined for the type 'VibeTheme' - lib\ui\features\settings\screens\theme_picker_screen.dart:122:51 - undefined_getter
+  error - The getter 'secondaryColor' isn't defined for the type 'VibeTheme' - lib\ui\features\settings\screens\theme_picker_screen.dart:123:51 - undefined_getter
+  error - The getter 'accentColor' isn't defined for the type 'VibeTheme' - lib\ui\features\settings\screens\theme_picker_screen.dart:124:51 - undefined_getter
+  error - Invalid constant value - lib\ui\features\settings\screens\theme_picker_screen.dart:138:49 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\theme_picker_screen.dart:138:49 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\settings\screens\theme_picker_screen.dart:151:46 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\theme_picker_screen.dart:151:46 - undefined_identifier
+  error - The getter 'description' isn't defined for the type 'VibeTheme' - lib\ui\features\settings\screens\theme_picker_screen.dart:153:30 - undefined_getter
+  error - Invalid constant value - lib\ui\features\settings\screens\theme_picker_screen.dart:162:48 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\settings\screens\theme_picker_screen.dart:162:48 - undefined_identifier
+  error - The getter 'primaryColor' isn't defined for the type 'VibeTheme' - lib\ui\features\settings\screens\theme_picker_screen.dart:165:39 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\settings\screens\theme_picker_screen.dart:195:31 - deprecated_member_use
+  error - The returned type 'Stream<void>' isn't returnable from a 'Stream<List<SplitModel>>' function, as required by the closure's context - lib\ui\features\split\providers\split_providers.dart:55:10 - return_of_invalid_type_from_closure
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<SplitModel>>' - lib\ui\features\split\providers\split_providers.dart:60:47 - undefined_getter
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<SplitModel>>' - lib\ui\features\split\providers\split_providers.dart:66:47 - undefined_getter
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<SplitModel>>' - lib\ui\features\split\providers\split_providers.dart:72:47 - undefined_getter
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<SplitModel>>' - lib\ui\features\split\providers\split_providers.dart:96:47 - undefined_getter
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:64:41 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:64:41 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:78:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:78:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:101:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:101:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:105:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:105:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:118:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:118:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:137:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:137:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:142:55 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:142:55 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:144:49 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:144:49 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:158:49 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:158:49 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:225:42 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:225:42 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:361:43 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:361:43 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\add_split_screen.dart:370:33 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\add_split_screen.dart:370:33 - undefined_identifier
+warning - The value of the local variable 'theme' isn't used - lib\ui\features\split\screens\split_screen.dart:40:11 - unused_local_variable
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:106:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:106:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:107:37 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:107:37 - undefined_identifier
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:114:45 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\split\screens\split_screen.dart:125:54 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:128:40 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:128:40 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:146:38 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:146:38 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:168:21 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:168:21 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:169:19 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:169:19 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\split\screens\split_screen.dart:172:22 - deprecated_member_use
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:173:45 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:200:55 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:200:55 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:226:45 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:226:45 - undefined_identifier
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:228:45 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:231:41 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:231:41 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:242:41 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:242:41 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:259:38 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:259:38 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\split\screens\split_screen.dart:268:48 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:298:38 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:298:38 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:341:56 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:341:56 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:350:41 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:350:41 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\split\screens\split_screen.dart:357:50 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:362:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:362:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:365:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:365:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:372:35 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:372:35 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\split\screens\split_screen.dart:418:28 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:447:35 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:447:35 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:494:37 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:494:37 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:501:52 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:501:52 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\split\screens\split_screen.dart:504:32 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:565:37 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:565:37 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:571:49 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:571:49 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\split\screens\split_screen.dart:574:45 - deprecated_member_use
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:622:39 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:622:39 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:627:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:627:36 - undefined_identifier
+  error - Invalid constant value - lib\ui\features\split\screens\split_screen.dart:629:36 - invalid_constant
+  error - Undefined name 'AppSpacing' - lib\ui\features\split\screens\split_screen.dart:629:36 - undefined_identifier
+  error - The function 'StateProvider' isn't defined - lib\ui\features\stats\providers\stats_providers.dart:53:27 - undefined_function
+  error - The function 'StateProvider' isn't defined - lib\ui\features\stats\providers\stats_providers.dart:62:28 - undefined_function
+   info - Angle brackets will be interpreted as HTML - lib\ui\features\stats\providers\stats_providers.dart:65:17 - unintended_html_in_doc_comment
+   info - Angle brackets will be interpreted as HTML - lib\ui\features\stats\providers\stats_providers.dart:91:17 - unintended_html_in_doc_comment
+  error - Undefined name 'vibeThemes' - lib\ui\features\stats\providers\stats_providers.dart:102:20 - undefined_identifier
+   info - Angle brackets will be interpreted as HTML - lib\ui\features\stats\providers\stats_providers.dart:152:16 - unintended_html_in_doc_comment
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<FlSpot>>' - lib\ui\features\stats\screens\stats_screen.dart:140:36 - undefined_getter
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<CategoryTotal>>' - lib\ui\features\stats\screens\stats_screen.dart:141:28 - undefined_getter
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<MonthlyComparison>>' - lib\ui\features\stats\screens\stats_screen.dart:142:25 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:267:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:310:52 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\stats\screens\stats_screen.dart:341:28 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:377:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:401:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:424:34 - deprecated_member_use
+  error - The named parameter 'tooltipRoundedRadius' isn't defined - lib\ui\features\stats\screens\stats_screen.dart:443:19 - undefined_named_parameter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:475:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:476:51 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\stats\screens\stats_screen.dart:483:23 - ambiguous_import
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\stats\screens\stats_screen.dart:569:29 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:602:32 - deprecated_member_use
+  error - The named parameter 'tooltipRoundedRadius' isn't defined - lib\ui\features\stats\screens\stats_screen.dart:652:19 - undefined_named_parameter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:686:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:709:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:724:52 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\stats\screens\stats_screen.dart:756:23 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:870:40 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\stats\screens\stats_screen.dart:876:43 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:938:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\screens\stats_screen.dart:944:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\chart_card.dart:54:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\chart_card.dart:59:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\chart_card.dart:91:36 - deprecated_member_use
+warning - Unused import: 'dart:math' - lib\ui\features\stats\widgets\heatmap_calendar.dart:1:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:104:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:184:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:199:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:226:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:246:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:258:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:262:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:274:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:297:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:311:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:315:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:327:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\stats\widgets\heatmap_calendar.dart:333:42 - deprecated_member_use
+  error - The returned type 'Stream<void>' isn't returnable from a 'Stream<List<SubscriptionModel>>' function, as required by the closure's context - lib\ui\features\subscriptions\providers\subscription_providers.dart:86:10 - return_of_invalid_type_from_closure
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<SubscriptionModel>>' - lib\ui\features\subscriptions\providers\subscription_providers.dart:92:52 - undefined_getter
+  error - The returned type 'Future<void>' isn't returnable from a 'Future<List<SubscriptionModel>>' function, as required by the closure's context - lib\ui\features\subscriptions\providers\subscription_providers.dart:174:10 - return_of_invalid_type_from_closure
+  error - The argument type 'Provider<TransactionRepository>' can't be assigned to the parameter type 'ProviderListenable<List<TransactionModel>>'.  - lib\ui\features\subscriptions\providers\subscription_providers.dart:175:15 - argument_type_not_assignable
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\ui\features\subscriptions\screens\add_subscription_screen.dart:240:15 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\subscriptions\screens\subscriptions_screen.dart:185:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\subscriptions\screens\subscriptions_screen.dart:461:50 - deprecated_member_use
+  error - Classes can only extend other classes - lib\ui\features\transactions\providers\transaction_providers.dart:53:41 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\ui\features\transactions\providers\transaction_providers.dart:54:39 - extra_positional_arguments
+  error - Undefined name 'state' - lib\ui\features\transactions\providers\transaction_providers.dart:57:5 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\transactions\providers\transaction_providers.dart:57:13 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\transactions\providers\transaction_providers.dart:61:5 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\transactions\providers\transaction_providers.dart:61:13 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\transactions\providers\transaction_providers.dart:65:5 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\transactions\providers\transaction_providers.dart:65:13 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\transactions\providers\transaction_providers.dart:69:5 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\transactions\providers\transaction_providers.dart:69:13 - undefined_identifier
+  error - Undefined name 'state' - lib\ui\features\transactions\providers\transaction_providers.dart:73:5 - undefined_identifier
+  error - The function 'StateNotifierProvider' isn't defined - lib\ui\features\transactions\providers\transaction_providers.dart:81:5 - undefined_function
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:331:24 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\transactions\screens\add_transaction_screen.dart:387:25 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:390:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:399:28 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\transactions\screens\add_transaction_screen.dart:483:25 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:486:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:501:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:582:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:586:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:616:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:650:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:1053:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:1056:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:1064:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\add_transaction_screen.dart:1078:43 - deprecated_member_use
+   info - Unnecessary braces in a string interpolation - lib\ui\features\transactions\screens\transaction_detail_screen.dart:110:28 - unnecessary_brace_in_string_interps
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:138:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:164:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:420:23 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:422:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:480:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:531:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:537:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:627:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:647:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:653:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:699:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:728:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:729:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:756:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_detail_screen.dart:790:59 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\transactions\screens\transaction_list_screen.dart:347:19 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_list_screen.dart:353:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_list_screen.dart:358:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_list_screen.dart:429:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_list_screen.dart:542:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_list_screen.dart:566:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\screens\transaction_list_screen.dart:631:52 - deprecated_member_use
+  error - The name 'Durations' is defined in the libraries 'package:cheddar/config/theme/spacing.dart' and 'package:flutter/src/material/motion.dart (via package:flutter/material.dart)' - lib\ui\features\transactions\screens\transaction_list_screen.dart:739:17 - ambiguous_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\ui\features\transactions\widgets\amount_input_widget.dart:198:41 - deprecated_member_use
+warning - The asset directory 'assets/lottie/' doesn't exist - pubspec.yaml:89:7 - asset_directory_does_not_exist
+   info - The imported package 'moneytracker' isn't a dependency of the importing package - test\widget_test.dart:11:8 - depend_on_referenced_packages
+  error - Target of URI doesn't exist: 'package:moneytracker/main.dart' - test\widget_test.dart:11:8 - uri_does_not_exist
+  error - The name 'MyApp' isn't a class - test\widget_test.dart:16:35 - creation_with_non_type
+
+flutter : 693 issues found. (ran in 6.5s)
+At line:1 char:1
++ flutter analyze --no-pub 2>&1 | Out-File -FilePath .\analyze_errors.t ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (693 issues found. (ran in 6.5s):St 
+   ring) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
