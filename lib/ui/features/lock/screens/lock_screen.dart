@@ -110,7 +110,7 @@ class _LockScreenState extends ConsumerState<LockScreen>
             children: [
               const Spacer(flex: 2),
 
-              // ── Lock icon with pulse animation ──
+              // -- Lock icon with pulse animation --
               _ShakeWidget(
                 controller: _shakeController,
                 child:
@@ -133,7 +133,7 @@ class _LockScreenState extends ConsumerState<LockScreen>
 
               const SizedBox(height: Spacing.xl),
 
-              // ── Welcome text ──
+              // -- Welcome text --
               Text(
                 'Welcome back${_userName.isNotEmpty ? ', $_userName' : ''}',
                 style: theme.textTheme.headlineSmall?.copyWith(
@@ -151,7 +151,7 @@ class _LockScreenState extends ConsumerState<LockScreen>
 
               const Spacer(),
 
-              // ── Error / Try again section ──
+              // -- Error / Try again section --
               if (state.error != null) ...[
                 Text(
                   state.error!,
@@ -197,7 +197,7 @@ class _LockScreenState extends ConsumerState<LockScreen>
 
               const Spacer(),
 
-              // ── PIN fallback ──
+              // -- PIN fallback --
               TextButton(
                 onPressed: () {
                   // PIN screen would be added in a future iteration.
@@ -224,7 +224,7 @@ class _LockScreenState extends ConsumerState<LockScreen>
   }
 }
 
-// ── Shake animation widget ───────────────────────────────────────────────────
+// -- Shake animation widget ---------------------------------------------------
 
 class _ShakeWidget extends StatelessWidget {
   final AnimationController controller;

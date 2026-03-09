@@ -200,7 +200,7 @@ class _NavBarItem extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // ── Icon ──
+              // -- Icon --
               AnimatedSwitcher(
                 duration: AppDurations.fast,
                 child: FaIcon(
@@ -211,7 +211,7 @@ class _NavBarItem extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              // ── Label ──
+              // -- Label --
               AnimatedDefaultTextStyle(
                 duration: AppDurations.fast,
                 style: TextStyle(

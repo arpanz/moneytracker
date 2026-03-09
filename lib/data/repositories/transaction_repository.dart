@@ -14,7 +14,7 @@ class TransactionRepository {
 
   Isar get _isar => _db.isar;
 
-  // ── CRUD ──────────────────────────────────────────────────────────────────
+  // -- CRUD ------------------------------------------------------------------
 
   /// Inserts a new transaction and returns its auto-generated id.
   Future<int> add(TransactionModel transaction) async {
@@ -62,7 +62,7 @@ class TransactionRepository {
     return (query as dynamic).findAll() as Future<List<TransactionModel>>;
   }
 
-  // ── FILTERED QUERIES ─────────────────────────────────────────────────────
+  // -- FILTERED QUERIES ------------------------------------------------------
 
   /// Returns transactions within the given date range (inclusive).
   Future<List<TransactionModel>> getByDateRange(
@@ -134,7 +134,7 @@ class TransactionRepository {
         .findAll();
   }
 
-  // ── AGGREGATES ────────────────────────────────────────────────────────────
+  // -- AGGREGATES ------------------------------------------------------------
 
   /// Calculates the total amount for a given type within a date range.
   ///
@@ -175,7 +175,7 @@ class TransactionRepository {
     return totals;
   }
 
-  // ── REAL-TIME STREAM ─────────────────────────────────────────────────────
+  // -- REAL-TIME STREAM ------------------------------------------------------
 
   /// Watches the entire transaction collection for any changes.
   ///
