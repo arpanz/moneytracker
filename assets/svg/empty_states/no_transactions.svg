@@ -1,1 +1,38 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMTgwIiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE4MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImVtcHR5QmcxIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGOEZBRkMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRUZGNkZGIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE4MCIgcng9IjE2IiBmaWxsPSJ1cmwoI2VtcHR5QmcxKSIvPgogIDwhLS0gUmVjZWlwdCBvdXRsaW5lIChkYXNoZWQpIC0tPgogIDxwYXRoIGQ9Ik04MCAyNSBMMTYwIDI1IEwxNjAgMTMwIEwxNTUgMTI1IEwxNTAgMTMwIEwxNDUgMTI1IEwxNDAgMTMwIEwxMzUgMTI1IEwxMzAgMTMwIEwxMjUgMTI1IEwxMjAgMTMwIEwxMTUgMTI1IEwxMTAgMTMwIEwxMDUgMTI1IEwxMDAgMTMwIEw5NSAxMjUgTDkwIDEzMCBMODUgMTI1IEw4MCAxMzAgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTRBM0I4IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDwhLS0gUmVjZWlwdCBsaW5lcyAodmVyeSBmYWludCkgLS0+CiAgPGxpbmUgeDE9Ijk1IiB5MT0iNDUiIHgyPSIxNDUiIHkyPSI0NSIgc3Ryb2tlPSIjQ0JENUUxIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iNCAzIi8+CiAgPGxpbmUgeDE9Ijk1IiB5MT0iNTgiIHgyPSIxNDAiIHkyPSI1OCIgc3Ryb2tlPSIjQ0JENUUxIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iNCAzIi8+CiAgPGxpbmUgeDE9Ijk1IiB5MT0iNzEiIHgyPSIxNDgiIHkyPSI3MSIgc3Ryb2tlPSIjQ0JENUUxIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iNCAzIi8+CiAgPGxpbmUgeDE9Ijk1IiB5MT0iODQiIHgyPSIxMzUiIHkyPSI4NCIgc3Ryb2tlPSIjQ0JENUUxIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iNCAzIi8+CiAgPCEtLSBTZXBhcmF0b3IgZGFzaGVzIC0tPgogIDxsaW5lIHgxPSI5MCIgeTE9Ijk3IiB4Mj0iMTUwIiB5Mj0iOTciIHN0cm9rZT0iI0NCRDVFMSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtZGFzaGFycmF5PSIyIDMiLz4KICA8IS0tIFRvdGFsIGxpbmUgLS0+CiAgPGxpbmUgeDE9Ijk1IiB5MT0iMTEwIiB4Mj0iMTQ1IiB5Mj0iMTEwIiBzdHJva2U9IiM5NEEzQjgiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1kYXNoYXJyYXk9IjUgMyIvPgogIDwhLS0gQ2xvY2sgaWNvbiAodG9wIHJpZ2h0KSAtLT4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzAsIDM1KSI+CiAgICA8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iMTgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzk0QTNCOCIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjYiLz4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSIxNSIgZmlsbD0iI0YxRjVGOSIvPgogICAgPGxpbmUgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9Ii04IiBzdHJva2U9IiM2NDc0OEIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8bGluZSB4MT0iMCIgeTE9IjAiIHgyPSI2IiB5Mj0iMyIgc3Ryb2tlPSIjNjQ3NDhCIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgPGNpcmNsZSBjeD0iMCIgY3k9IjAiIHI9IjEuNSIgZmlsbD0iIzY0NzQ4QiIvPgogICAgPCEtLSBDbG9jayB0aWNrIG1hcmtzIC0tPgogICAgPGxpbmUgeDE9IjAiIHkxPSItMTMiIHgyPSIwIiB5Mj0iLTExIiBzdHJva2U9IiM5NEEzQjgiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8bGluZSB4MT0iMTEiIHkxPSIwIiB4Mj0iMTMiIHkyPSIwIiBzdHJva2U9IiM5NEEzQjgiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8bGluZSB4MT0iMCIgeTE9IjExIiB4Mj0iMCIgeTI9IjEzIiBzdHJva2U9IiM5NEEzQjgiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8bGluZSB4MT0iLTEzIiB5MT0iMCIgeDI9Ii0xMSIgeTI9IjAiIHN0cm9rZT0iIzk0QTNCOCIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8L2c+CiAgPCEtLSBTdWJ0bGUgcXVlc3Rpb24gbWFyayAtLT4KICA8dGV4dCB4PSIxMjAiIHk9Ijc4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjgiIGZpbGw9IiNDQkQ1RTEiIG9wYWNpdHk9IjAuNCI+PzwvdGV4dD4KICA8IS0tIEJvdHRvbSB0ZXh0IGFyZWEgaW5kaWNhdG9yIC0tPgogIDx0ZXh0IHg9IjEyMCIgeT0iMTU4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiM5NEEzQjgiIG9wYWNpdHk9IjAuNyI+Tm8gdHJhbnNhY3Rpb25zIHlldDwvdGV4dD4KPC9zdmc+
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" width="240" height="180">
+  <defs>
+    <linearGradient id="emptyBg1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#EFF6FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="180" rx="16" fill="url(#emptyBg1)"/>
+  <!-- Receipt outline (dashed) -->
+  <path d="M80 25 L160 25 L160 130 L155 125 L150 130 L145 125 L140 130 L135 125 L130 130 L125 125 L120 130 L115 125 L110 130 L105 125 L100 130 L95 125 L90 130 L85 125 L80 130 Z" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 4" stroke-linejoin="round"/>
+  <!-- Receipt lines (very faint) -->
+  <line x1="95" y1="45" x2="145" y2="45" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
+  <line x1="95" y1="58" x2="140" y2="58" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
+  <line x1="95" y1="71" x2="148" y2="71" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
+  <line x1="95" y1="84" x2="135" y2="84" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
+  <!-- Separator dashes -->
+  <line x1="90" y1="97" x2="150" y2="97" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="2 3"/>
+  <!-- Total line -->
+  <line x1="95" y1="110" x2="145" y2="110" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="5 3"/>
+  <!-- Clock icon (top right) -->
+  <g transform="translate(170, 35)">
+    <circle cx="0" cy="0" r="18" fill="none" stroke="#94A3B8" stroke-width="2" opacity="0.6"/>
+    <circle cx="0" cy="0" r="15" fill="#F1F5F9"/>
+    <line x1="0" y1="0" x2="0" y2="-8" stroke="#64748B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="0" y1="0" x2="6" y2="3" stroke="#64748B" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="0" cy="0" r="1.5" fill="#64748B"/>
+    <!-- Clock tick marks -->
+    <line x1="0" y1="-13" x2="0" y2="-11" stroke="#94A3B8" stroke-width="1" stroke-linecap="round"/>
+    <line x1="11" y1="0" x2="13" y2="0" stroke="#94A3B8" stroke-width="1" stroke-linecap="round"/>
+    <line x1="0" y1="11" x2="0" y2="13" stroke="#94A3B8" stroke-width="1" stroke-linecap="round"/>
+    <line x1="-13" y1="0" x2="-11" y2="0" stroke="#94A3B8" stroke-width="1" stroke-linecap="round"/>
+  </g>
+  <!-- Subtle question mark -->
+  <text x="120" y="78" text-anchor="middle" font-family="Arial" font-size="28" fill="#CBD5E1" opacity="0.4">?</text>
+  <!-- Bottom text area indicator -->
+  <text x="120" y="158" text-anchor="middle" font-family="Arial" font-size="11" fill="#94A3B8" opacity="0.7">No transactions yet</text>
+</svg>
