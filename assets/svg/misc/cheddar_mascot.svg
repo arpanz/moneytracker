@@ -1,1 +1,41 @@
-PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY2hlZXNlIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0Y3RDk0RSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNFOEE4MTciLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImNoZWVrcyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkZBQTgwIiBzdG9wLW9wYWNpdHk9IjAuNiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNGRkFBODAiIHN0b3Atb3BhY2l0eT0iMCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBCb2R5IC0gY2hlZXNlIHdlZGdlIC0tPgogIDxwYXRoIGQ9Ik0xMDAgMjAgTDE3NSAxNjAgUTE3NSAxNzUgMTYwIDE3NSBMNDAgMTc1IFEyNSAxNzUgMjUgMTYwIEwxMDAgMjBaIiBmaWxsPSJ1cmwoI2NoZWVzZSkiIHN0cm9rZT0iI0Q0OTQwQSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSBDaGVlc2UgaG9sZXMgLS0+CiAgPGVsbGlwc2UgY3g9IjgwIiBjeT0iMTIwIiByeD0iMTQiIHJ5PSIxMiIgZmlsbD0iI0U4QTgxNyIgb3BhY2l0eT0iMC41Ii8+CiAgPGVsbGlwc2UgY3g9IjEzMCIgY3k9IjE0MCIgcng9IjEwIiByeT0iOSIgZmlsbD0iI0U4QTgxNyIgb3BhY2l0eT0iMC41Ii8+CiAgPGVsbGlwc2UgY3g9IjEwNSIgY3k9IjEwMCIgcng9IjgiIHJ5PSI3IiBmaWxsPSIjRThBODE3IiBvcGFjaXR5PSIwLjUiLz4KICA8IS0tIEV5ZXMgLS0+CiAgPGVsbGlwc2UgY3g9Ijc4IiBjeT0iODAiIHJ4PSIxMCIgcnk9IjEyIiBmaWxsPSJ3aGl0ZSIvPgogIDxlbGxpcHNlIGN4PSIxMjIiIGN5PSI4MCIgcng9IjEwIiByeT0iMTIiIGZpbGw9IndoaXRlIi8+CiAgPGVsbGlwc2UgY3g9IjgwIiBjeT0iODIiIHJ4PSI1IiByeT0iNiIgZmlsbD0iIzJEMkQyRCIvPgogIDxlbGxpcHNlIGN4PSIxMjQiIGN5PSI4MiIgcng9IjUiIHJ5PSI2IiBmaWxsPSIjMkQyRDJEIi8+CiAgPGNpcmNsZSBjeD0iODIiIGN5PSI3OSIgcj0iMiIgZmlsbD0id2hpdGUiLz4KICA8Y2lyY2xlIGN4PSIxMjYiIGN5PSI3OSIgcj0iMiIgZmlsbD0id2hpdGUiLz4KICA8IS0tIFJvc3kgY2hlZWtzIC0tPgogIDxlbGxpcHNlIGN4PSI2MCIgY3k9Ijk1IiByeD0iMTIiIHJ5PSI4IiBmaWxsPSJ1cmwoI2NoZWVrcykiLz4KICA8ZWxsaXBzZSBjeD0iMTQwIiBjeT0iOTUiIHJ4PSIxMiIgcnk9IjgiIGZpbGw9InVybCgjY2hlZWtzKSIvPgogIDwhLS0gU21pbGUgLS0+CiAgPHBhdGggZD0iTTg1IDEwMCBRMTAwIDExOCAxMTUgMTAwIiBmaWxsPSJub25lIiBzdHJva2U9IiMyRDJEMkQiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8IS0tIExlZnQgYXJtIHdhdmluZyAtLT4KICA8cGF0aCBkPSJNMzggMTMwIFEyMCAxMTAgMTUgODUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0U4QTgxNyIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8Y2lyY2xlIGN4PSIxNSIgY3k9IjgyIiByPSI2IiBmaWxsPSIjRjdEOTRFIiBzdHJva2U9IiNFOEE4MTciIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPCEtLSBSaWdodCBhcm0gLS0+CiAgPHBhdGggZD0iTTE2MiAxMzAgUTE3NSAxMjAgMTc4IDEwOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRThBODE3IiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxjaXJjbGUgY3g9IjE3OCIgY3k9IjEwNSIgcj0iNiIgZmlsbD0iI0Y3RDk0RSIgc3Ryb2tlPSIjRThBODE3IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDwhLS0gTGVncyAtLT4KICA8cGF0aCBkPSJNNzAgMTc1IEw2NSAxOTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0U4QTgxNyIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTMwIDE3NSBMMTM1IDE5NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRThBODE3IiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxlbGxpcHNlIGN4PSI2MiIgY3k9IjE5NiIgcng9IjgiIHJ5PSI0IiBmaWxsPSIjRDQ5NDBBIi8+CiAgPGVsbGlwc2UgY3g9IjEzOCIgY3k9IjE5NiIgcng9IjgiIHJ5PSI0IiBmaWxsPSIjRDQ5NDBBIi8+Cjwvc3ZnPg==
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="cheese" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F7D94E"/>
+      <stop offset="100%" stop-color="#E8A817"/>
+    </linearGradient>
+    <linearGradient id="cheeks" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFAA80" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#FFAA80" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- Body - cheese wedge -->
+  <path d="M100 20 L175 160 Q175 175 160 175 L40 175 Q25 175 25 160 L100 20Z" fill="url(#cheese)" stroke="#D4940A" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Cheese holes -->
+  <ellipse cx="80" cy="120" rx="14" ry="12" fill="#E8A817" opacity="0.5"/>
+  <ellipse cx="130" cy="140" rx="10" ry="9" fill="#E8A817" opacity="0.5"/>
+  <ellipse cx="105" cy="100" rx="8" ry="7" fill="#E8A817" opacity="0.5"/>
+  <!-- Eyes -->
+  <ellipse cx="78" cy="80" rx="10" ry="12" fill="white"/>
+  <ellipse cx="122" cy="80" rx="10" ry="12" fill="white"/>
+  <ellipse cx="80" cy="82" rx="5" ry="6" fill="#2D2D2D"/>
+  <ellipse cx="124" cy="82" rx="5" ry="6" fill="#2D2D2D"/>
+  <circle cx="82" cy="79" r="2" fill="white"/>
+  <circle cx="126" cy="79" r="2" fill="white"/>
+  <!-- Rosy cheeks -->
+  <ellipse cx="60" cy="95" rx="12" ry="8" fill="url(#cheeks)"/>
+  <ellipse cx="140" cy="95" rx="12" ry="8" fill="url(#cheeks)"/>
+  <!-- Smile -->
+  <path d="M85 100 Q100 118 115 100" fill="none" stroke="#2D2D2D" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Left arm waving -->
+  <path d="M38 130 Q20 110 15 85" fill="none" stroke="#E8A817" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="15" cy="82" r="6" fill="#F7D94E" stroke="#E8A817" stroke-width="1.5"/>
+  <!-- Right arm -->
+  <path d="M162 130 Q175 120 178 108" fill="none" stroke="#E8A817" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="178" cy="105" r="6" fill="#F7D94E" stroke="#E8A817" stroke-width="1.5"/>
+  <!-- Legs -->
+  <path d="M70 175 L65 195" fill="none" stroke="#E8A817" stroke-width="6" stroke-linecap="round"/>
+  <path d="M130 175 L135 195" fill="none" stroke="#E8A817" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="62" cy="196" rx="8" ry="4" fill="#D4940A"/>
+  <ellipse cx="138" cy="196" rx="8" ry="4" fill="#D4940A"/>
+</svg>
