@@ -1,1 +1,36 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMTgwIiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE4MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImVtcHR5Qmc0IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkZCRUIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkVGM0M3Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE4MCIgcng9IjE2IiBmaWxsPSJ1cmwoI2VtcHR5Qmc0KSIvPgogIDwhLS0gT3V0ZXIgY2lyY2xlIChwaWUgY2hhcnQpIGRhc2hlZCAtLT4KICA8Y2lyY2xlIGN4PSIxMjAiIGN5PSI4NSIgcj0iNTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZDRDM0RCIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjggNSIgb3BhY2l0eT0iMC42Ii8+CiAgPCEtLSBQaWUgc2xpY2UgMSAocHJlc2VudCBidXQgZmFpbnQpIC0tPgogIDxwYXRoIGQ9Ik0xMjAgODUgTDEyMCAzMCBBNTUgNTUgMCAwIDEgMTY3IDYwIFoiIGZpbGw9IiNGREJBNzQiIG9wYWNpdHk9IjAuMiIgc3Ryb2tlPSIjRkI5MjNDIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1kYXNoYXJyYXk9IjQgMyIvPgogIDwhLS0gUGllIHNsaWNlIDIgKHByZXNlbnQgYnV0IGZhaW50KSAtLT4KICA8cGF0aCBkPSJNMTIwIDg1IEwxNjcgNjAgQTU1IDU1IDAgMCAxIDE3MCAxMDAgWiIgZmlsbD0iI0ZDRDM0RCIgb3BhY2l0eT0iMC4yIiBzdHJva2U9IiNGNTlFMEIiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWRhc2hhcnJheT0iNCAzIi8+CiAgPCEtLSBNaXNzaW5nIHNsaWNlIGluZGljYXRvciAoZ2FwIHdpdGggZGFzaGVzKSAtLT4KICA8cGF0aCBkPSJNMTIwIDg1IEwxNzAgMTAwIEE1NSA1NSAwIDAgMSA5NSAxMzIgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRDFENURCIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNSA0IiBvcGFjaXR5PSIwLjUiLz4KICA8IS0tIEFub3RoZXIgbWlzc2luZyBzbGljZSAtLT4KICA8cGF0aCBkPSJNMTIwIDg1IEw5NSAxMzIgQTU1IDU1IDAgMCAxIDcwIDcwIFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0QxRDVEQiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjUgNCIgb3BhY2l0eT0iMC41Ii8+CiAgPCEtLSBTbWFsbCByZW1haW5pbmcgc2xpY2UgLS0+CiAgPHBhdGggZD0iTTEyMCA4NSBMNzAgNzAgQTU1IDU1IDAgMCAxIDEyMCAzMCBaIiBmaWxsPSIjRkRFNjhBIiBvcGFjaXR5PSIwLjIiIHN0cm9rZT0iI0ZCQkYyNCIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtZGFzaGFycmF5PSI0IDMiLz4KICA8IS0tIENlbnRlciBjaXJjbGUgLS0+CiAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iODUiIHI9IjIwIiBmaWxsPSIjRkZGQkVCIiBzdHJva2U9IiNGQ0QzNEQiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSI0IDMiIG9wYWNpdHk9IjAuNiIvPgogIDwhLS0gUXVlc3Rpb24gbWFyayBpbiBjZW50ZXIgLS0+CiAgPHRleHQgeD0iMTIwIiB5PSI5MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1zaXplPSIxOCIgZmlsbD0iI0Y1OUUwQiIgb3BhY2l0eT0iMC40Ij4lPC90ZXh0PgogIDwhLS0gTGVnZW5kIGRvdHMgKGVtcHR5KSAtLT4KICA8ZyBvcGFjaXR5PSIwLjQiPgogICAgPGNpcmNsZSBjeD0iNTIiIGN5PSIxNTUiIHI9IjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZEQkE3NCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICAgIDxsaW5lIHgxPSI2MCIgeTE9IjE1NSIgeDI9IjgyIiB5Mj0iMTU1IiBzdHJva2U9IiNEMUQ1REIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtZGFzaGFycmF5PSIzIDIiLz4KICAgIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjE1NSIgcj0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkNEMzREIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogICAgPGxpbmUgeDE9IjEwOCIgeTE9IjE1NSIgeDI9IjEzMCIgeTI9IjE1NSIgc3Ryb2tlPSIjRDFENURCIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iMyAyIi8+CiAgICA8Y2lyY2xlIGN4PSIxNDgiIGN5PSIxNTUiIHI9IjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0QxRDVEQiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICAgIDxsaW5lIHgxPSIxNTYiIHkxPSIxNTUiIHgyPSIxNzgiIHkyPSIxNTUiIHN0cm9rZT0iI0QxRDVEQiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1kYXNoYXJyYXk9IjMgMiIvPgogIDwvZz4KICA8dGV4dCB4PSIxMjAiIHk9IjE3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExIiBmaWxsPSIjRjU5RTBCIiBvcGFjaXR5PSIwLjYiPk5vIGJ1ZGdldHMgY3JlYXRlZDwvdGV4dD4KPC9zdmc+
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" width="240" height="180">
+  <defs>
+    <linearGradient id="emptyBg4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFBEB"/>
+      <stop offset="100%" stop-color="#FEF3C7"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="180" rx="16" fill="url(#emptyBg4)"/>
+  <!-- Outer circle (pie chart) dashed -->
+  <circle cx="120" cy="85" r="55" fill="none" stroke="#FCD34D" stroke-width="2.5" stroke-dasharray="8 5" opacity="0.6"/>
+  <!-- Pie slice 1 (present but faint) -->
+  <path d="M120 85 L120 30 A55 55 0 0 1 167 60 Z" fill="#FDBA74" opacity="0.2" stroke="#FB923C" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- Pie slice 2 (present but faint) -->
+  <path d="M120 85 L167 60 A55 55 0 0 1 170 100 Z" fill="#FCD34D" opacity="0.2" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- Missing slice indicator (gap with dashes) -->
+  <path d="M120 85 L170 100 A55 55 0 0 1 95 132 Z" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.5"/>
+  <!-- Another missing slice -->
+  <path d="M120 85 L95 132 A55 55 0 0 1 70 70 Z" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.5"/>
+  <!-- Small remaining slice -->
+  <path d="M120 85 L70 70 A55 55 0 0 1 120 30 Z" fill="#FDE68A" opacity="0.2" stroke="#FBBF24" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- Center circle -->
+  <circle cx="120" cy="85" r="20" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>
+  <!-- Question mark in center -->
+  <text x="120" y="92" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="18" fill="#F59E0B" opacity="0.4">%</text>
+  <!-- Legend dots (empty) -->
+  <g opacity="0.4">
+    <circle cx="52" cy="155" r="4" fill="none" stroke="#FDBA74" stroke-width="1.5"/>
+    <line x1="60" y1="155" x2="82" y2="155" stroke="#D1D5DB" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 2"/>
+    <circle cx="100" cy="155" r="4" fill="none" stroke="#FCD34D" stroke-width="1.5"/>
+    <line x1="108" y1="155" x2="130" y2="155" stroke="#D1D5DB" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 2"/>
+    <circle cx="148" cy="155" r="4" fill="none" stroke="#D1D5DB" stroke-width="1.5"/>
+    <line x1="156" y1="155" x2="178" y2="155" stroke="#D1D5DB" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 2"/>
+  </g>
+  <text x="120" y="172" text-anchor="middle" font-family="Arial" font-size="11" fill="#F59E0B" opacity="0.6">No budgets created</text>
+</svg>
