@@ -1,1 +1,58 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImNoZWVzZUJvZHkiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0Y3RDk0RSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNFOEE4MjgiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnV2FybSIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkZGOEU3Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0ZGRThCMCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iY2hlZWsiIGN4PSIwLjUiIGN5PSIwLjUiIHI9IjAuNSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGRkIwODgiIHN0b3Atb3BhY2l0eT0iMC43Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0ZGQjA4OCIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogIDwvZGVmcz4KICA8IS0tIEJhY2tncm91bmQgY2lyY2xlIC0tPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iOTUiIGZpbGw9InVybCgjYmdXYXJtKSIvPgogIDwhLS0gU2hhZG93IC0tPgogIDxlbGxpcHNlIGN4PSIxMDAiIGN5PSIxNzIiIHJ4PSI0NSIgcnk9IjgiIGZpbGw9IiNFOEE4MjgiIG9wYWNpdHk9IjAuMjUiLz4KICA8IS0tIEJvZHk6IGNoZWVzZSB3ZWRnZSB0cmlhbmdsZSB3aXRoIHJvdW5kZWQgY29ybmVycyAtLT4KICA8cGF0aCBkPSJNMTAwIDQwIEwxNTUgMTQ1IFExNTggMTUyIDE1MiAxNTUgTDQ4IDE1NSBRNDIgMTUyIDQ1IDE0NSBaIiBmaWxsPSJ1cmwoI2NoZWVzZUJvZHkpIiBzdHJva2U9IiNENDk0MUMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDwhLS0gQ2hlZXNlIGhvbGVzIC0tPgogIDxlbGxpcHNlIGN4PSI5MCIgY3k9IjEyMCIgcng9IjEwIiByeT0iOCIgZmlsbD0iI0Q0OTQxQyIgb3BhY2l0eT0iMC41Ii8+CiAgPGVsbGlwc2UgY3g9IjEyMCIgY3k9IjEwNSIgcng9IjciIHJ5PSI2IiBmaWxsPSIjRDQ5NDFDIiBvcGFjaXR5PSIwLjQiLz4KICA8ZWxsaXBzZSBjeD0iMTA1IiBjeT0iMTQwIiByeD0iNiIgcnk9IjUiIGZpbGw9IiNENDk0MUMiIG9wYWNpdHk9IjAuNDUiLz4KICA8IS0tIEV5ZXMgLS0+CiAgPGVsbGlwc2UgY3g9IjgyIiBjeT0iOTAiIHJ4PSI3IiByeT0iOCIgZmlsbD0id2hpdGUiLz4KICA8ZWxsaXBzZSBjeD0iMTE4IiBjeT0iOTAiIHJ4PSI3IiByeT0iOCIgZmlsbD0id2hpdGUiLz4KICA8ZWxsaXBzZSBjeD0iODQiIGN5PSI5MSIgcng9IjQiIHJ5PSI0LjUiIGZpbGw9IiMyRDJEMkQiLz4KICA8ZWxsaXBzZSBjeD0iMTIwIiBjeT0iOTEiIHJ4PSI0IiByeT0iNC41IiBmaWxsPSIjMkQyRDJEIi8+CiAgPCEtLSBFeWUgc2hpbmUgLS0+CiAgPGNpcmNsZSBjeD0iODYiIGN5PSI4OCIgcj0iMS44IiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEyMiIgY3k9Ijg4IiByPSIxLjgiIGZpbGw9IndoaXRlIi8+CiAgPCEtLSBSb3N5IGNoZWVrcyAtLT4KICA8Y2lyY2xlIGN4PSI3MCIgY3k9IjEwMiIgcj0iOCIgZmlsbD0idXJsKCNjaGVlaykiLz4KICA8Y2lyY2xlIGN4PSIxMzAiIGN5PSIxMDIiIHI9IjgiIGZpbGw9InVybCgjY2hlZWspIi8+CiAgPCEtLSBTbWlsZSAtLT4KICA8cGF0aCBkPSJNODggMTA0IFExMDAgMTE4IDExMiAxMDQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzJEMkQyRCIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwhLS0gTGVmdCBhcm0gd2F2aW5nIC0tPgogIDxwYXRoIGQ9Ik00OCAxMjAgUTMwIDEwMCAyMiA3OCBRMTggNjYgMjggNjIgUTM4IDU4IDQyIDcwIEw1MCA5NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRThBODI4IiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDwhLS0gTGVmdCBoYW5kIG9wZW4gLS0+CiAgPGNpcmNsZSBjeD0iMjUiIGN5PSI2NSIgcj0iOCIgZmlsbD0iI0Y3RDk0RSIgc3Ryb2tlPSIjRDQ5NDFDIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDwhLS0gRmluZ2VycyBvbiB3YXZpbmcgaGFuZCAtLT4KICA8cGF0aCBkPSJNMjAgNTggUTE4IDUwIDIyIDQ4IiBmaWxsPSJub25lIiBzdHJva2U9IiNGN0Q5NEUiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTI1IDU2IFEyNSA0OCAyOCA0NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRjdEOTRFIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMCA1OCBRMzMgNTEgMzUgNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0Y3RDk0RSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8IS0tIFJpZ2h0IGFybSBkb3duIC0tPgogIDxwYXRoIGQ9Ik0xNTIgMTIwIFExNjUgMTM1IDE2MCAxNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0U4QTgyOCIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8IS0tIExpdHRsZSBsZWdzIC0tPgogIDxwYXRoIGQ9Ik04NSAxNTUgTDgwIDE3MiBRNzggMTc4IDg0IDE3OCBMOTIgMTc4IiBmaWxsPSJub25lIiBzdHJva2U9IiNFOEE4MjgiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTExNSAxNTUgTDEyMCAxNzIgUTEyMiAxNzggMTE2IDE3OCBMMTA4IDE3OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRThBODI4IiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDwhLS0gU3BhcmtsZSBhY2NlbnRzIC0tPgogIDxnIGZpbGw9IiNGMEMwNDAiIG9wYWNpdHk9IjAuNyI+CiAgICA8cGF0aCBkPSJNMTY1IDQ1IEwxNjggMzggTDE3MSA0NSBMMTc4IDQ4IEwxNzEgNTEgTDE2OCA1OCBMMTY1IDUxIEwxNTggNDggWiIvPgogICAgPHBhdGggZD0iTTM1IDM4IEwzNyAzMyBMMzkgMzggTDQ0IDQwIEwzOSA0MiBMMzcgNDcgTDM1IDQyIEwzMCA0MCBaIiB0cmFuc2Zvcm09InNjYWxlKDAuOCkgdHJhbnNsYXRlKDUsNSkiLz4KICA8L2c+Cjwvc3ZnPg==
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="cheeseBody" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7D94E"/>
+      <stop offset="100%" stop-color="#E8A828"/>
+    </linearGradient>
+    <linearGradient id="bgWarm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF8E7"/>
+      <stop offset="100%" stop-color="#FFE8B0"/>
+    </linearGradient>
+    <radialGradient id="cheek" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#FFB088" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#FFB088" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#bgWarm)"/>
+  <!-- Shadow -->
+  <ellipse cx="100" cy="172" rx="45" ry="8" fill="#E8A828" opacity="0.25"/>
+  <!-- Body: cheese wedge triangle with rounded corners -->
+  <path d="M100 40 L155 145 Q158 152 152 155 L48 155 Q42 152 45 145 Z" fill="url(#cheeseBody)" stroke="#D4941C" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Cheese holes -->
+  <ellipse cx="90" cy="120" rx="10" ry="8" fill="#D4941C" opacity="0.5"/>
+  <ellipse cx="120" cy="105" rx="7" ry="6" fill="#D4941C" opacity="0.4"/>
+  <ellipse cx="105" cy="140" rx="6" ry="5" fill="#D4941C" opacity="0.45"/>
+  <!-- Eyes -->
+  <ellipse cx="82" cy="90" rx="7" ry="8" fill="white"/>
+  <ellipse cx="118" cy="90" rx="7" ry="8" fill="white"/>
+  <ellipse cx="84" cy="91" rx="4" ry="4.5" fill="#2D2D2D"/>
+  <ellipse cx="120" cy="91" rx="4" ry="4.5" fill="#2D2D2D"/>
+  <!-- Eye shine -->
+  <circle cx="86" cy="88" r="1.8" fill="white"/>
+  <circle cx="122" cy="88" r="1.8" fill="white"/>
+  <!-- Rosy cheeks -->
+  <circle cx="70" cy="102" r="8" fill="url(#cheek)"/>
+  <circle cx="130" cy="102" r="8" fill="url(#cheek)"/>
+  <!-- Smile -->
+  <path d="M88 104 Q100 118 112 104" fill="none" stroke="#2D2D2D" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Left arm waving -->
+  <path d="M48 120 Q30 100 22 78 Q18 66 28 62 Q38 58 42 70 L50 95" fill="none" stroke="#E8A828" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Left hand open -->
+  <circle cx="25" cy="65" r="8" fill="#F7D94E" stroke="#D4941C" stroke-width="1.5"/>
+  <!-- Fingers on waving hand -->
+  <path d="M20 58 Q18 50 22 48" fill="none" stroke="#F7D94E" stroke-width="3" stroke-linecap="round"/>
+  <path d="M25 56 Q25 48 28 46" fill="none" stroke="#F7D94E" stroke-width="3" stroke-linecap="round"/>
+  <path d="M30 58 Q33 51 35 50" fill="none" stroke="#F7D94E" stroke-width="3" stroke-linecap="round"/>
+  <!-- Right arm down -->
+  <path d="M152 120 Q165 135 160 148" fill="none" stroke="#E8A828" stroke-width="6" stroke-linecap="round"/>
+  <!-- Little legs -->
+  <path d="M85 155 L80 172 Q78 178 84 178 L92 178" fill="none" stroke="#E8A828" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M115 155 L120 172 Q122 178 116 178 L108 178" fill="none" stroke="#E8A828" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Sparkle accents -->
+  <g fill="#F0C040" opacity="0.7">
+    <path d="M165 45 L168 38 L171 45 L178 48 L171 51 L168 58 L165 51 L158 48 Z"/>
+    <path d="M35 38 L37 33 L39 38 L44 40 L39 42 L37 47 L35 42 L30 40 Z" transform="scale(0.8) translate(5,5)"/>
+  </g>
+</svg>
