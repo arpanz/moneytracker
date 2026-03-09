@@ -53,9 +53,6 @@ const List<_NavTab> _tabs = [
   ),
 ];
 
-/// Height of the floating nav bar including padding, for use as bottom inset.
-const double kFloatingNavBarHeight = 72.0;
-
 /// Main application shell that wraps [ShellRoute] children with a
 /// floating-style bottom navigation bar.
 ///
@@ -166,9 +163,8 @@ class _FloatingNavBar extends StatelessWidget {
   }
 }
 
-/// FIX: Each nav item now uses a fixed-width SizedBox instead of Expanded,
-/// and the Column is explicitly center-aligned. Icons are wrapped in a
-/// fixed-size box for consistent optical sizing across different FA icons.
+/// A single item in the floating navigation bar with animated
+/// icon color, label opacity, and a pill-shaped selection indicator.
 class _NavBarItem extends StatelessWidget {
   final _NavTab tab;
   final bool isSelected;
@@ -187,11 +183,7 @@ class _NavBarItem extends StatelessWidget {
     final Color activeColor = colorScheme.primary;
     final Color inactiveColor = colorScheme.onSurface.withValues(alpha: 0.40);
 
-    // FIX: Use fixed-width container instead of Expanded to prevent
-    // variable-width labels ("Home" vs "Transactions") from causing
-    // uneven spacing. 64dp accommodates the longest label.
-    return SizedBox(
-      width: 64,
+    return Expanded(
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -207,30 +199,19 @@ class _NavBarItem extends StatelessWidget {
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            // FIX: Explicitly center children to prevent vertical misalignment
-            // across devices with different safe area insets.
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // -- Icon --
-              // FIX: Wrap icon in fixed-size box so all FA icons occupy the
-              // same optical space regardless of their intrinsic glyph width.
-              SizedBox(
-                width: 24,
-                height: 24,
-                child: Center(
-                  child: AnimatedSwitcher(
-                    duration: AppDurations.fast,
-                    child: FaIcon(
-                      isSelected ? tab.activeIcon : tab.icon,
-                      key: ValueKey<bool>(isSelected),
-                      size: 18,
-                      color: isSelected ? activeColor : inactiveColor,
-                    ),
-                  ),
+              // ── Icon ──
+              AnimatedSwitcher(
+                duration: AppDurations.fast,
+                child: FaIcon(
+                  isSelected ? tab.activeIcon : tab.icon,
+                  key: ValueKey<bool>(isSelected),
+                  size: 18,
+                  color: isSelected ? activeColor : inactiveColor,
                 ),
               ),
               const SizedBox(height: 4),
-              // -- Label --
+              // ── Label ──
               AnimatedDefaultTextStyle(
                 duration: AppDurations.fast,
                 style: TextStyle(
@@ -244,7 +225,6 @@ class _NavBarItem extends StatelessWidget {
                   tab.label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
                 ),
               ),
             ],
