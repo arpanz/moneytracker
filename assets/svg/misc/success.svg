@@ -1,1 +1,25 @@
-PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ic3VjY2Vzc0dyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNjZCQjZBIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzQzQTA0NyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBDZWxlYnJhdGlvbiBkb3RzIC0tPgogIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjMiIGZpbGw9IiNGRkQ1NEYiIG9wYWNpdHk9IjAuNyIvPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjE1IiByPSIyLjUiIGZpbGw9IiNGRjhBNjUiIG9wYWNpdHk9IjAuNiIvPgogIDxjaXJjbGUgY3g9IjE1IiBjeT0iOTAiIHI9IjIiIGZpbGw9IiNDRTkzRDgiIG9wYWNpdHk9IjAuNSIvPgogIDxjaXJjbGUgY3g9IjEwNSIgY3k9Ijk1IiByPSIzIiBmaWxsPSIjNEZDM0Y3IiBvcGFjaXR5PSIwLjYiLz4KICA8Y2lyY2xlIGN4PSI1NSIgY3k9IjgiIHI9IjIiIGZpbGw9IiM4MUM3ODQiIG9wYWNpdHk9IjAuNyIvPgogIDxjaXJjbGUgY3g9IjgiIGN5PSI1NSIgcj0iMi41IiBmaWxsPSIjRkZENTRGIiBvcGFjaXR5PSIwLjUiLz4KICA8Y2lyY2xlIGN4PSIxMTIiIGN5PSI2MCIgcj0iMiIgZmlsbD0iI0YwNjI5MiIgb3BhY2l0eT0iMC42Ii8+CiAgPCEtLSBNYWluIGNpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI0MCIgZmlsbD0idXJsKCNzdWNjZXNzR3JhZCkiLz4KICA8IS0tIElubmVyIGdsb3cgLS0+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4yIi8+CiAgPCEtLSBDaGVja21hcmsgLS0+CiAgPHBhdGggZD0iTTQwIDYwIEw1MyA3MyBMODAgNDYiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSBTcGFya2xlIHN0YXJzIC0tPgogIDxwYXRoIGQ9Ik05MCAyNSBMOTIgMTkgTDk0IDI1IEwxMDAgMjcgTDk0IDI5IEw5MiAzNSBMOTAgMjkgTDg0IDI3IFoiIGZpbGw9IiNGRkQ1NEYiIG9wYWNpdHk9IjAuOCIvPgogIDxwYXRoIGQ9Ik0yNSAxMDAgTDI3IDk2IEwyOSAxMDAgTDMzIDEwMSBMMjkgMTAzIEwyNyAxMDcgTDI1IDEwMyBMMjEgMTAxIFoiIGZpbGw9IiNGRkQ1NEYiIG9wYWNpdHk9IjAuNiIvPgo8L3N2Zz4=
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="successGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#66BB6A"/>
+      <stop offset="100%" stop-color="#43A047"/>
+    </linearGradient>
+  </defs>
+  <!-- Celebration dots -->
+  <circle cx="20" cy="20" r="3" fill="#FFD54F" opacity="0.7"/>
+  <circle cx="100" cy="15" r="2.5" fill="#FF8A65" opacity="0.6"/>
+  <circle cx="15" cy="90" r="2" fill="#CE93D8" opacity="0.5"/>
+  <circle cx="105" cy="95" r="3" fill="#4FC3F7" opacity="0.6"/>
+  <circle cx="55" cy="8" r="2" fill="#81C784" opacity="0.7"/>
+  <circle cx="8" cy="55" r="2.5" fill="#FFD54F" opacity="0.5"/>
+  <circle cx="112" cy="60" r="2" fill="#F06292" opacity="0.6"/>
+  <!-- Main circle -->
+  <circle cx="60" cy="60" r="40" fill="url(#successGrad)"/>
+  <!-- Inner glow -->
+  <circle cx="60" cy="60" r="34" fill="none" stroke="white" stroke-width="1" opacity="0.2"/>
+  <!-- Checkmark -->
+  <path d="M40 60 L53 73 L80 46" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Sparkle stars -->
+  <path d="M90 25 L92 19 L94 25 L100 27 L94 29 L92 35 L90 29 L84 27 Z" fill="#FFD54F" opacity="0.8"/>
+  <path d="M25 100 L27 96 L29 100 L33 101 L29 103 L27 107 L25 103 L21 101 Z" fill="#FFD54F" opacity="0.6"/>
+</svg>
