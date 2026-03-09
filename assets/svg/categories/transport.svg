@@ -1,1 +1,27 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iY2FyR3JhZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNjBBNUZBIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzI1NjNFQiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPCEtLSBDYXIgYm9keSAtLT4KICA8cGF0aCBkPSJNOCAzOCBMOCA0NCRROCA0NiAxMCA0NiBMMTYgNDYgUTE3IDQyIDIxIDQyIFEyNSA0MiAyNiA0NiBMMzggNDYgUTM5IDQyIDQzIDQyIFE0NyA0MiA0OCA0NiBMNTQgNDYgUTU2IDQ2IDU2IDQ0IEw1NiAzOCBRNTYgMzQgNTIgMzQgTDQ4IDI4IFE0NiAyNCA0MiAyNCBMMjQgMjQgUTIwIDI0IDE4IDI4IEwxNCAzNCBROCAzNCA4IDM4IFoiIGZpbGw9InVybCgjY2FyR3JhZCkiLz4KICA8IS0tIFdpbmRzaGllbGQgLS0+CiAgPHBhdGggZD0iTTIwIDI4IEwxOCAzNCBMMzAgMzQgTDMwIDI2IEwyNCAyNiBRMjIgMjYgMjAgMjggWiIgZmlsbD0iI0RCRUFGRSIgc3Ryb2tlPSIjOTNDNUZEIiBzdHJva2Utd2lkdGg9IjAuOCIvPgogIDwhLS0gUmVhciB3aW5kb3cgLS0+CiAgPHBhdGggZD0iTTM0IDI2IEwzNCAzNCBMNDYgMzQgTDQ0IDI4IFE0MyAyNiA0MCAyNiBaIiBmaWxsPSIjREJFQUZFIiBzdHJva2U9IiM5M0M1RkQiIHN0cm9rZS13aWR0aD0iMC44Ii8+CiAgPCEtLSBGcm9udCB3aGVlbCAtLT4KICA8Y2lyY2xlIGN4PSIyMSIgY3k9IjQ2IiByPSI1IiBmaWxsPSIjMUUzQTVGIiBzdHJva2U9IiM2MEE1RkEiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPGNpcmNsZSBjeD0iMjEiIGN5PSI0NiIgcj0iMiIgZmlsbD0iIzkzQzVGRCIvPgogIDwhLS0gUmVhciB3aGVlbCAtLT4KICA8Y2lyY2xlIGN4PSI0MyIgY3k9IjQ2IiByPSI1IiBmaWxsPSIjMUUzQTVGIiBzdHJva2U9IiM2MEE1RkEiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPGNpcmNsZSBjeD0iNDMiIGN5PSI0NiIgcj0iMiIgZmlsbD0iIzkzQzVGRCIvPgogIDwhLS0gSGVhZGxpZ2h0IC0tPgogIDxlbGxpcHNlIGN4PSI1NSIgY3k9IjM4IiByeD0iMiIgcnk9IjIuNSIgZmlsbD0iI0ZDRDM0RCIvPgogIDwhLS0gVGFpbGxpZ2h0IC0tPgogIDxyZWN0IHg9IjciIHk9IjM2IiB3aWR0aD0iMi41IiBoZWlnaHQ9IjQiIHJ4PSIxIiBmaWxsPSIjRUY0NDQ0Ii8+CiAgPCEtLSBSb2FkIGxpbmUgLS0+CiAgPGxpbmUgeDE9IjQiIHkxPSI1MyIgeDI9IjYwIiB5Mj0iNTMiIHN0cm9rZT0iI0NCRDVFMSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+Cjwvc3ZnPg==
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="carGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <!-- Car body -->
+  <path d="M8 38 L8 44 Q8 46 10 46 L16 46 Q17 42 21 42 Q25 42 26 46 L38 46 Q39 42 43 42 Q47 42 48 46 L54 46 Q56 46 56 44 L56 38 Q56 34 52 34 L48 28 Q46 24 42 24 L24 24 Q20 24 18 28 L14 34 Q8 34 8 38 Z" fill="url(#carGrad)"/>
+  <!-- Windshield -->
+  <path d="M20 28 L18 34 L30 34 L30 26 L24 26 Q22 26 20 28 Z" fill="#DBEAFE" stroke="#93C5FD" stroke-width="0.8"/>
+  <!-- Rear window -->
+  <path d="M34 26 L34 34 L46 34 L44 28 Q43 26 40 26 Z" fill="#DBEAFE" stroke="#93C5FD" stroke-width="0.8"/>
+  <!-- Front wheel -->
+  <circle cx="21" cy="46" r="5" fill="#1E3A5F" stroke="#60A5FA" stroke-width="1.5"/>
+  <circle cx="21" cy="46" r="2" fill="#93C5FD"/>
+  <!-- Rear wheel -->
+  <circle cx="43" cy="46" r="5" fill="#1E3A5F" stroke="#60A5FA" stroke-width="1.5"/>
+  <circle cx="43" cy="46" r="2" fill="#93C5FD"/>
+  <!-- Headlight -->
+  <ellipse cx="55" cy="38" rx="2" ry="2.5" fill="#FCD34D"/>
+  <!-- Taillight -->
+  <rect x="7" y="36" width="2.5" height="4" rx="1" fill="#EF4444"/>
+  <!-- Road line -->
+  <line x1="4" y1="53" x2="60" y2="53" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 4"/>
+</svg>
