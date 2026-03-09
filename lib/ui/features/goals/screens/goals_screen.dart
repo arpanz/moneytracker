@@ -143,7 +143,7 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                             const SizedBox(width: 4),
                             AnimatedRotation(
                               turns: _showCompleted ? 0.5 : 0,
-                              duration: Durations.fast,
+                              duration: AppDurations.fast,
                               child: Icon(
                                 Icons.keyboard_arrow_down,
                                 color: theme.colorScheme.onSurfaceVariant,
@@ -176,7 +176,7 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                       crossFadeState: _showCompleted
                           ? CrossFadeState.showSecond
                           : CrossFadeState.showFirst,
-                      duration: Durations.medium,
+                      duration: AppDurations.medium,
                     ),
                   ],
 
@@ -310,7 +310,7 @@ class _GoalCard extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: isCompleted
-                      ? Colors.green.withOpacity(0.15)
+                      ? Colors.green.withValues(alpha: 0.15)
                       : theme.colorScheme.primaryContainer,
                   borderRadius: Radii.borderFull,
                 ),
@@ -362,7 +362,6 @@ class _GoalJarPainter extends CustomPainter {
     final jarRight = w * 0.85;
     final jarTop = h * 0.15;
     final jarBottom = h * 0.9;
-    final jarWidth = jarRight - jarLeft;
     final jarHeight = jarBottom - jarTop;
 
     // Neck dimensions
@@ -411,7 +410,7 @@ class _GoalJarPainter extends CustomPainter {
 
       // Create liquid fill with wave
       final liquidPaint = Paint()
-        ..color = liquidColor.withOpacity(0.35)
+        ..color = liquidColor.withValues(alpha: 0.35)
         ..style = PaintingStyle.fill;
 
       final liquidPath = Path();
@@ -446,7 +445,7 @@ class _GoalJarPainter extends CustomPainter {
 
       // Draw a more opaque wave line at top
       final wavePaint = Paint()
-        ..color = liquidColor.withOpacity(0.6)
+        ..color = liquidColor.withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0;
 
