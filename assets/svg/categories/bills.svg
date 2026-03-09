@@ -1,1 +1,15 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmlsbEdyYWQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0ZCOTIzQyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNFQTU4MEMiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDwhLS0gRG9jdW1lbnQgYm9keSAtLT4KICA8cGF0aCBkPSJNMTQgOCBMNDIgOCBMNTAgMTYgTDUwIDU2IFE1MCA1OCA0OCA1OCBMMTYgNTggUTE0IDU4IDE0IDU2IFoiIGZpbGw9IndoaXRlIiBzdHJva2U9InVybCgjYmlsbEdyYWQpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8IS0tIEZvbGRlZCBjb3JuZXIgLS0+CiAgPHBhdGggZD0iTTQyIDggTDQyIDE2IEw1MCAxNiIgZmlsbD0iI0ZFRDdBQSIgc3Ryb2tlPSIjRkI5MjNDIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDwhLS0gRG9sbGFyIHNpZ24gY2lyY2xlIC0tPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMzYiIHI9IjEzIiBmaWxsPSJ1cmwoI2JpbGxHcmFkKSIgb3BhY2l0eT0iMC4xNSIvPgogIDwhLS0gRG9sbGFyIHNpZ24gLS0+CiAgPHRleHQgeD0iMzIiIHk9IjQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSJib2xkIiBmb250LXNpemU9IjIwIiBmaWxsPSIjRUE1ODBDIj4kPC90ZXh0PgogIDwhLS0gTGluZXMgLS0+CiAgPGxpbmUgeDE9IjIwIiB5MT0iNTIiIHgyPSI0NCIgeTI9IjUyIiBzdHJva2U9IiNGREJBNzQiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGxpbmUgeDE9IjIwIiB5MT0iMjIiIHgyPSIzNiIgeTI9IjIyIiBzdHJva2U9IiNGREJBNzQiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPg==
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="billGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FB923C"/>
+      <stop offset="100%" stop-color="#F97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#billGrad)"/>
+  <rect x="18" y="14" width="28" height="36" rx="3" fill="white" opacity="0.95"/>
+  <line x1="24" y1="24" x2="40" y2="24" stroke="#F97316" stroke-width="2" stroke-linecap="round"/>
+  <line x1="24" y1="30" x2="36" y2="30" stroke="#FDBA74" stroke-width="2" stroke-linecap="round"/>
+  <line x1="24" y1="36" x2="38" y2="36" stroke="#FDBA74" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="32" cy="46" r="3" fill="#F97316" opacity="0.6"/>
+</svg>
