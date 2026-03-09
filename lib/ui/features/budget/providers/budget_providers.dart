@@ -197,7 +197,7 @@ final unbudgetedSpendingProvider =
 });
 
 /// Daily spending breakdown for a specific budget's category within its period.
-/// Returns Map<DateTime (day-only), double> for chart display.
+/// Returns `Map<DateTime, double>` (day-only keys) for chart display.
 final dailySpendingForBudgetProvider =
     FutureProvider.family<Map<DateTime, double>, int>(
         (ref, budgetId) async {
