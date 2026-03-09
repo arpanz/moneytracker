@@ -68,14 +68,19 @@ class GoalsSummary {
 // ── Providers ───────────────────────────────────────────────────────────────
 
 /// Real-time stream of all goals.
-final goalListProvider = StreamProvider<List<GoalModel>>((ref) {
+final goalListProvider = StreamProvider<List<GoalModel>>((ref) async* {
   final repo = ref.watch(goalRepositoryProvider);
-  return repo.watchAll();
+  // Emit current data immediately
+  yield await repo.getAll();
+  // Then re-fetch on every change notification
+  await for (final _ in repo.watchAll()) {
+    yield await repo.getAll();
+  }
 });
 
 /// Enriched goals with progress calculations.
 final goalsWithProgressProvider = Provider<List<GoalWithProgress>>((ref) {
-  final goals = ref.watch(goalListProvider).valueOrNull ?? [];
+  final goals = ref.watch(goalListProvider).value ?? [];
   final now = DateTime.now();
 
   return goals.map((g) {
