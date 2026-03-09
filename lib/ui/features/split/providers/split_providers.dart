@@ -50,9 +50,12 @@ class SplitSummary {
 // ── Providers ───────────────────────────────────────────────────────────────
 
 /// Real-time stream of all splits.
-final splitListProvider = StreamProvider<List<SplitModel>>((ref) {
+final splitListProvider = StreamProvider<List<SplitModel>>((ref) async* {
   final repo = ref.watch(splitRepositoryProvider);
-  return repo.watchAll();
+  yield await repo.getAll();
+  await for (final _ in repo.watchAll()) {
+    yield await repo.getAll();
+  }
 });
 
 /// Active (unsettled) splits.
@@ -110,20 +113,24 @@ final participantBalancesProvider = Provider<List<ParticipantBalance>>((ref) {
   }
 
   return balances.values
-      .map((a) => ParticipantBalance(
-            name: a.name,
-            contact: a.contact,
-            totalOwed: a.totalOwed,
-            totalSettled: a.totalSettled,
-            splitCount: a.splitCount,
-          ))
+      .map(
+        (a) => ParticipantBalance(
+          name: a.name,
+          contact: a.contact,
+          totalOwed: a.totalOwed,
+          totalSettled: a.totalSettled,
+          splitCount: a.splitCount,
+        ),
+      )
       .toList()
     ..sort((a, b) => b.outstanding.compareTo(a.outstanding));
 });
 
 /// Single split by ID.
-final splitByIdProvider =
-    FutureProvider.family<SplitModel?, int>((ref, id) async {
+final splitByIdProvider = FutureProvider.family<SplitModel?, int>((
+  ref,
+  id,
+) async {
   final repo = ref.watch(splitRepositoryProvider);
   return repo.getById(id);
 });

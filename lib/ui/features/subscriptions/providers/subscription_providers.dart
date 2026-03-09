@@ -80,9 +80,14 @@ class SubscriptionInsight {
 // ── Providers ───────────────────────────────────────────────────────────────
 
 /// Stream of all active subscriptions, kept in sync with the DB.
-final subscriptionListProvider = StreamProvider<List<SubscriptionModel>>((ref) {
+final subscriptionListProvider = StreamProvider<List<SubscriptionModel>>((
+  ref,
+) async* {
   final repo = ref.watch(subscriptionRepositoryProvider);
-  return repo.watchAll();
+  yield await repo.getAll();
+  await for (final _ in repo.watchAll()) {
+    yield await repo.getAll();
+  }
 });
 
 /// Enriched subscription list with computed costs and days-until-bill.
@@ -170,14 +175,12 @@ final subscriptionInsightsProvider = Provider<List<SubscriptionInsight>>((ref) {
 });
 
 /// Auto-detection trigger: scans recent transactions for recurring patterns.
-final autoDetectSubscriptionsProvider = FutureProvider<List<SubscriptionModel>>(
-  (ref) async {
-    final repo = ref.watch(subscriptionRepositoryProvider);
-    return repo.detectFromTransactions(
-      ref.watch(transactionRepositoryProvider),
-    );
-  },
-);
+final autoDetectSubscriptionsProvider = FutureProvider<void>((ref) async {
+  final subscriptionRepo = ref.watch(subscriptionRepositoryProvider);
+  final transactionRepo = ref.watch(transactionRepositoryProvider);
+  final transactions = await transactionRepo.getAll();
+  await subscriptionRepo.detectFromTransactions(transactions);
+});
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 

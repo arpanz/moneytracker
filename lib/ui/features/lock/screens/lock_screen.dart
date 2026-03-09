@@ -1,5 +1,3 @@
-import 'dart:ui' hide LockState;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +9,7 @@ import '../../../../config/constants/app_constants.dart';
 import '../../../../config/constants/asset_paths.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
-import '../providers/lock_provider.dart';
+import '../providers/lock_provider.dart' as app_lock;
 
 /// Biometric authentication screen displayed when app lock is enabled.
 ///
@@ -58,7 +56,7 @@ class _LockScreenState extends ConsumerState<LockScreen>
   }
 
   Future<void> _triggerAuth() async {
-    final notifier = ref.read(lockProvider.notifier);
+    final notifier = ref.read(app_lock.lockProvider.notifier);
     final available = await notifier.checkBiometricAvailability();
     if (!available) {
       // Biometrics not available -- navigate straight through.
@@ -76,12 +74,12 @@ class _LockScreenState extends ConsumerState<LockScreen>
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(lockProvider);
+    final state = ref.watch(app_lock.lockProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     // Navigate to home on successful authentication.
-    ref.listen<LockState>(lockProvider, (previous, next) {
+    ref.listen<app_lock.LockState>(app_lock.lockProvider, (previous, next) {
       if (next.isAuthenticated && !(previous?.isAuthenticated ?? false)) {
         context.goNamed(RouteNames.home);
       }
@@ -115,21 +113,22 @@ class _LockScreenState extends ConsumerState<LockScreen>
               // ── Lock icon with pulse animation ──
               _ShakeWidget(
                 controller: _shakeController,
-                child: SvgPicture.asset(
-                  AssetPaths.lockIcon,
-                  height: 120,
-                  colorFilter: ColorFilter.mode(
-                    colorScheme.onPrimary,
-                    BlendMode.srcIn,
-                  ),
-                )
-                    .animate(onPlay: (c) => c.repeat(reverse: true))
-                    .scale(
-                      begin: const Offset(1.0, 1.0),
-                      end: const Offset(1.06, 1.06),
-                      duration: const Duration(milliseconds: 1200),
-                      curve: Curves.easeInOut,
-                    ),
+                child:
+                    SvgPicture.asset(
+                          AssetPaths.lockIcon,
+                          height: 120,
+                          colorFilter: ColorFilter.mode(
+                            colorScheme.onPrimary,
+                            BlendMode.srcIn,
+                          ),
+                        )
+                        .animate(onPlay: (c) => c.repeat(reverse: true))
+                        .scale(
+                          begin: const Offset(1.0, 1.0),
+                          end: const Offset(1.06, 1.06),
+                          duration: const Duration(milliseconds: 1200),
+                          curve: Curves.easeInOut,
+                        ),
               ),
 
               const SizedBox(height: Spacing.xl),
@@ -163,18 +162,17 @@ class _LockScreenState extends ConsumerState<LockScreen>
                 ),
                 const SizedBox(height: Spacing.md),
                 FilledButton.icon(
-                  onPressed:
-                      state.isAuthenticating ? null : _triggerAuth,
-                  icon: const Icon(Icons.fingerprint_rounded),
-                  label: const Text('Try Again'),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: colorScheme.onPrimary,
-                    foregroundColor: colorScheme.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: Radii.borderMd,
-                    ),
-                  ),
-                )
+                      onPressed: state.isAuthenticating ? null : _triggerAuth,
+                      icon: const Icon(Icons.fingerprint_rounded),
+                      label: const Text('Try Again'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.onPrimary,
+                        foregroundColor: colorScheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: Radii.borderMd,
+                        ),
+                      ),
+                    )
                     .animate()
                     .fadeIn(duration: AppDurations.fast)
                     .scale(
@@ -211,7 +209,9 @@ class _LockScreenState extends ConsumerState<LockScreen>
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onPrimary.withValues(alpha: 0.7),
                     decoration: TextDecoration.underline,
-                    decorationColor: colorScheme.onPrimary.withValues(alpha: 0.4),
+                    decorationColor: colorScheme.onPrimary.withValues(
+                      alpha: 0.4,
+                    ),
                   ),
                 ),
               ),
@@ -230,22 +230,15 @@ class _ShakeWidget extends StatelessWidget {
   final AnimationController controller;
   final Widget child;
 
-  const _ShakeWidget({
-    required this.controller,
-    required this.child,
-  });
+  const _ShakeWidget({required this.controller, required this.child});
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: controller,
       builder: (context, child) {
-        final sineValue =
-            _shakeTween.evaluate(controller);
-        return Transform.translate(
-          offset: Offset(sineValue, 0),
-          child: child,
-        );
+        final sineValue = _shakeTween.evaluate(controller);
+        return Transform.translate(offset: Offset(sineValue, 0), child: child);
       },
       child: child,
     );

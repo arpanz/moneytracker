@@ -76,9 +76,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
       initialDateRange: currentRange,
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme,
-          ),
+          data: Theme.of(
+            context,
+          ).copyWith(colorScheme: Theme.of(context).colorScheme),
           child: child!,
         );
       },
@@ -137,9 +137,13 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     final topCategories = ref.watch(topCategoriesProvider);
 
     // Determine if everything is empty (all loaded with no data).
-    final allEmpty = spendingTrend.valueOrNull?.every((s) => s.y == 0) == true &&
+    final allEmpty =
+        spendingTrend.valueOrNull?.every((s) => s.y == 0) == true &&
         (categoryBreakdown.valueOrNull?.isEmpty ?? true) &&
-        incomeVsExpense.valueOrNull?.every((m) => m.income == 0 && m.expense == 0) == true;
+        incomeVsExpense.valueOrNull?.every(
+              (m) => m.income == 0 && m.expense == 0,
+            ) ==
+            true;
 
     return Scaffold(
       body: CustomScrollView(
@@ -197,11 +201,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                 ),
 
                 // Section 5: Top Categories
-                _buildTopCategoriesSection(
-                  theme,
-                  cheddarColors,
-                  topCategories,
-                ),
+                _buildTopCategoriesSection(theme, cheddarColors, topCategories),
 
                 // Bottom padding for nav bar.
                 const SizedBox(height: 100),
@@ -256,8 +256,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                   color: isSelected
                       ? theme.colorScheme.onPrimary
                       : theme.colorScheme.onSurface,
-                  fontWeight:
-                      isSelected ? FontWeight.w600 : FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   fontSize: 13,
                 ),
                 backgroundColor: theme.colorScheme.surface,
@@ -266,9 +265,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       ? Colors.transparent
                       : theme.colorScheme.outline.withOpacity(0.3),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: Radii.borderFull,
-                ),
+                shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
                 padding: const EdgeInsets.symmetric(
                   horizontal: Spacing.sm,
                   vertical: Spacing.xs,
@@ -285,60 +282,59 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
 
   Widget _buildEmptyState(ThemeData theme) {
     return Center(
-      child: Padding(
-        padding: Spacing.paddingXl,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              AssetPaths.emptyTransactions,
-              width: 180,
-              height: 180,
+          child: Padding(
+            padding: Spacing.paddingXl,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  AssetPaths.emptyTransactions,
+                  width: 180,
+                  height: 180,
+                ),
+                const SizedBox(height: Spacing.lg),
+                Text(
+                  'No statistics yet',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: Spacing.sm),
+                Text(
+                  'Start adding transactions to see your\nspending insights and trends here.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: Spacing.lg),
-            Text(
-              'No statistics yet',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: Spacing.sm),
-            Text(
-              'Start adding transactions to see your\nspending insights and trends here.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(duration: 500.ms).slideY(
-          begin: 0.1,
-          end: 0,
-          duration: 500.ms,
-        );
+          ),
+        )
+        .animate()
+        .fadeIn(duration: 500.ms)
+        .slideY(begin: 0.1, end: 0, duration: 500.ms);
   }
 
   // ── Shimmer Placeholder ─────────────────────────────────────────────────
 
-  Widget _buildShimmerPlaceholder(
-    CheddarColors colors, {
-    double height = 200,
-  }) {
+  Widget _buildShimmerPlaceholder(CheddarColors colors, {double height = 200}) {
     return Container(
-      height: height,
-      decoration: BoxDecoration(
-        borderRadius: Radii.borderMd,
-        gradient: LinearGradient(
-          colors: [colors.shimmerBase, colors.shimmerHighlight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-    )
+          height: height,
+          decoration: BoxDecoration(
+            borderRadius: Radii.borderMd,
+            gradient: LinearGradient(
+              colors: [colors.shimmerBase, colors.shimmerHighlight],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        )
         .animate(onPlay: (c) => c.repeat())
-        .shimmer(duration: AppDurations.shimmer, color: colors.shimmerHighlight);
+        .shimmer(
+          duration: AppDurations.shimmer,
+          color: colors.shimmerHighlight,
+        );
   }
 
   // ── Section 1: Spending Trend ───────────────────────────────────────────
@@ -362,10 +358,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             return _buildNoDataPlaceholder(theme, 'No spending data');
           }
 
-          final maxY = spots.map((s) => s.y).reduce(
-                    (a, b) => a > b ? a : b,
-                  ) *
-              1.2;
+          final maxY =
+              spots.map((s) => s.y).reduce((a, b) => a > b ? a : b) * 1.2;
 
           return LineChart(
             LineChartData(
@@ -397,8 +391,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         child: Text(
                           _formatAmount(value),
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface
-                                .withOpacity(0.5),
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
                             fontSize: 10,
                           ),
                         ),
@@ -413,15 +406,15 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     interval: _computeBottomInterval(spots.length),
                     getTitlesWidget: (value, meta) {
                       final dayIndex = value.toInt();
-                      final date = dateRange.start
-                          .add(Duration(days: dayIndex));
+                      final date = dateRange.start.add(
+                        Duration(days: dayIndex),
+                      );
                       return Padding(
                         padding: const EdgeInsets.only(top: 6),
                         child: Text(
                           DateFormat('d').format(date),
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface
-                                .withOpacity(0.5),
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
                             fontSize: 10,
                           ),
                         ),
@@ -438,13 +431,13 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
               lineTouchData: LineTouchData(
                 handleBuiltInTouches: true,
                 touchTooltipData: LineTouchTooltipData(
-                  getTooltipColor: (_) =>
-                      theme.colorScheme.inverseSurface,
-                  tooltipRoundedRadius: 8,
+                  getTooltipColor: (_) => theme.colorScheme.inverseSurface,
+                  tooltipBorderRadius: BorderRadius.circular(8),
                   getTooltipItems: (touchedSpots) {
                     return touchedSpots.map((spot) {
-                      final date = dateRange.start
-                          .add(Duration(days: spot.x.toInt()));
+                      final date = dateRange.start.add(
+                        Duration(days: spot.x.toInt()),
+                      );
                       return LineTooltipItem(
                         '${DateFormat('dd MMM').format(date)}\n${_formatFullAmount(spot.y)}',
                         TextStyle(
@@ -530,8 +523,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                             _touchedPieIndex = -1;
                             return;
                           }
-                          _touchedPieIndex = response
-                              .touchedSection!.touchedSectionIndex;
+                          _touchedPieIndex =
+                              response.touchedSection!.touchedSectionIndex;
                         });
                       },
                     ),
@@ -556,10 +549,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                           shadows: const [
-                            Shadow(
-                              color: Colors.black26,
-                              blurRadius: 2,
-                            ),
+                            Shadow(color: Colors.black26, blurRadius: 2),
                           ],
                         ),
                         titlePositionPercentageOffset: 0.55,
@@ -598,8 +588,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       Text(
                         _formatFullAmount(cat.amount),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface
-                              .withOpacity(0.5),
+                          color: theme.colorScheme.onSurface.withOpacity(0.5),
                         ),
                       ),
                     ],
@@ -635,8 +624,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
           }
 
           final maxVal = months.fold<double>(0, (prev, m) {
-            final localMax =
-                m.income > m.expense ? m.income : m.expense;
+            final localMax = m.income > m.expense ? m.income : m.expense;
             return localMax > prev ? localMax : prev;
           });
           final maxY = maxVal * 1.2;
@@ -647,9 +635,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
               maxY: maxY > 0 ? maxY : 100,
               barTouchData: BarTouchData(
                 touchTooltipData: BarTouchTooltipData(
-                  getTooltipColor: (_) =>
-                      theme.colorScheme.inverseSurface,
-                  tooltipRoundedRadius: 8,
+                  getTooltipColor: (_) => theme.colorScheme.inverseSurface,
+                  tooltipBorderRadius: BorderRadius.circular(8),
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                     final label = rodIndex == 0 ? 'Income' : 'Expense';
                     return BarTooltipItem(
@@ -682,8 +669,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         child: Text(
                           _formatAmount(value),
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface
-                                .withOpacity(0.5),
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
                             fontSize: 10,
                           ),
                         ),
@@ -705,8 +691,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         child: Text(
                           months[index].monthLabel,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface
-                                .withOpacity(0.5),
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
                             fontSize: 10,
                           ),
                         ),
@@ -781,10 +766,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
           }
 
           // Show heatmap for current month of the date range.
-          final month = DateTime(
-            dateRange.start.year,
-            dateRange.start.month,
-          );
+          final month = DateTime(dateRange.start.year, dateRange.start.month);
 
           return HeatmapCalendar(
             dailySpending: spendingMap,
@@ -834,82 +816,77 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             children: categories.asMap().entries.map((entry) {
               final i = entry.key;
               final cat = entry.value;
-              final fraction =
-                  maxAmount > 0 ? cat.amount / maxAmount : 0.0;
+              final fraction = maxAmount > 0 ? cat.amount / maxAmount : 0.0;
 
               return Padding(
-                padding: const EdgeInsets.only(bottom: Spacing.sm),
-                child: Row(
-                  children: [
-                    // ── Category Label ──
-                    SizedBox(
-                      width: 80,
-                      child: Text(
-                        cat.category,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 11,
+                    padding: const EdgeInsets.only(bottom: Spacing.sm),
+                    child: Row(
+                      children: [
+                        // ── Category Label ──
+                        SizedBox(
+                          width: 80,
+                          child: Text(
+                            cat.category,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    const SizedBox(width: Spacing.sm),
+                        const SizedBox(width: Spacing.sm),
 
-                    // ── Horizontal Bar ──
-                    Expanded(
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Stack(
-                            children: [
-                              // Background track.
-                              Container(
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.outline
-                                      .withOpacity(0.08),
-                                  borderRadius: Radii.borderSm,
-                                ),
-                              ),
-                              // Filled bar.
-                              AnimatedContainer(
-                                duration: AppDurations.medium,
-                                curve: Curves.easeOutCubic,
-                                height: 24,
-                                width:
-                                    constraints.maxWidth * fraction,
-                                decoration: BoxDecoration(
-                                  color: cat.color,
-                                  borderRadius: Radii.borderSm,
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: Spacing.sm),
-
-                    // ── Amount Label ──
-                    SizedBox(
-                      width: 56,
-                      child: Text(
-                        _formatAmount(cat.amount),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 11,
+                        // ── Horizontal Bar ──
+                        Expanded(
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return Stack(
+                                children: [
+                                  // Background track.
+                                  Container(
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.outline
+                                          .withOpacity(0.08),
+                                      borderRadius: Radii.borderSm,
+                                    ),
+                                  ),
+                                  // Filled bar.
+                                  AnimatedContainer(
+                                    duration: AppDurations.medium,
+                                    curve: Curves.easeOutCubic,
+                                    height: 24,
+                                    width: constraints.maxWidth * fraction,
+                                    decoration: BoxDecoration(
+                                      color: cat.color,
+                                      borderRadius: Radii.borderSm,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
                         ),
-                        textAlign: TextAlign.right,
-                      ),
+                        const SizedBox(width: Spacing.sm),
+
+                        // ── Amount Label ──
+                        SizedBox(
+                          width: 56,
+                          child: Text(
+                            _formatAmount(cat.amount),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 11,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              )
-                  .animate()
-                  .fadeIn(
-                    delay: (100 * i).ms,
-                    duration: 400.ms,
                   )
+                  .animate()
+                  .fadeIn(delay: (100 * i).ms, duration: 400.ms)
                   .slideX(
                     begin: -0.1,
                     end: 0,

@@ -33,14 +33,7 @@
   error - The property 'xxs' can't be accessed on the type 'Type' in a constant expression - lib\ui\features\settings\screens\theme_picker_screen.dart:145:48 - const_eval_property_access
   error - The getter 'xxs' isn't defined for the type 'Spacing' - lib\ui\features\settings\screens\theme_picker_screen.dart:145:59 - undefined_getter
   error - The returned type 'Stream<void>' isn't returnable from a 'Stream<List<SplitModel>>' function, as required by the closure's context - lib\ui\features\split\providers\split_providers.dart:55:10 - return_of_invalid_type_from_closure
-  error - The getter 'radiusLg' isn't defined for the type 'Spacing' - lib\ui\features\split\screens\split_screen.dart:114:56 - undefined_getter
-  error - The property 'xxs' can't be accessed on the type 'Type' in a constant expression - lib\ui\features\split\screens\split_screen.dart:169:19 - const_eval_property_access
-  error - The getter 'xxs' isn't defined for the type 'Spacing' - lib\ui\features\split\screens\split_screen.dart:169:30 - undefined_getter
-  error - The getter 'radiusSm' isn't defined for the type 'Spacing' - lib\ui\features\split\screens\split_screen.dart:173:56 - undefined_getter
-  error - The getter 'radiusMd' isn't defined for the type 'Spacing' - lib\ui\features\split\screens\split_screen.dart:228:56 - undefined_getter
-  error - The property 'radiusLg' can't be accessed on the type 'Type' in a constant expression - lib\ui\features\split\screens\split_screen.dart:341:56 - const_eval_property_access
-  error - The getter 'radiusLg' isn't defined for the type 'Spacing' - lib\ui\features\split\screens\split_screen.dart:341:67 - undefined_getter
-  error - Undefined name 'vibeThemes' - lib\ui\features\stats\providers\stats_providers.dart:98:20 - undefined_identifier
+  error - The getter 'data' isn't defined for the type 'VibeTheme' - lib\ui\features\stats\providers\stats_providers.dart:97:44 - undefined_getter
   error - The named parameter 'tooltipRoundedRadius' isn't defined - lib\ui\features\stats\screens\stats_screen.dart:443:19 - undefined_named_parameter
   error - The named parameter 'tooltipRoundedRadius' isn't defined - lib\ui\features\stats\screens\stats_screen.dart:652:19 - undefined_named_parameter
   error - The returned type 'Stream<void>' isn't returnable from a 'Stream<List<SubscriptionModel>>' function, as required by the closure's context - lib\ui\features\subscriptions\providers\subscription_providers.dart:85:10 - return_of_invalid_type_from_closure

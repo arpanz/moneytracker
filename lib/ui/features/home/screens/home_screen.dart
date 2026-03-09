@@ -15,6 +15,7 @@ import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_extensions.dart';
 import '../../../../config/theme/theme_provider.dart';
+import '../../../../config/theme/vibe_themes.dart';
 import '../../../../domain/models/transaction_model.dart';
 import '../providers/home_provider.dart';
 import '../widgets/balance_card.dart';
@@ -99,9 +100,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
 
-              const SliverToBoxAdapter(
-                child: SizedBox(height: Spacing.md),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: Spacing.md)),
 
               // ── Income / Expense Row ──
               SliverToBoxAdapter(
@@ -111,9 +110,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
 
-              const SliverToBoxAdapter(
-                child: SizedBox(height: Spacing.lg),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: Spacing.lg)),
 
               // ── Quick Actions ──
               SliverToBoxAdapter(
@@ -123,9 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
 
-              const SliverToBoxAdapter(
-                child: SizedBox(height: Spacing.lg),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: Spacing.lg)),
 
               // ── Mini Spending Chart ──
               SliverToBoxAdapter(
@@ -135,9 +130,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
 
-              const SliverToBoxAdapter(
-                child: SizedBox(height: Spacing.lg),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: Spacing.lg)),
 
               // ── Recent Transactions Header ──
               SliverToBoxAdapter(
@@ -173,9 +166,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               _RecentTransactionsList(ref: ref, theme: theme),
 
               // Bottom padding for nav bar clearance.
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 100),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
           ),
         ),
@@ -206,11 +197,11 @@ class _GreetingHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '$greeting${userName.isNotEmpty ? ', $userName' : ''}',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        )
+              '$greeting${userName.isNotEmpty ? ', $userName' : ''}',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            )
             .animate()
             .fadeIn(duration: AppDurations.medium)
             .slideY(
@@ -226,9 +217,9 @@ class _GreetingHeader extends StatelessWidget {
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ).animate().fadeIn(
-              delay: const Duration(milliseconds: 100),
-              duration: AppDurations.medium,
-            ),
+          delay: const Duration(milliseconds: 100),
+          duration: AppDurations.medium,
+        ),
       ],
     );
   }
@@ -269,13 +260,13 @@ class _BalanceCardShimmer extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      width: double.infinity,
-      height: 120,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
-      ),
-    )
+          width: double.infinity,
+          height: 120,
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerHighest,
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+          ),
+        )
         .animate(onPlay: (c) => c.repeat())
         .shimmer(
           duration: AppDurations.shimmer,
@@ -299,30 +290,30 @@ class _IncomeExpenseRow extends StatelessWidget {
     final cheddarColors = theme.extension<CheddarColors>();
 
     return Row(
-      children: [
-        Expanded(
-          child: _MiniStatCard(
-            label: 'Income',
-            amount: incomeAsync.value ?? 0,
-            isLoading: incomeAsync.isLoading,
-            icon: Icons.arrow_upward_rounded,
-            iconColor: cheddarColors?.income ?? Colors.green,
-            theme: theme,
-          ),
-        ),
-        const SizedBox(width: Spacing.md),
-        Expanded(
-          child: _MiniStatCard(
-            label: 'Expense',
-            amount: expenseAsync.value ?? 0,
-            isLoading: expenseAsync.isLoading,
-            icon: Icons.arrow_downward_rounded,
-            iconColor: cheddarColors?.expense ?? Colors.red,
-            theme: theme,
-          ),
-        ),
-      ],
-    )
+          children: [
+            Expanded(
+              child: _MiniStatCard(
+                label: 'Income',
+                amount: incomeAsync.value ?? 0,
+                isLoading: incomeAsync.isLoading,
+                icon: Icons.arrow_upward_rounded,
+                iconColor: cheddarColors?.income ?? Colors.green,
+                theme: theme,
+              ),
+            ),
+            const SizedBox(width: Spacing.md),
+            Expanded(
+              child: _MiniStatCard(
+                label: 'Expense',
+                amount: expenseAsync.value ?? 0,
+                isLoading: expenseAsync.isLoading,
+                icon: Icons.arrow_downward_rounded,
+                iconColor: cheddarColors?.expense ?? Colors.red,
+                theme: theme,
+              ),
+            ),
+          ],
+        )
         .animate()
         .fadeIn(
           delay: const Duration(milliseconds: 200),
@@ -466,12 +457,10 @@ class _QuickActionsRow extends StatelessWidget {
           theme: theme,
         ),
       ],
-    )
-        .animate()
-        .fadeIn(
-          delay: const Duration(milliseconds: 300),
-          duration: AppDurations.medium,
-        );
+    ).animate().fadeIn(
+      delay: const Duration(milliseconds: 300),
+      duration: AppDurations.medium,
+    );
   }
 }
 
@@ -557,107 +546,110 @@ class _SpendingChart extends StatelessWidget {
         final total = top5.fold<double>(0, (sum, e) => sum + e.value);
 
         return Container(
-          padding: const EdgeInsets.all(Spacing.md),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerLow,
-            borderRadius: Radii.borderLg,
-            border: Border.all(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Spending Breakdown',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
+              padding: const EdgeInsets.all(Spacing.md),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerLow,
+                borderRadius: Radii.borderLg,
+                border: Border.all(
+                  color: theme.colorScheme.outlineVariant.withValues(
+                    alpha: 0.3,
+                  ),
                 ),
               ),
-              const SizedBox(height: Spacing.md),
-              SizedBox(
-                height: 160,
-                child: Row(
-                  children: [
-                    // Pie chart.
-                    SizedBox(
-                      width: 120,
-                      height: 120,
-                      child: PieChart(
-                        PieChartData(
-                          sectionsSpace: 2,
-                          centerSpaceRadius: 28,
-                          sections: List.generate(top5.length, (i) {
-                            final entry = top5[i];
-                            final pct = total > 0
-                                ? (entry.value / total) * 100
-                                : 0.0;
-                            return PieChartSectionData(
-                              value: entry.value,
-                              color: chartColors[i % chartColors.length],
-                              radius: 28,
-                              title: '${pct.round()}%',
-                              titleStyle: theme.textTheme.labelSmall?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
-                              ),
-                            );
-                          }),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Spending Breakdown',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                  SizedBox(
+                    height: 160,
+                    child: Row(
+                      children: [
+                        // Pie chart.
+                        SizedBox(
+                          width: 120,
+                          height: 120,
+                          child: PieChart(
+                            PieChartData(
+                              sectionsSpace: 2,
+                              centerSpaceRadius: 28,
+                              sections: List.generate(top5.length, (i) {
+                                final entry = top5[i];
+                                final pct = total > 0
+                                    ? (entry.value / total) * 100
+                                    : 0.0;
+                                return PieChartSectionData(
+                                  value: entry.value,
+                                  color: chartColors[i % chartColors.length],
+                                  radius: 28,
+                                  title: '${pct.round()}%',
+                                  titleStyle: theme.textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10,
+                                      ),
+                                );
+                              }),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: Spacing.lg),
+                        // Legend.
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: List.generate(top5.length, (i) {
+                              final entry = top5[i];
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 3,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            chartColors[i % chartColors.length],
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: Spacing.sm),
+                                    Expanded(
+                                      child: Text(
+                                        entry.key,
+                                        style: theme.textTheme.bodySmall,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${AppConstants.currencySymbol} ${_MiniStatCard._formatCompact(entry.value)}',
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: Spacing.lg),
-                    // Legend.
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: List.generate(top5.length, (i) {
-                          final entry = top5[i];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 3,
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 10,
-                                  height: 10,
-                                  decoration: BoxDecoration(
-                                    color: chartColors[
-                                        i % chartColors.length],
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: Spacing.sm),
-                                Expanded(
-                                  child: Text(
-                                    entry.key,
-                                    style: theme.textTheme.bodySmall,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Text(
-                                  '${AppConstants.currencySymbol} ${_MiniStatCard._formatCompact(entry.value)}',
-                                  style:
-                                      theme.textTheme.bodySmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        )
+            )
             .animate()
             .fadeIn(
               delay: const Duration(milliseconds: 400),
@@ -709,10 +701,7 @@ class _RecentTransactionsList extends StatelessWidget {
               padding: Spacing.paddingLg,
               child: Column(
                 children: [
-                  SvgPicture.asset(
-                    AssetPaths.emptyTransactions,
-                    height: 120,
-                  ),
+                  SvgPicture.asset(AssetPaths.emptyTransactions, height: 120),
                   const SizedBox(height: Spacing.md),
                   Text(
                     'No transactions yet',
@@ -724,8 +713,9 @@ class _RecentTransactionsList extends StatelessWidget {
                   Text(
                     'Tap "Add Expense" to get started',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant
-                          .withValues(alpha: 0.7),
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.7,
+                      ),
                     ),
                   ),
                 ],
@@ -759,38 +749,37 @@ class _RecentTransactionsList extends StatelessWidget {
                   return await _showDeleteConfirmation(context, theme);
                 },
                 onDismissed: (_) {
-                  ref
-                      .read(transactionRepositoryProvider)
-                      .delete(txn.id);
+                  ref.read(transactionRepositoryProvider).delete(txn.id);
                   ref.invalidate(recentTransactionsProvider);
                   ref.invalidate(totalBalanceProvider);
                   ref.invalidate(monthlyIncomeProvider);
                   ref.invalidate(monthlyExpenseProvider);
                   ref.invalidate(categoryTotalsProvider);
                 },
-                child: _TransactionRow(
-                  transaction: txn,
-                  theme: theme,
-                  cheddarColors: cheddarColors,
-                  onTap: () {
-                    context.pushNamed(
-                      RouteNames.transactionDetail,
-                      pathParameters: {'id': txn.id.toString()},
-                    );
-                  },
-                )
-                    .animate()
-                    .fadeIn(
-                      delay: Duration(milliseconds: 100 * index),
-                      duration: AppDurations.medium,
-                    )
-                    .slideX(
-                      begin: 0.05,
-                      end: 0,
-                      delay: Duration(milliseconds: 100 * index),
-                      duration: AppDurations.medium,
-                      curve: Curves.easeOut,
-                    ),
+                child:
+                    _TransactionRow(
+                          transaction: txn,
+                          theme: theme,
+                          cheddarColors: cheddarColors,
+                          onTap: () {
+                            context.pushNamed(
+                              RouteNames.transactionDetail,
+                              pathParameters: {'id': txn.id.toString()},
+                            );
+                          },
+                        )
+                        .animate()
+                        .fadeIn(
+                          delay: Duration(milliseconds: 100 * index),
+                          duration: AppDurations.medium,
+                        )
+                        .slideX(
+                          begin: 0.05,
+                          end: 0,
+                          delay: Duration(milliseconds: 100 * index),
+                          duration: AppDurations.medium,
+                          curve: Curves.easeOut,
+                        ),
               );
             },
           ),
@@ -804,9 +793,7 @@ class _RecentTransactionsList extends StatelessWidget {
           ),
         ),
       ),
-      error: (_, __) => const SliverToBoxAdapter(
-        child: SizedBox.shrink(),
-      ),
+      error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
     );
   }
 
@@ -861,9 +848,13 @@ class _TransactionRow extends StatelessWidget {
     final amountColor = isIncome
         ? (cheddarColors?.income ?? Colors.green)
         : isTransfer
-            ? (cheddarColors?.transfer ?? Colors.blue)
-            : (cheddarColors?.expense ?? Colors.red);
-    final prefix = isIncome ? '+' : isTransfer ? '' : '-';
+        ? (cheddarColors?.transfer ?? Colors.blue)
+        : (cheddarColors?.expense ?? Colors.red);
+    final prefix = isIncome
+        ? '+'
+        : isTransfer
+        ? ''
+        : '-';
     final dateStr = DateFormat('MMM d').format(transaction.date);
 
     // Map category to SVG icon.
@@ -873,9 +864,7 @@ class _TransactionRow extends StatelessWidget {
       onTap: onTap,
       borderRadius: Radii.borderMd,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: Spacing.sm + 2,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: Spacing.sm + 2),
         child: Row(
           children: [
             // Category icon.
@@ -888,11 +877,7 @@ class _TransactionRow extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(8),
               child: categoryIcon != null
-                  ? SvgPicture.asset(
-                      categoryIcon,
-                      width: 26,
-                      height: 26,
-                    )
+                  ? SvgPicture.asset(categoryIcon, width: 26, height: 26)
                   : Icon(
                       Icons.receipt_long_rounded,
                       size: 22,
@@ -979,53 +964,53 @@ class _TransactionShimmer extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
-      child: Row(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest,
-              borderRadius: Radii.borderMd,
-            ),
-          ),
-          const SizedBox(width: Spacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 100,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest,
-                    borderRadius: Radii.borderSm,
-                  ),
+          padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: Radii.borderMd,
                 ),
-                const SizedBox(height: 6),
-                Container(
-                  width: 60,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest,
-                    borderRadius: Radii.borderSm,
-                  ),
+              ),
+              const SizedBox(width: Spacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest,
+                        borderRadius: Radii.borderSm,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      width: 60,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest,
+                        borderRadius: Radii.borderSm,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Container(
+                width: 50,
+                height: 14,
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: Radii.borderSm,
+                ),
+              ),
+            ],
           ),
-          Container(
-            width: 50,
-            height: 14,
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest,
-              borderRadius: Radii.borderSm,
-            ),
-          ),
-        ],
-      ),
-    )
+        )
         .animate(onPlay: (c) => c.repeat())
         .shimmer(
           duration: AppDurations.shimmer,

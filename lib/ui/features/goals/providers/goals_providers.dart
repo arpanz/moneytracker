@@ -84,28 +84,47 @@ final goalsWithProgressProvider = Provider<List<GoalWithProgress>>((ref) {
   final now = DateTime.now();
 
   return goals.map((g) {
+    final deadline = g.deadline;
     final pct = g.targetAmount > 0
-        ? (g.currentAmount / g.targetAmount * 100).clamp(0.0, 100.0)
+        ? (g.currentAmount / g.targetAmount * 100).clamp(0.0, 100.0).toDouble()
         : 0.0;
-    final remaining = (g.targetAmount - g.currentAmount).clamp(0, double.infinity);
-    final daysLeft = g.deadline.difference(now).inDays;
+    final remaining = (g.targetAmount - g.currentAmount)
+        .clamp(0.0, double.infinity)
+        .toDouble();
+    final daysLeft = deadline?.difference(now).inDays ?? 0;
     final isComplete = g.currentAmount >= g.targetAmount;
 
     GoalStatus status;
     if (isComplete) {
       status = GoalStatus.completed;
-    } else if (daysLeft < 0) {
+    } else if (deadline != null && daysLeft < 0) {
       status = GoalStatus.overdue;
     } else {
-      // Check if on track: linear pace
-      final totalDays = g.deadline.difference(g.createdAt).inDays.clamp(1, 36500);
-      final daysPassed = now.difference(g.createdAt).inDays.clamp(1, totalDays);
-      final expectedPct = (daysPassed / totalDays) * 100;
-      status = pct >= expectedPct * 0.85 ? GoalStatus.onTrack : GoalStatus.behind;
+      if (deadline == null) {
+        status = GoalStatus.onTrack;
+      } else {
+        // Check if on track against a linear savings pace.
+        final totalDays = deadline
+            .difference(g.createdAt)
+            .inDays
+            .clamp(1, 36500);
+        final daysPassed = now
+            .difference(g.createdAt)
+            .inDays
+            .clamp(1, totalDays);
+        final expectedPct = (daysPassed / totalDays) * 100;
+        status = pct >= expectedPct * 0.85
+            ? GoalStatus.onTrack
+            : GoalStatus.behind;
+      }
     }
 
-    final daily = daysLeft > 0 ? remaining / daysLeft : remaining;
-    final weekly = daysLeft > 7 ? remaining / (daysLeft / 7) : remaining;
+    final daily = deadline != null && daysLeft > 0
+        ? remaining / daysLeft
+        : remaining;
+    final weekly = deadline != null && daysLeft > 7
+        ? remaining / (daysLeft / 7)
+        : remaining;
 
     return GoalWithProgress(
       goal: g,
@@ -116,13 +135,21 @@ final goalsWithProgressProvider = Provider<List<GoalWithProgress>>((ref) {
       weeklySuggestion: weekly,
       status: status,
     );
-  }).toList()
-    ..sort((a, b) {
-      // Completed last, then by deadline
-      if (a.status == GoalStatus.completed && b.status != GoalStatus.completed) return 1;
-      if (b.status == GoalStatus.completed && a.status != GoalStatus.completed) return -1;
-      return a.goal.deadline.compareTo(b.goal.deadline);
-    });
+  }).toList()..sort((a, b) {
+    // Completed last, then by deadline
+    if (a.status == GoalStatus.completed && b.status != GoalStatus.completed) {
+      return 1;
+    }
+    if (b.status == GoalStatus.completed && a.status != GoalStatus.completed) {
+      return -1;
+    }
+    final aDeadline = a.goal.deadline;
+    final bDeadline = b.goal.deadline;
+    if (aDeadline == null && bDeadline == null) return 0;
+    if (aDeadline == null) return 1;
+    if (bDeadline == null) return -1;
+    return aDeadline.compareTo(bDeadline);
+  });
 });
 
 /// Summary statistics for the goals dashboard.
@@ -139,8 +166,9 @@ final goalsSummaryProvider = Provider<GoalsSummary>((ref) {
     completedGoals: completed,
     totalSaved: totalSaved,
     totalTarget: totalTarget,
-    overallPercentage:
-        totalTarget > 0 ? (totalSaved / totalTarget * 100).clamp(0, 100) : 0,
+    overallPercentage: totalTarget > 0
+        ? (totalSaved / totalTarget * 100).clamp(0.0, 100.0).toDouble()
+        : 0,
   );
 });
 
@@ -153,8 +181,10 @@ final activeGoalsProvider = Provider<List<GoalWithProgress>>((ref) {
 });
 
 /// Single goal by ID for detail screen.
-final goalByIdProvider =
-    FutureProvider.family<GoalModel?, int>((ref, id) async {
+final goalByIdProvider = FutureProvider.family<GoalModel?, int>((
+  ref,
+  id,
+) async {
   final repo = ref.watch(goalRepositoryProvider);
   return repo.getById(id);
 });

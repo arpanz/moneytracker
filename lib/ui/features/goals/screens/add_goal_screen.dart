@@ -102,7 +102,8 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
     try {
       final goalRepo = ref.read(goalRepositoryProvider);
       final amount = double.parse(
-          _amountController.text.replaceAll(',', '').trim());
+        _amountController.text.replaceAll(',', '').trim(),
+      );
 
       if (_isEditing) {
         final goal = widget.existingGoal!
@@ -128,9 +129,9 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving goal: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error saving goal: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -143,9 +144,7 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
     final textTheme = theme.textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Goal' : 'New Goal'),
-      ),
+      appBar: AppBar(title: Text(_isEditing ? 'Edit Goal' : 'New Goal')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -166,9 +165,12 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
             const SizedBox(height: Spacing.lg),
 
             // Target amount
-            Text('Target Amount',
-                style: textTheme.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'Target Amount',
+              style: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: Spacing.sm),
             TextFormField(
               controller: _amountController,
@@ -192,26 +194,32 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
             const SizedBox(height: Spacing.lg),
 
             // Deadline picker
-            Text('Deadline (Optional)',
-                style: textTheme.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'Deadline (Optional)',
+              style: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: Spacing.sm),
             InkWell(
               onTap: _pickDeadline,
               borderRadius: Radii.borderMd,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
-                  border: Border.all(
-                      color: theme.colorScheme.outlineVariant),
+                  border: Border.all(color: theme.colorScheme.outlineVariant),
                   borderRadius: Radii.borderMd,
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.calendar_today_outlined,
-                        size: 20,
-                        color: theme.colorScheme.onSurfaceVariant),
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 20,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                     const SizedBox(width: 12),
                     Text(
                       _deadline != null
@@ -226,9 +234,11 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
                     const Spacer(),
                     if (_deadline != null)
                       IconButton(
-                        icon: Icon(Icons.clear,
-                            size: 18,
-                            color: theme.colorScheme.onSurfaceVariant),
+                        icon: Icon(
+                          Icons.clear,
+                          size: 18,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                         onPressed: () => setState(() => _deadline = null),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -240,9 +250,12 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
             const SizedBox(height: Spacing.lg),
 
             // Icon picker
-            Text('Icon',
-                style: textTheme.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'Icon',
+              style: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: Spacing.sm),
             Wrap(
               spacing: 8,
@@ -252,7 +265,7 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
                 return GestureDetector(
                   onTap: () => setState(() => _selectedIcon = entry.key),
                   child: AnimatedContainer(
-                    duration: Durations.fast,
+                    duration: AppDurations.fast,
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
@@ -261,8 +274,7 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
                           : theme.colorScheme.surfaceContainerHighest,
                       borderRadius: Radii.borderMd,
                       border: isSelected
-                          ? Border.all(
-                              color: Color(_selectedColor), width: 2)
+                          ? Border.all(color: Color(_selectedColor), width: 2)
                           : null,
                     ),
                     child: Center(
@@ -281,9 +293,12 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
             const SizedBox(height: Spacing.lg),
 
             // Color picker
-            Text('Color',
-                style: textTheme.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'Color',
+              style: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: Spacing.sm),
             Row(
               children: _colorOptions.map((colorVal) {
@@ -291,10 +306,9 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: GestureDetector(
-                    onTap: () =>
-                        setState(() => _selectedColor = colorVal),
+                    onTap: () => setState(() => _selectedColor = colorVal),
                     child: AnimatedContainer(
-                      duration: Durations.fast,
+                      duration: AppDurations.fast,
                       width: isSelected ? 40 : 36,
                       height: isSelected ? 40 : 36,
                       decoration: BoxDecoration(
@@ -314,8 +328,11 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
                             : null,
                       ),
                       child: isSelected
-                          ? const Icon(Icons.check,
-                              color: Colors.white, size: 18)
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 18,
+                            )
                           : null,
                     ),
                   ),
@@ -333,9 +350,12 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Link to Account (Optional)',
-                        style: textTheme.titleSmall
-                            ?.copyWith(fontWeight: FontWeight.w600)),
+                    Text(
+                      'Link to Account (Optional)',
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     const SizedBox(height: Spacing.sm),
                     DropdownButtonFormField<String?>(
                       value: _linkedAccountId,
@@ -348,13 +368,14 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
                           value: null,
                           child: Text('None'),
                         ),
-                        ...accounts.map((a) => DropdownMenuItem(
-                              value: '${a.id}',
-                              child: Text(a.name),
-                            )),
+                        ...accounts.map(
+                          (a) => DropdownMenuItem(
+                            value: '${a.id}',
+                            child: Text(a.name),
+                          ),
+                        ),
                       ],
-                      onChanged: (v) =>
-                          setState(() => _linkedAccountId = v),
+                      onChanged: (v) => setState(() => _linkedAccountId = v),
                     ),
                   ],
                 );
@@ -370,16 +391,16 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
             onPressed: _isSaving ? null : _save,
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: Radii.borderMd,
-              ),
+              shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
             ),
             child: _isSaving
                 ? const SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white),
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
                   )
                 : Text(_isEditing ? 'Update Goal' : 'Create Goal'),
           ),

@@ -69,16 +69,14 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
                       },
                       decoration: InputDecoration(
                         hintText: 'Search transactions...',
-                        prefixIcon:
-                            const Icon(Icons.search, size: 20),
+                        prefixIcon: const Icon(Icons.search, size: 20),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
                                 icon: const Icon(Icons.clear, size: 18),
                                 onPressed: () {
                                   _searchController.clear();
                                   ref
-                                      .read(
-                                          transactionFilterProvider.notifier)
+                                      .read(transactionFilterProvider.notifier)
                                       .setSearch('');
                                   _searchFocusNode.unfocus();
                                 },
@@ -163,9 +161,8 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
                   hasScrollBody: false,
                   child: _EmptyState(
                     hasFilter: filter.isActive,
-                    onClear: () => ref
-                        .read(transactionFilterProvider.notifier)
-                        .clearAll(),
+                    onClear: () =>
+                        ref.read(transactionFilterProvider.notifier).clearAll(),
                   ),
                 );
               }
@@ -267,11 +264,9 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
       context: context,
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-      initialDateRange: currentRange ??
-          DateTimeRange(
-            start: DateTime(now.year, now.month, 1),
-            end: now,
-          ),
+      initialDateRange:
+          currentRange ??
+          DateTimeRange(start: DateTime(now.year, now.month, 1), end: now),
     );
 
     if (picked != null) {
@@ -344,7 +339,7 @@ class _FilterChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: Durations.fast,
+        duration: AppDurations.fast,
         padding: const EdgeInsets.symmetric(
           horizontal: Spacing.md,
           vertical: Spacing.sm,
@@ -547,10 +542,7 @@ class _TransactionTile extends StatelessWidget {
               _categoryIconPath,
               width: 22,
               height: 22,
-              colorFilter: ColorFilter.mode(
-                _categoryColor,
-                BlendMode.srcIn,
-              ),
+              colorFilter: ColorFilter.mode(_categoryColor, BlendMode.srcIn),
             ),
           ),
         ),
@@ -593,10 +585,7 @@ class _EmptyState extends StatelessWidget {
   final bool hasFilter;
   final VoidCallback onClear;
 
-  const _EmptyState({
-    required this.hasFilter,
-    required this.onClear,
-  });
+  const _EmptyState({required this.hasFilter, required this.onClear});
 
   @override
   Widget build(BuildContext context) {
@@ -615,9 +604,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: Spacing.lg),
             Text(
-              hasFilter
-                  ? 'No matching transactions'
-                  : 'No transactions yet',
+              hasFilter ? 'No matching transactions' : 'No transactions yet',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -736,7 +723,7 @@ class _ShimmerBoxState extends State<_ShimmerBox>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: Durations.shimmer,
+      duration: AppDurations.shimmer,
       vsync: this,
     )..repeat(reverse: true);
 
@@ -763,8 +750,7 @@ class _ShimmerBoxState extends State<_ShimmerBox>
           decoration: BoxDecoration(
             color: _colorAnimation.value,
             shape: widget.isCircle ? BoxShape.circle : BoxShape.rectangle,
-            borderRadius:
-                widget.isCircle ? null : Radii.borderSm,
+            borderRadius: widget.isCircle ? null : Radii.borderSm,
           ),
         );
       },

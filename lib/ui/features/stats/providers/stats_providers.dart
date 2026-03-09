@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/di/providers.dart';
-import '../../../../config/theme/theme_extensions.dart';
 import '../../../../config/theme/theme_provider.dart';
+import '../../../../config/theme/vibe_themes.dart';
 
 // ── Enums ───────────────────────────────────────────────────────────────────
 
@@ -56,7 +56,7 @@ final dateRangeProvider = StateProvider<DateTimeRange>((ref) {
 final periodTypeProvider = StateProvider<PeriodType>((ref) => PeriodType.month);
 
 /// Spending trend data points for the line chart.
-/// Returns List<FlSpot> where x = day index, y = cumulative/daily spending.
+/// Returns `List<FlSpot>` where x = day index, y = cumulative/daily spending.
 final spendingTrendProvider = FutureProvider<List<FlSpot>>((ref) async {
   final txnRepo = ref.watch(transactionRepositoryProvider);
   final range = ref.watch(dateRangeProvider);
@@ -82,7 +82,7 @@ final spendingTrendProvider = FutureProvider<List<FlSpot>>((ref) async {
 });
 
 /// Category breakdown for the pie chart.
-/// Returns List<CategoryTotal> sorted by amount descending.
+/// Returns `List<CategoryTotal>` sorted by amount descending.
 final categoryBreakdownProvider = FutureProvider<List<CategoryTotal>>((
   ref,
 ) async {
@@ -162,7 +162,7 @@ final incomeVsExpenseProvider = FutureProvider<List<MonthlyComparison>>((
 });
 
 /// Daily spending map for the heatmap calendar.
-/// Returns Map<DateTime (day only), double>.
+/// Returns `Map<DateTime, double>` keyed by day-only dates.
 final dailySpendingMapProvider = FutureProvider<Map<DateTime, double>>((
   ref,
 ) async {

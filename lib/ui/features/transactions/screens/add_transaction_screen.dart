@@ -72,7 +72,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       try {
         final rule = json.decode(txn.recurringRule!) as Map<String, dynamic>;
         _recurringFrequency = (rule['frequency'] as String?) ?? 'Monthly';
-        _recurringFrequency = _recurringFrequency[0].toUpperCase() +
+        _recurringFrequency =
+            _recurringFrequency[0].toUpperCase() +
             _recurringFrequency.substring(1);
       } catch (_) {
         _recurringFrequency = 'Monthly';
@@ -210,9 +211,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 decoration: InputDecoration(
                   hintText: 'Add a note...',
                   prefixIcon: const Icon(Icons.note_alt_outlined, size: 20),
-                  border: OutlineInputBorder(
-                    borderRadius: Radii.borderMd,
-                  ),
+                  border: OutlineInputBorder(borderRadius: Radii.borderMd),
                 ),
                 textCapitalization: TextCapitalization.sentences,
                 maxLength: 200,
@@ -232,9 +231,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 label: const Text('Attach Receipt'),
                 style: OutlinedButton.styleFrom(
                   padding: Spacing.paddingMd,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: Radii.borderMd,
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
                 ),
               ),
 
@@ -256,9 +253,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 child: FilledButton(
                   onPressed: _isSaving ? null : _onSave,
                   style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: Radii.borderMd,
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
                   ),
                   child: _isSaving
                       ? const SizedBox(
@@ -270,7 +265,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                           ),
                         )
                       : Text(
-                          _isEditing ? 'Update Transaction' : 'Save Transaction',
+                          _isEditing
+                              ? 'Update Transaction'
+                              : 'Save Transaction',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -325,10 +322,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(ctx)
-                      .colorScheme
-                      .onSurface
-                      .withOpacity(0.2),
+                  color: Theme.of(ctx).colorScheme.onSurface.withOpacity(0.2),
                   borderRadius: Radii.borderFull,
                 ),
               ),
@@ -348,16 +342,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   onPressed: () => Navigator.of(ctx).pop(),
                   style: FilledButton.styleFrom(
                     backgroundColor: accentColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: Radii.borderMd,
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
                   ),
                   child: const Text(
                     'Done',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -372,9 +361,19 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   Widget _buildTypeSelector(CheddarColors cheddarColors) {
     final types = [
-      _TypeOption('Expense', 1, cheddarColors.expense, FontAwesomeIcons.arrowDown),
+      _TypeOption(
+        'Expense',
+        1,
+        cheddarColors.expense,
+        FontAwesomeIcons.arrowDown,
+      ),
       _TypeOption('Income', 0, cheddarColors.income, FontAwesomeIcons.arrowUp),
-      _TypeOption('Transfer', 2, cheddarColors.transfer, FontAwesomeIcons.arrowRightArrowLeft),
+      _TypeOption(
+        'Transfer',
+        2,
+        cheddarColors.transfer,
+        FontAwesomeIcons.arrowRightArrowLeft,
+      ),
     ];
 
     return Row(
@@ -384,7 +383,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: AnimatedContainer(
-              duration: Durations.fast,
+              duration: AppDurations.fast,
               decoration: BoxDecoration(
                 color: isSelected
                     ? option.color.withOpacity(0.15)
@@ -393,10 +392,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 border: Border.all(
                   color: isSelected
                       ? option.color
-                      : Theme.of(context)
-                          .colorScheme
-                          .outline
-                          .withOpacity(0.3),
+                      : Theme.of(context).colorScheme.outline.withOpacity(0.3),
                   width: isSelected ? 2 : 1,
                 ),
               ),
@@ -425,8 +421,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                           option.label,
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight:
-                                isSelected ? FontWeight.w700 : FontWeight.w500,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
                             color: isSelected
                                 ? option.color
                                 : Theme.of(context).colorScheme.onSurface,
@@ -480,7 +477,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           return GestureDetector(
             onTap: () => setState(() => _selectedCategory = cat),
             child: AnimatedContainer(
-              duration: Durations.fast,
+              duration: AppDurations.fast,
               decoration: BoxDecoration(
                 color: isSelected
                     ? catColor.withOpacity(0.15)
@@ -518,8 +515,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     cat.name,
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
                       color: isSelected
                           ? catColor
                           : Theme.of(context).colorScheme.onSurface,
@@ -585,9 +583,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   ? accountColor
                   : Theme.of(context).colorScheme.outline.withOpacity(0.3),
             ),
-            shape: RoundedRectangleBorder(
-              borderRadius: Radii.borderFull,
-            ),
+            shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
           );
         },
       ),
@@ -661,7 +657,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 const SizedBox(width: Spacing.sm),
                 Text(
                   timeFormat.format(
-                    DateTime(2026, 1, 1, _selectedTime.hour, _selectedTime.minute),
+                    DateTime(
+                      2026,
+                      1,
+                      1,
+                      _selectedTime.hour,
+                      _selectedTime.minute,
+                    ),
                   ),
                   style: theme.textTheme.bodyMedium,
                 ),
@@ -717,18 +719,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 label: Text(tag),
                 onDeleted: () => setState(() => _tags.remove(tag)),
                 deleteIcon: const Icon(Icons.close, size: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: Radii.borderFull,
-                ),
+                shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
               );
             }),
             ActionChip(
               avatar: const Icon(Icons.add, size: 16),
               label: const Text('Add Tag'),
               onPressed: () => _showAddTagDialog(theme),
-              shape: RoundedRectangleBorder(
-                borderRadius: Radii.borderFull,
-              ),
+              shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
             ),
           ],
         ),
@@ -746,9 +744,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           content: TextField(
             controller: _tagController,
             autofocus: true,
-            decoration: const InputDecoration(
-              hintText: 'Tag name...',
-            ),
+            decoration: const InputDecoration(hintText: 'Tag name...'),
             textCapitalization: TextCapitalization.words,
             onSubmitted: (_) => _submitTag(ctx),
           ),
@@ -818,10 +814,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
                       child: ChoiceChip(
-                        label: Text(
-                          freq,
-                          style: const TextStyle(fontSize: 12),
-                        ),
+                        label: Text(freq, style: const TextStyle(fontSize: 12)),
                         selected: isSelected,
                         onSelected: (sel) {
                           if (sel) {
@@ -1052,9 +1045,7 @@ class _AmountDisplayButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: _amountColor.withOpacity(0.08),
           borderRadius: Radii.borderLg,
-          border: Border.all(
-            color: _amountColor.withOpacity(0.2),
-          ),
+          border: Border.all(color: _amountColor.withOpacity(0.2)),
         ),
         child: Column(
           children: [
@@ -1102,8 +1093,10 @@ class _AmountDisplayButton extends StatelessWidget {
 // ── Internal Providers ──────────────────────────────────────────────────────
 
 /// Categories filtered by the current transaction type.
-final _categoriesForTypeProvider =
-    FutureProvider.family<List<CategoryModel>, int>((ref, type) async {
+final _categoriesForTypeProvider = FutureProvider.family<List<CategoryModel>, int>((
+  ref,
+  type,
+) async {
   final repo = ref.watch(categoryRepositoryProvider);
   // For expenses (1), get expense categories; for income (0), income categories.
   // For transfers (2), return all expense categories as a sensible default.
@@ -1112,8 +1105,7 @@ final _categoriesForTypeProvider =
 });
 
 /// All active (non-archived) accounts.
-final _activeAccountsProvider =
-    FutureProvider<List<AccountModel>>((ref) async {
+final _activeAccountsProvider = FutureProvider<List<AccountModel>>((ref) async {
   final repo = ref.watch(accountRepositoryProvider);
   return repo.getActive();
 });

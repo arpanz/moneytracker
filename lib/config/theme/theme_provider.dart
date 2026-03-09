@@ -16,15 +16,14 @@ class ThemeState {
     this.themeMode = ThemeMode.system,
   });
 
-  ThemeState copyWith({
-    VibeTheme? vibeTheme,
-    ThemeMode? themeMode,
-  }) {
+  ThemeState copyWith({VibeTheme? vibeTheme, ThemeMode? themeMode}) {
     return ThemeState(
       vibeTheme: vibeTheme ?? this.vibeTheme,
       themeMode: themeMode ?? this.themeMode,
     );
   }
+
+  String get themeName => vibeTheme.data.name;
 
   @override
   bool operator ==(Object other) =>
@@ -39,12 +38,10 @@ class ThemeState {
 }
 
 /// Riverpod provider for the theme state.
-final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeState>(
-  (ref) {
-    final prefs = ref.watch(sharedPreferencesProvider);
-    return ThemeNotifier(prefs);
-  },
-);
+final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeState>((ref) {
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return ThemeNotifier(prefs);
+});
 
 /// Manages theme state and persists preferences to [SharedPreferences].
 class ThemeNotifier extends StateNotifier<ThemeState> {

@@ -54,25 +54,17 @@ class LockNotifier extends StateNotifier<LockState> {
   Future<void> authenticate() async {
     if (state.isAuthenticating) return;
 
-    state = state.copyWith(
-      isAuthenticating: true,
-      clearError: true,
-    );
+    state = state.copyWith(isAuthenticating: true, clearError: true);
 
     try {
       final success = await _auth.authenticate(
         localizedReason: 'Authenticate to access Cheddar',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: false,
-        ),
+        biometricOnly: false,
+        persistAcrossBackgrounding: true,
       );
 
       if (success) {
-        state = state.copyWith(
-          isAuthenticated: true,
-          isAuthenticating: false,
-        );
+        state = state.copyWith(isAuthenticated: true, isAuthenticating: false);
       } else {
         state = state.copyWith(
           isAuthenticating: false,

@@ -63,7 +63,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   void _goToPage(int page) {
     _pageController.animateToPage(
       page,
-      duration: Durations.medium,
+      duration: AppDurations.medium,
       curve: Curves.easeInOut,
     );
   }
@@ -92,7 +92,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               alignment: Alignment.centerRight,
               child: AnimatedOpacity(
                 opacity: state.currentPage < _totalPages - 1 ? 1.0 : 0.0,
-                duration: Durations.fast,
+                duration: AppDurations.fast,
                 child: Padding(
                   padding: const EdgeInsets.only(
                     top: Spacing.sm,
@@ -155,7 +155,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 children: List.generate(_totalPages, (index) {
                   final isActive = index == state.currentPage;
                   return AnimatedContainer(
-                    duration: Durations.fast,
+                    duration: AppDurations.fast,
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     width: isActive ? 28 : 8,
                     height: 8,
@@ -190,9 +190,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     }
                   },
                   style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: Radii.borderMd,
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
                   ),
                   child: Text(
                     state.currentPage < _totalPages - 1
@@ -291,40 +289,38 @@ class _OnboardingPageLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: Spacing.horizontalLg,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset(
-            svgPath,
-            height: svgHeight,
-          ),
-          const SizedBox(height: Spacing.xl),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: Spacing.sm),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      )
-          .animate()
-          .fadeIn(duration: Durations.medium)
-          .slideY(
-            begin: 0.1,
-            end: 0,
-            duration: Durations.medium,
-            curve: Curves.easeOut,
-          ),
+      child:
+          Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(svgPath, height: svgHeight),
+                  const SizedBox(height: Spacing.xl),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.sm),
+                  Text(
+                    subtitle,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              )
+              .animate()
+              .fadeIn(duration: AppDurations.medium)
+              .slideY(
+                begin: 0.1,
+                end: 0,
+                duration: AppDurations.medium,
+                curve: Curves.easeOut,
+              ),
     );
   }
 }
@@ -364,106 +360,105 @@ class _SetupPage extends StatelessWidget {
 
     return SingleChildScrollView(
       padding: Spacing.horizontalLg,
-      child: Column(
-        children: [
-          const SizedBox(height: Spacing.xl),
-          Icon(
-            Icons.person_outline_rounded,
-            size: 72,
-            color: colorScheme.primary,
-          ),
-          const SizedBox(height: Spacing.lg),
-          Text(
-            'Let\'s set up',
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: Spacing.xs),
-          Text(
-            'Just a few quick things',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: Spacing.xl),
-
-          // ── Name input ──
-          TextField(
-            controller: nameController,
-            onChanged: onNameChanged,
-            textCapitalization: TextCapitalization.words,
-            decoration: InputDecoration(
-              labelText: 'Your name',
-              hintText: 'e.g. Astral',
-              prefixIcon: const Icon(Icons.person_rounded),
-              border: OutlineInputBorder(
-                borderRadius: Radii.borderMd,
-              ),
-            ),
-          ),
-          const SizedBox(height: Spacing.md),
-
-          // ── Currency dropdown ──
-          DropdownButtonFormField<String>(
-            value: state.currency,
-            decoration: InputDecoration(
-              labelText: 'Currency',
-              prefixIcon: const Icon(Icons.currency_exchange_rounded),
-              border: OutlineInputBorder(
-                borderRadius: Radii.borderMd,
-              ),
-            ),
-            items: _currencies.map((code) {
-              return DropdownMenuItem(
-                value: code,
-                child: Text(_currencyLabels[code] ?? code),
-              );
-            }).toList(),
-            onChanged: onCurrencyChanged,
-          ),
-          const SizedBox(height: Spacing.md),
-
-          // ── Biometric toggle ──
-          if (biometricsAvailable)
-            Container(
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withOpacity(0.4),
-                borderRadius: Radii.borderMd,
-              ),
-              child: SwitchListTile(
-                value: state.biometricEnabled,
-                onChanged: (_) => onBiometricToggle(),
-                title: Text(
-                  'Enable biometric lock',
-                  style: theme.textTheme.bodyLarge,
-                ),
-                subtitle: Text(
-                  'Secure the app with fingerprint or face',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+      child:
+          Column(
+                children: [
+                  const SizedBox(height: Spacing.xl),
+                  Icon(
+                    Icons.person_outline_rounded,
+                    size: 72,
+                    color: colorScheme.primary,
                   ),
-                ),
-                secondary: Icon(
-                  Icons.fingerprint_rounded,
-                  color: colorScheme.primary,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: Radii.borderMd,
-                ),
+                  const SizedBox(height: Spacing.lg),
+                  Text(
+                    'Let\'s set up',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.xs),
+                  Text(
+                    'Just a few quick things',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.xl),
+
+                  // ── Name input ──
+                  TextField(
+                    controller: nameController,
+                    onChanged: onNameChanged,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: InputDecoration(
+                      labelText: 'Your name',
+                      hintText: 'e.g. Astral',
+                      prefixIcon: const Icon(Icons.person_rounded),
+                      border: OutlineInputBorder(borderRadius: Radii.borderMd),
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.md),
+
+                  // ── Currency dropdown ──
+                  DropdownButtonFormField<String>(
+                    value: state.currency,
+                    decoration: InputDecoration(
+                      labelText: 'Currency',
+                      prefixIcon: const Icon(Icons.currency_exchange_rounded),
+                      border: OutlineInputBorder(borderRadius: Radii.borderMd),
+                    ),
+                    items: _currencies.map((code) {
+                      return DropdownMenuItem(
+                        value: code,
+                        child: Text(_currencyLabels[code] ?? code),
+                      );
+                    }).toList(),
+                    onChanged: onCurrencyChanged,
+                  ),
+                  const SizedBox(height: Spacing.md),
+
+                  // ── Biometric toggle ──
+                  if (biometricsAvailable)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest.withOpacity(
+                          0.4,
+                        ),
+                        borderRadius: Radii.borderMd,
+                      ),
+                      child: SwitchListTile(
+                        value: state.biometricEnabled,
+                        onChanged: (_) => onBiometricToggle(),
+                        title: Text(
+                          'Enable biometric lock',
+                          style: theme.textTheme.bodyLarge,
+                        ),
+                        subtitle: Text(
+                          'Secure the app with fingerprint or face',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        secondary: Icon(
+                          Icons.fingerprint_rounded,
+                          color: colorScheme.primary,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: Radii.borderMd,
+                        ),
+                      ),
+                    ),
+                ],
+              )
+              .animate()
+              .fadeIn(duration: AppDurations.medium)
+              .slideY(
+                begin: 0.1,
+                end: 0,
+                duration: AppDurations.medium,
+                curve: Curves.easeOut,
               ),
-            ),
-        ],
-      )
-          .animate()
-          .fadeIn(duration: Durations.medium)
-          .slideY(
-            begin: 0.1,
-            end: 0,
-            duration: Durations.medium,
-            curve: Curves.easeOut,
-          ),
     );
   }
 }

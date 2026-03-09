@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 
 /// Consistent spacing values used throughout the Cheddar app.
 abstract class Spacing {
+  static const double xxs = 2.0;
   static const double xs = 4.0;
   static const double sm = 8.0;
   static const double md = 16.0;
   static const double lg = 24.0;
   static const double xl = 32.0;
   static const double xxl = 48.0;
+
+  // Legacy aliases kept for older call sites that still reference radius tokens
+  // through AppSpacing.
+  static const double radiusMd = Radii.md;
+  static const double radiusLg = Radii.lg;
 
   /// Convenience EdgeInsets helpers
   static const EdgeInsets paddingXs = EdgeInsets.all(xs);
@@ -40,7 +46,9 @@ abstract class Radii {
   static const BorderRadius borderMd = BorderRadius.all(Radius.circular(md));
   static const BorderRadius borderLg = BorderRadius.all(Radius.circular(lg));
   static const BorderRadius borderXl = BorderRadius.all(Radius.circular(xl));
-  static const BorderRadius borderFull = BorderRadius.all(Radius.circular(full));
+  static const BorderRadius borderFull = BorderRadius.all(
+    Radius.circular(full),
+  );
 }
 
 /// Animation duration tokens.
