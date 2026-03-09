@@ -15,7 +15,7 @@ class ThemePickerScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final currentTheme = ref.watch(themeProvider);
-    final allThemes = VibeThemes.all;
+    final allThemes = VibeTheme.values;
 
     return Scaffold(
       appBar: AppBar(
@@ -32,13 +32,13 @@ class ThemePickerScreen extends ConsumerWidget {
         itemCount: allThemes.length,
         itemBuilder: (context, index) {
           final vibe = allThemes[index];
-          final isSelected = currentTheme.themeName == vibe.name;
+          final isSelected = currentTheme.vibeTheme == vibe;
 
           return _ThemeCard(
             vibe: vibe,
             isSelected: isSelected,
             onTap: () {
-              ref.read(themeProvider.notifier).setTheme(vibe.name);
+              ref.read(themeProvider.notifier).setVibeTheme(vibe);
             },
           ).animate(delay: (index * 80).ms)
               .fadeIn(duration: 300.ms)
@@ -63,6 +63,7 @@ class _ThemeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final d = vibe.data;
 
     return GestureDetector(
       onTap: onTap,
@@ -73,14 +74,14 @@ class _ThemeCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           border: Border.all(
             color: isSelected
-                ? vibe.primaryColor
+                ? d.primaryLight
                 : theme.colorScheme.outlineVariant,
             width: isSelected ? 3 : 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: vibe.primaryColor.withOpacity(0.3),
+                    color: d.primaryLight.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -98,8 +99,8 @@ class _ThemeCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        vibe.primaryColor,
-                        vibe.secondaryColor,
+                        d.primaryLight,
+                        d.secondaryLight,
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -109,19 +110,18 @@ class _ThemeCard extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          vibe.icon,
-                          color: Colors.white.withOpacity(0.9),
-                          size: 32,
+                        Text(
+                          d.emoji,
+                          style: const TextStyle(fontSize: 32),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         // Color dots preview
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            _ColorDot(color: vibe.primaryColor),
-                            _ColorDot(color: vibe.secondaryColor),
-                            _ColorDot(color: vibe.accentColor),
+                            _ColorDot(color: d.primaryLight),
+                            _ColorDot(color: d.secondaryLight),
+                            _ColorDot(color: d.accent),
                           ],
                         ),
                       ],
@@ -140,7 +140,7 @@ class _ThemeCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        vibe.name,
+                        d.name,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -148,21 +148,11 @@ class _ThemeCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: AppSpacing.xxs),
-                      Text(
-                        vibe.description,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
                       if (isSelected) ...[
                         const SizedBox(height: AppSpacing.xxs),
                         Icon(
                           Icons.check_circle_rounded,
-                          color: vibe.primaryColor,
+                          color: d.primaryLight,
                           size: 18,
                         ),
                       ],
@@ -192,7 +182,7 @@ class _ColorDot extends StatelessWidget {
         color: color,
         shape: BoxShape.circle,
         border: Border.all(
-          color: Colors.white.withOpacity(0.5),
+          color: Colors.white.withValues(alpha: 0.5),
           width: 1.5,
         ),
       ),
