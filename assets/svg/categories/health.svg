@@ -1,1 +1,15 @@
-PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iaGVhcnRHcmFkIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGOTczNzMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjREMyNjI2Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8IS0tIEhlYXJ0IHNoYXBlIC0tPgogIDxwYXRoIGQ9Ik0zMiA1MiBMMTIgMzIgUTQgMjQgMTIgMTQgUTIwIDggMjggMTYgTDMyIDIwIEwzNiAxNiBRNDQgOCA1MiAxNCBRNjAgMjQgNTIgMzIgWiIgZmlsbD0idXJsKCNoZWFydEdyYWQpIiBzdHJva2U9IiM5OTFCMUIiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSBIZWFydGJlYXQgLyBwdWxzZSBsaW5lIC0tPgogIDxwb2x5bGluZSBwb2ludHM9IjE2LDMwIDI0LDMwIDI4LDIwIDMyLDQwIDM2LDI0IDQwLDMwIDQ4LDMwIiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPCEtLSBTdWJ0bGUgaGlnaGxpZ2h0IC0tPgogIDxlbGxpcHNlIGN4PSIyMCIgY3k9IjIwIiByeD0iNiIgcnk9IjQiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjIiIHRyYW5zZm9ybT0icm90YXRlKC0zMCwgMjAsIDIwKSIvPgo8L3N2Zz4=
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="heartGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FB7185"/>
+      <stop offset="100%" stop-color="#E11D48"/>
+    </linearGradient>
+  </defs>
+  <!-- Heart shape -->
+  <path d="M32 52 Q14 40 10 28 Q6 16 16 14 Q24 10 32 20 Q40 10 48 14 Q58 16 54 28 Q50 40 32 52 Z" fill="url(#heartGrad)" stroke="#BE123C" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Pulse line across heart -->
+  <polyline points="12,32 22,32 26,22 30,40 34,28 38,36 42,32 52,32" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Subtle shine -->
+  <ellipse cx="22" cy="24" rx="4" ry="6" fill="white" opacity="0.2" transform="rotate(-20, 22, 24)"/>
+</svg>
