@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/di/providers.dart';
-import '../../../../config/constants/app_constants.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_extensions.dart';
@@ -25,6 +24,8 @@ class BudgetDetailScreen extends ConsumerWidget {
     final budgetAsync = ref.watch(budgetByIdProvider(id));
     final dailyAsync = ref.watch(dailySpendingForBudgetProvider(id));
     final budgetsWithSpending = ref.watch(budgetWithSpendingProvider);
+    // FIX #16: runtime currency symbol
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Scaffold(
       body: budgetAsync.when(
@@ -35,7 +36,6 @@ class BudgetDetailScreen extends ConsumerWidget {
             return const Center(child: Text('Budget not found'));
           }
 
-          // Find the BudgetWithSpending for this budget
           final bwsList = budgetsWithSpending.valueOrNull ?? [];
           final bws = bwsList.isNotEmpty
               ? bwsList.firstWhere(
@@ -57,6 +57,7 @@ class BudgetDetailScreen extends ConsumerWidget {
           return _BudgetDetailBody(
             bws: bws,
             dailySpendingAsync: dailyAsync,
+            currencySymbol: currencySymbol,
           );
         },
       ),
@@ -67,10 +68,12 @@ class BudgetDetailScreen extends ConsumerWidget {
 class _BudgetDetailBody extends ConsumerWidget {
   final BudgetWithSpending bws;
   final AsyncValue<Map<DateTime, double>> dailySpendingAsync;
+  final String currencySymbol;
 
   const _BudgetDetailBody({
     required this.bws,
     required this.dailySpendingAsync,
+    required this.currencySymbol,
   });
 
   @override
@@ -91,7 +94,6 @@ class _BudgetDetailBody extends ConsumerWidget {
 
     return CustomScrollView(
       slivers: [
-        // ── AppBar ──
         SliverAppBar(
           pinned: true,
           title: Text(bws.budget.category),
@@ -115,12 +117,12 @@ class _BudgetDetailBody extends ConsumerWidget {
             children: [
               const SizedBox(height: Spacing.lg),
 
-              // ── Circular Progress ──
               _AnimatedCircularProgress(
                 percentage: bws.percentage,
                 spent: bws.spent,
                 limit: bws.budget.limitAmount,
                 color: statusColor,
+                currencySymbol: currencySymbol,
               ).animate().fadeIn(duration: 600.ms).scale(
                     begin: const Offset(0.8, 0.8),
                     end: const Offset(1.0, 1.0),
@@ -130,7 +132,6 @@ class _BudgetDetailBody extends ConsumerWidget {
 
               const SizedBox(height: Spacing.lg),
 
-              // ── Stats Row ──
               Padding(
                 padding: Spacing.horizontalMd,
                 child: Row(
@@ -138,7 +139,7 @@ class _BudgetDetailBody extends ConsumerWidget {
                     _StatTile(
                       label: 'Daily Avg',
                       value:
-                          '${AppConstants.currencySymbol} ${formatter.format(bws.dailyAverage.toInt())}',
+                          '$currencySymbol ${formatter.format(bws.dailyAverage.toInt())}',
                       icon: Icons.trending_up_rounded,
                       color: theme.colorScheme.primary,
                     ),
@@ -153,7 +154,7 @@ class _BudgetDetailBody extends ConsumerWidget {
                     _StatTile(
                       label: 'Projected',
                       value:
-                          '${AppConstants.currencySymbol} ${formatter.format(bws.projectedSpend.toInt())}',
+                          '$currencySymbol ${formatter.format(bws.projectedSpend.toInt())}',
                       icon: Icons.auto_graph_rounded,
                       color: bws.projectedSpend > bws.budget.limitAmount
                           ? cheddarColors.expense
@@ -168,7 +169,6 @@ class _BudgetDetailBody extends ConsumerWidget {
 
               const SizedBox(height: Spacing.lg),
 
-              // ── Daily Spending Chart ──
               Padding(
                 padding: Spacing.horizontalMd,
                 child: Text(
@@ -189,18 +189,17 @@ class _BudgetDetailBody extends ConsumerWidget {
                   height: 200,
                   child: Center(child: Text('Chart unavailable')),
                 ),
-                data: (dailyMap) =>
-                    _DailySpendingChart(
-                      dailyMap: dailyMap,
-                      budgetLimit: bws.budget.limitAmount,
-                      period: bws.budget.period,
-                      statusColor: statusColor,
-                    ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
+                data: (dailyMap) => _DailySpendingChart(
+                  dailyMap: dailyMap,
+                  budgetLimit: bws.budget.limitAmount,
+                  period: bws.budget.period,
+                  statusColor: statusColor,
+                  currencySymbol: currencySymbol,
+                ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
               ),
 
               const SizedBox(height: Spacing.lg),
 
-              // ── Transaction List ──
               Padding(
                 padding: Spacing.horizontalMd,
                 child: Row(
@@ -224,11 +223,11 @@ class _BudgetDetailBody extends ConsumerWidget {
               _BudgetTransactionsList(
                 category: bws.budget.category,
                 statusColor: statusColor,
+                currencySymbol: currencySymbol,
               ),
 
               const SizedBox(height: Spacing.xxl),
 
-              // ── Action Buttons ──
               Padding(
                 padding: Spacing.horizontalMd,
                 child: Row(
@@ -299,26 +298,26 @@ class _BudgetDetailBody extends ConsumerWidget {
 
     if (confirmed == true && context.mounted) {
       await ref.read(deleteBudgetProvider(bws.budget.id).future);
-      if (context.mounted) {
-        context.pop();
-      }
+      if (context.mounted) context.pop();
     }
   }
 }
 
-// ── Animated Circular Progress ──────────────────────────────────────────────
+// ── Animated Circular Progress ─────────────────────────────────────────────────
 
 class _AnimatedCircularProgress extends StatelessWidget {
   final double percentage;
   final double spent;
   final double limit;
   final Color color;
+  final String currencySymbol;
 
   const _AnimatedCircularProgress({
     required this.percentage,
     required this.spent,
     required this.limit,
     required this.color,
+    required this.currencySymbol,
   });
 
   @override
@@ -345,16 +344,17 @@ class _AnimatedCircularProgress extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // FIX #16: runtime currency symbol
                   Text(
-                    '${AppConstants.currencySymbol} ${formatter.format(spent.toInt())}',
+                    '$currencySymbol ${formatter.format(spent.toInt())}',
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
-                    'of ${AppConstants.currencySymbol} ${formatter.format(limit.toInt())}',
+                    'of $currencySymbol ${formatter.format(limit.toInt())}',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -385,7 +385,6 @@ class _CircularProgressPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - strokeWidth) / 2;
 
-    // Background arc
     final bgPaint = Paint()
       ..color = backgroundColor
       ..style = PaintingStyle.stroke
@@ -393,7 +392,6 @@ class _CircularProgressPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
     canvas.drawCircle(center, radius, bgPaint);
 
-    // Progress arc
     final progressPaint = Paint()
       ..color = progressColor
       ..style = PaintingStyle.stroke
@@ -419,7 +417,7 @@ class _CircularProgressPainter extends CustomPainter {
   }
 }
 
-// ── Stat Tile ───────────────────────────────────────────────────────────────
+// ── Stat Tile ───────────────────────────────────────────────────────────────────
 
 class _StatTile extends StatelessWidget {
   final String label;
@@ -445,7 +443,8 @@ class _StatTile extends StatelessWidget {
           horizontal: Spacing.sm,
         ),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          // FIX: withOpacity → withValues
+          color: color.withValues(alpha: 0.08),
           borderRadius: Radii.borderMd,
         ),
         child: Column(
@@ -464,7 +463,7 @@ class _StatTile extends StatelessWidget {
             Text(
               label,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 fontSize: 11,
               ),
             ),
@@ -475,19 +474,21 @@ class _StatTile extends StatelessWidget {
   }
 }
 
-// ── Daily Spending Chart ────────────────────────────────────────────────────
+// ── Daily Spending Chart ───────────────────────────────────────────────────────
 
 class _DailySpendingChart extends StatelessWidget {
   final Map<DateTime, double> dailyMap;
   final double budgetLimit;
   final int period;
   final Color statusColor;
+  final String currencySymbol;
 
   const _DailySpendingChart({
     required this.dailyMap,
     required this.budgetLimit,
     required this.period,
     required this.statusColor,
+    required this.currencySymbol,
   });
 
   @override
@@ -501,7 +502,7 @@ class _DailySpendingChart extends StatelessWidget {
           child: Text(
             'No spending data yet',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.4),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
             ),
           ),
         ),
@@ -544,14 +545,15 @@ class _DailySpendingChart extends StatelessWidget {
               horizontalLines: [
                 HorizontalLine(
                   y: dailyBudget,
-                  color: theme.colorScheme.onSurface.withOpacity(0.3),
+                  // FIX: withOpacity → withValues
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                   strokeWidth: 1,
                   dashArray: [5, 5],
                   label: HorizontalLineLabel(
                     show: true,
                     alignment: Alignment.topRight,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       fontSize: 10,
                     ),
                     labelResolver: (_) => 'daily limit',
@@ -577,8 +579,9 @@ class _DailySpendingChart extends StatelessWidget {
                             DateFormat('d').format(sortedDays[idx]),
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontSize: 10,
+                              // FIX: withOpacity → withValues
                               color: theme.colorScheme.onSurface
-                                  .withOpacity(0.5),
+                                  .withValues(alpha: 0.5),
                             ),
                           ),
                         );
@@ -602,15 +605,14 @@ class _DailySpendingChart extends StatelessWidget {
             borderData: FlBorderData(show: false),
             barTouchData: BarTouchData(
               touchTooltipData: BarTouchTooltipData(
-                getTooltipColor: (_) =>
-                    theme.colorScheme.inverseSurface,
+                getTooltipColor: (_) => theme.colorScheme.inverseSurface,
                 getTooltipItem: (group, groupIndex, rod, rodIndex) {
                   final idx = group.x;
                   if (idx >= 0 && idx < sortedDays.length) {
-                    final date =
-                        DateFormat('MMM d').format(sortedDays[idx]);
+                    final date = DateFormat('MMM d').format(sortedDays[idx]);
+                    // FIX #16: use passed-in currencySymbol
                     return BarTooltipItem(
-                      '$date\n${AppConstants.currencySymbol} ${rod.toY.toInt()}',
+                      '$date\n$currencySymbol ${rod.toY.toInt()}',
                       TextStyle(
                         color: theme.colorScheme.onInverseSurface,
                         fontWeight: FontWeight.w600,
@@ -642,15 +644,17 @@ class _DailySpendingChart extends StatelessWidget {
   }
 }
 
-// ── Budget Transactions List ────────────────────────────────────────────────
+// ── Budget Transactions List ──────────────────────────────────────────────────
 
 class _BudgetTransactionsList extends ConsumerWidget {
   final String category;
   final Color statusColor;
+  final String currencySymbol;
 
   const _BudgetTransactionsList({
     required this.category,
     required this.statusColor,
+    required this.currencySymbol,
   });
 
   @override
@@ -677,14 +681,14 @@ class _BudgetTransactionsList extends ConsumerWidget {
               child: Text(
                 'No transactions yet',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                  // FIX: withOpacity → withValues
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
               ),
             ),
           );
         }
 
-        // Show last 10 transactions
         final displayList = transactions.take(10).toList();
         final dateFormat = DateFormat('MMM d, h:mm a');
 
@@ -693,7 +697,8 @@ class _BudgetTransactionsList extends ConsumerWidget {
             final txn = entry.value;
             return ListTile(
               leading: CircleAvatar(
-                backgroundColor: statusColor.withOpacity(0.1),
+                // FIX: withOpacity → withValues
+                backgroundColor: statusColor.withValues(alpha: 0.1),
                 child: Icon(
                   Icons.receipt_rounded,
                   color: statusColor,
@@ -711,11 +716,13 @@ class _BudgetTransactionsList extends ConsumerWidget {
               subtitle: Text(
                 dateFormat.format(txn.date),
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  // FIX: withOpacity → withValues
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
               trailing: Text(
-                '-${AppConstants.currencySymbol} ${NumberFormat('#,##,###', 'en_IN').format(txn.amount.toInt())}',
+                // FIX #16: runtime currency symbol
+                '-$currencySymbol ${NumberFormat('#,##,###', 'en_IN').format(txn.amount.toInt())}',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: cheddarColors.expense,
