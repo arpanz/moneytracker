@@ -8,6 +8,7 @@ import '../../domain/models/goal_model.dart';
 import '../../domain/models/category_model.dart';
 import '../../domain/models/subscription_model.dart';
 import '../../domain/models/split_model.dart';
+import '../../domain/models/loan_model.dart';
 
 class DatabaseService {
   late Isar _isar;
@@ -25,6 +26,7 @@ class DatabaseService {
         CategoryModelSchema,
         SubscriptionModelSchema,
         SplitModelSchema,
+        LoanModelSchema,
       ],
       directory: dir.path,
       name: 'cheddar_db',

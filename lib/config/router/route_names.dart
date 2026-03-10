@@ -19,6 +19,9 @@ abstract class RouteNames {
   static const accounts = 'accounts';
   static const addAccount = 'add-account';
   static const accountDetail = 'account-detail';
+  static const loans = 'loans';
+  static const addLoan = 'add-loan';
+  static const loanDetail = 'loan-detail';
   static const settings = 'settings';
   static const themePicker = 'theme-picker';
   static const scanner = 'scanner';

@@ -56,36 +56,63 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               horizontal: AppSpacing.md,
               vertical: AppSpacing.sm,
             ),
-            child: Row(
-              children: [
-                _QuickLink(
-                  icon: Icons.savings_outlined,
-                  label: 'Goals',
-                  color: Colors.amber,
-                  onTap: () => context.pushNamed(RouteNames.goals),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                _QuickLink(
-                  icon: Icons.subscriptions_outlined,
-                  label: 'Subscriptions',
-                  color: Colors.purple,
-                  onTap: () => context.pushNamed(RouteNames.subscriptions),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                _QuickLink(
-                  icon: Icons.call_split_rounded,
-                  label: 'Splits',
-                  color: Colors.teal,
-                  onTap: () => context.pushNamed(RouteNames.split),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                _QuickLink(
-                  icon: Icons.psychology_outlined,
-                  label: 'Personality',
-                  color: Colors.deepOrange,
-                  onTap: () => context.pushNamed(RouteNames.personality),
-                ),
-              ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final itemWidth =
+                    (constraints.maxWidth - (AppSpacing.sm * 3)) / 4;
+                return Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: [
+                    SizedBox(
+                      width: itemWidth,
+                      child: _QuickLink(
+                        icon: Icons.savings_outlined,
+                        label: 'Goals',
+                        color: Colors.amber,
+                        onTap: () => context.pushNamed(RouteNames.goals),
+                      ),
+                    ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: _QuickLink(
+                        icon: Icons.subscriptions_outlined,
+                        label: 'Subscriptions',
+                        color: Colors.purple,
+                        onTap: () =>
+                            context.pushNamed(RouteNames.subscriptions),
+                      ),
+                    ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: _QuickLink(
+                        icon: Icons.call_split_rounded,
+                        label: 'Splits',
+                        color: Colors.teal,
+                        onTap: () => context.pushNamed(RouteNames.split),
+                      ),
+                    ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: _QuickLink(
+                        icon: Icons.currency_exchange_rounded,
+                        label: 'Loans',
+                        color: Colors.indigo,
+                        onTap: () => context.pushNamed(RouteNames.loans),
+                      ),
+                    ),
+                    SizedBox(
+                      width: itemWidth,
+                      child: _QuickLink(
+                        icon: Icons.psychology_outlined,
+                        label: 'Personality',
+                        color: Colors.deepOrange,
+                        onTap: () => context.pushNamed(RouteNames.personality),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
 
@@ -157,6 +184,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             subtitle: const Text('Bank accounts, wallets, credit cards'),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => context.pushNamed(RouteNames.accounts),
+          ),
+          ListTile(
+            leading: const Icon(Icons.currency_exchange_rounded),
+            title: const Text('Loan Tracker'),
+            subtitle: const Text('Track lendings and borrowings'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => context.pushNamed(RouteNames.loans),
           ),
 
           // ── Data ──
@@ -501,28 +535,26 @@ class _QuickLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: color, size: 24),
-              const SizedBox(height: AppSpacing.xxs),
-              Text(
-                label,
-                style: theme.textTheme.labelSmall?.copyWith(color: color),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: AppSpacing.xxs),
+            Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(color: color),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );

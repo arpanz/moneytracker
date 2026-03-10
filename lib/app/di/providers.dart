@@ -8,6 +8,7 @@ import '../../data/repositories/account_repository.dart';
 import '../../data/repositories/budget_repository.dart';
 import '../../data/repositories/category_repository.dart';
 import '../../data/repositories/goal_repository.dart';
+import '../../data/repositories/loan_repository.dart';
 import '../../data/repositories/split_repository.dart';
 import '../../data/repositories/subscription_repository.dart';
 import '../../data/repositories/transaction_repository.dart';
@@ -46,6 +47,10 @@ final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) {
 
 final splitRepositoryProvider = Provider<SplitRepository>((ref) {
   return SplitRepository(ref.watch(databaseServiceProvider));
+});
+
+final loanRepositoryProvider = Provider<LoanRepository>((ref) {
+  return LoanRepository(ref.watch(databaseServiceProvider));
 });
 
 final currencyCodeProvider = StateProvider<String>((ref) {

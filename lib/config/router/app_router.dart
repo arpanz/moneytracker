@@ -1,4 +1,5 @@
 import 'package:cheddar/domain/models/transaction_model.dart';
+import 'package:cheddar/domain/models/loan_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,6 +27,9 @@ import '../../ui/features/split/screens/add_split_screen.dart';
 import '../../ui/features/accounts/screens/accounts_screen.dart';
 import '../../ui/features/accounts/screens/add_account_screen.dart';
 import '../../ui/features/accounts/screens/account_detail_screen.dart';
+import '../../ui/features/loans/screens/loans_screen.dart';
+import '../../ui/features/loans/screens/add_loan_screen.dart';
+import '../../ui/features/loans/screens/loan_detail_screen.dart';
 import '../../ui/features/settings/screens/settings_screen.dart';
 import '../../ui/features/settings/screens/theme_picker_screen.dart';
 import '../../ui/features/scanner/screens/scanner_screen.dart';
@@ -218,6 +222,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/accounts',
         name: RouteNames.accounts,
         builder: (context, state) => const AccountsScreen(),
+      ),
+      GoRoute(
+        path: '/loans',
+        name: RouteNames.loans,
+        builder: (context, state) => const LoansScreen(),
+      ),
+      GoRoute(
+        path: '/loan/add',
+        name: RouteNames.addLoan,
+        builder: (context, state) {
+          final extra = state.extra;
+          return AddLoanScreen(existingLoan: extra is LoanModel ? extra : null);
+        },
+      ),
+      GoRoute(
+        path: '/loan/:id',
+        name: RouteNames.loanDetail,
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) return const _NotFoundScreen();
+          return LoanDetailScreen(loanId: id);
+        },
       ),
       GoRoute(
         path: '/account/add',
