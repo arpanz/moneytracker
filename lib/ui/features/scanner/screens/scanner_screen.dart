@@ -88,8 +88,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     } else {
       setState(() {
         _hasPermission = false;
-        _permissionError =
-            'Camera permission is required to scan receipts.';
+        _permissionError = 'Camera permission is required to scan receipts.';
       });
     }
   }
@@ -127,7 +126,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     } on CameraException catch (e) {
       if (mounted) {
         setState(() {
-          _permissionError = 'Camera error: ${e.description ?? 'Unknown error'}';
+          _permissionError =
+              'Camera error: ${e.description ?? 'Unknown error'}';
         });
       }
     }
@@ -170,7 +170,9 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
       final fileSize = await File(xFile.path).length();
       if (fileSize > AppConstants.maxReceiptImageSizeKb * 1024) {
         if (mounted) {
-          _showSnackBar('Image is too large. Please try again with a closer shot.');
+          _showSnackBar(
+            'Image is too large. Please try again with a closer shot.',
+          );
         }
         return;
       }
@@ -249,7 +251,9 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
               receiptData: data,
               onSave: () => _saveAsTransaction(data),
               onFieldChanged: (updated) {
-                ref.read(scannerStateProvider.notifier).updateReceiptData(updated);
+                ref
+                    .read(scannerStateProvider.notifier)
+                    .updateReceiptData(updated);
               },
             );
           },
@@ -276,16 +280,14 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     // Create a pre-filled transaction model and navigate to add screen
     final transaction = TransactionModel()
       ..amount = data.totalAmount ?? 0.0
-      ..type = 1 // expense
+      ..type =
+          1 // expense
       ..note = data.merchantName ?? ''
       ..date = data.date ?? DateTime.now()
       ..receiptImagePath = savedImagePath
       ..createdAt = DateTime.now();
 
-    context.pushNamed(
-      RouteNames.addTransaction,
-      extra: transaction,
-    );
+    context.pushNamed(RouteNames.addTransaction, extra: transaction);
   }
 
   // ── Build ──
@@ -330,9 +332,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
       );
     }
 
-    return Center(
-      child: CameraPreview(_cameraController!),
-    );
+    return Center(child: CameraPreview(_cameraController!));
   }
 
   Widget _buildErrorState(ThemeData theme) {
@@ -435,11 +435,14 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
             children: [
               // Capture button
               GestureDetector(
-                onTap: _isCameraInitialized && !_isCapturing
-                    ? _captureImage
-                    : null,
-                child: _CaptureButton(isCapturing: _isCapturing),
-              ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.8, 0.8)),
+                    onTap: _isCameraInitialized && !_isCapturing
+                        ? _captureImage
+                        : null,
+                    child: _CaptureButton(isCapturing: _isCapturing),
+                  )
+                  .animate()
+                  .fadeIn(duration: 400.ms)
+                  .scale(begin: const Offset(0.8, 0.8)),
 
               const SizedBox(height: Spacing.md),
 
@@ -544,7 +547,7 @@ class _CaptureButton extends StatelessWidget {
 // ── Circle Icon Button ──
 
 class _CircleIconButton extends StatelessWidget {
-  final IconData icon;
+  final FaIconData icon;
   final VoidCallback? onPressed;
   final bool isActive;
 
@@ -566,9 +569,7 @@ class _CircleIconButton extends StatelessWidget {
           color: isActive
               ? Colors.white.withOpacity(0.3)
               : Colors.black.withOpacity(0.4),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.2),
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.2)),
         ),
         child: Center(
           child: FaIcon(
@@ -609,10 +610,10 @@ class _ReceiptResultSheetState extends State<_ReceiptResultSheet> {
   void initState() {
     super.initState();
     final data = widget.receiptData;
-    _merchantController =
-        TextEditingController(text: data.merchantName ?? '');
-    _amountController =
-        TextEditingController(text: data.totalAmount?.toStringAsFixed(2) ?? '');
+    _merchantController = TextEditingController(text: data.merchantName ?? '');
+    _amountController = TextEditingController(
+      text: data.totalAmount?.toStringAsFixed(2) ?? '',
+    );
     _dateController = TextEditingController(
       text: data.date != null
           ? DateFormat('dd/MM/yyyy').format(data.date!)
@@ -658,14 +659,16 @@ class _ReceiptResultSheetState extends State<_ReceiptResultSheet> {
       }
     }
 
-    widget.onFieldChanged(ReceiptData(
-      merchantName: _merchantController.text.isNotEmpty
-          ? _merchantController.text
-          : null,
-      totalAmount: double.tryParse(_amountController.text),
-      date: parsedDate ?? widget.receiptData.date,
-      lineItems: lineItems,
-    ));
+    widget.onFieldChanged(
+      ReceiptData(
+        merchantName: _merchantController.text.isNotEmpty
+            ? _merchantController.text
+            : null,
+        totalAmount: double.tryParse(_amountController.text),
+        date: parsedDate ?? widget.receiptData.date,
+        lineItems: lineItems,
+      ),
+    );
   }
 
   @override
@@ -816,8 +819,8 @@ class _ReceiptResultSheetState extends State<_ReceiptResultSheet> {
                                 onChanged: (_) => _notifyChanges(),
                                 keyboardType:
                                     const TextInputType.numberWithOptions(
-                                  decimal: true,
-                                ),
+                                      decimal: true,
+                                    ),
                                 style: theme.textTheme.bodySmall,
                                 textAlign: TextAlign.end,
                                 decoration: const InputDecoration(
@@ -843,10 +846,7 @@ class _ReceiptResultSheetState extends State<_ReceiptResultSheet> {
                     height: 52,
                     child: FilledButton.icon(
                       onPressed: widget.onSave,
-                      icon: const FaIcon(
-                        FontAwesomeIcons.floppyDisk,
-                        size: 18,
-                      ),
+                      icon: const FaIcon(FontAwesomeIcons.floppyDisk, size: 18),
                       label: const Text('Save as Transaction'),
                     ),
                   ),

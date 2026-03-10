@@ -320,7 +320,7 @@ class _FilterChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final Color? color;
-  final IconData? icon;
+  final FaIconData? icon;
   final VoidCallback onTap;
 
   const _FilterChip({

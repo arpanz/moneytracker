@@ -7,8 +7,8 @@ import '../../../config/theme/spacing.dart';
 /// Data class describing a single bottom navigation tab.
 class _NavTab {
   final String label;
-  final IconData icon;
-  final IconData activeIcon;
+  final FaIconData icon;
+  final FaIconData activeIcon;
   final String path;
 
   const _NavTab({
@@ -115,12 +115,7 @@ class _FloatingNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(
-        Spacing.md,
-        0,
-        Spacing.md,
-        Spacing.lg,
-      ),
+      margin: const EdgeInsets.fromLTRB(Spacing.md, 0, Spacing.md, Spacing.lg),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: const BorderRadius.all(Radius.circular(Radii.xl)),
@@ -236,8 +231,7 @@ class _NavBarItem extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 10,
-                  fontWeight:
-                      isSelected ? FontWeight.w600 : FontWeight.w500,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   color: isSelected ? activeColor : inactiveColor,
                 ),
                 child: Text(

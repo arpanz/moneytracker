@@ -42,7 +42,7 @@ dependencies:
   # UI & Animations
   flutter_svg: ^2.0.17
   lottie: ^3.3.1
-  font_awesome_flutter: ^10.8.0
+  font_awesome_flutter: ^11.0.0
   shimmer: ^3.0.0
   flutter_animate: ^4.5.2
   animated_text_kit: ^4.2.3

@@ -383,14 +383,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         'Expense',
         1,
         cheddarColors.expense,
-        FontAwesomeIcons.arrowDown,
+        FontAwesomeIcons.arrowDown as IconData,
       ),
-      _TypeOption('Income', 0, cheddarColors.income, FontAwesomeIcons.arrowUp),
+      _TypeOption('Income', 0, cheddarColors.income, FontAwesomeIcons.arrowUp as IconData),
       _TypeOption(
         'Transfer',
         2,
         cheddarColors.transfer,
-        FontAwesomeIcons.arrowRightArrowLeft,
+        FontAwesomeIcons.arrowRightArrowLeft as IconData,
       ),
     ];
 
@@ -435,7 +435,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         FaIcon(
-                          option.icon,
+                          option.icon as FaIconData?,
                           size: 14,
                           color: isSelected
                               ? option.color
@@ -586,7 +586,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 FaIcon(
-                  _accountIcon(account.icon),
+                  _accountIcon(account.icon) as FaIconData?,
                   size: 14,
                   color: isSelected
                       ? accountColor
@@ -1002,7 +1002,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   // ── Helper: Account icon mapping ──
 
-  IconData _accountIcon(String iconName) {
+  FaIconData _accountIcon(String iconName) {
     switch (iconName) {
       case 'wallet':
         return FontAwesomeIcons.wallet;

@@ -47,10 +47,7 @@ class TransactionDetailScreen extends ConsumerWidget {
       error: (e, _) => Scaffold(
         appBar: AppBar(title: const Text('Transaction')),
         body: Center(
-          child: Text(
-            'Error: $e',
-            style: theme.textTheme.bodyMedium,
-          ),
+          child: Text('Error: $e', style: theme.textTheme.bodyMedium),
         ),
       ),
     );
@@ -214,8 +211,7 @@ class _TransactionDetailContent extends ConsumerWidget {
               ),
             ),
 
-            if (transaction.note != null &&
-                transaction.note!.isNotEmpty) ...[
+            if (transaction.note != null && transaction.note!.isNotEmpty) ...[
               const SizedBox(height: Spacing.sm),
               _InfoCard(
                 icon: FontAwesomeIcons.noteSticky,
@@ -264,10 +260,7 @@ class _TransactionDetailContent extends ConsumerWidget {
             // ── Split Info ──
             if (transaction.splitId != null) ...[
               const SizedBox(height: Spacing.md),
-              _SplitSection(
-                splitId: transaction.splitId!,
-                ref: ref,
-              ),
+              _SplitSection(splitId: transaction.splitId!, ref: ref),
             ],
 
             const SizedBox(height: Spacing.xl),
@@ -288,9 +281,7 @@ class _TransactionDetailContent extends ConsumerWidget {
                 ),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: theme.colorScheme.error),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: Radii.borderMd,
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
                 ),
               ),
             ),
@@ -387,7 +378,7 @@ class _TypeBadge extends StatelessWidget {
     }
   }
 
-  IconData get _icon {
+  FaIconData get _icon {
     switch (type) {
       case 0:
         return FontAwesomeIcons.arrowUp;
@@ -443,7 +434,7 @@ class _TypeBadge extends StatelessWidget {
 // ── Info Card ───────────────────────────────────────────────────────────────
 
 class _InfoCard extends StatelessWidget {
-  final IconData icon;
+  final FaIconData icon;
   final String label;
   final Widget child;
 
@@ -467,11 +458,7 @@ class _InfoCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                FaIcon(
-                  icon,
-                  size: 14,
-                  color: theme.colorScheme.primary,
-                ),
+                FaIcon(icon, size: 14, color: theme.colorScheme.primary),
                 const SizedBox(width: Spacing.sm),
                 Text(
                   label,
@@ -557,9 +544,7 @@ class _ReceiptSection extends StatelessWidget {
           ),
           backgroundColor: Colors.black,
           body: Center(
-            child: InteractiveViewer(
-              child: Image.file(File(imagePath)),
-            ),
+            child: InteractiveViewer(child: Image.file(File(imagePath))),
           ),
         ),
       ),
@@ -752,8 +737,9 @@ class _SplitSection extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 14,
-                        backgroundColor:
-                            theme.colorScheme.primary.withOpacity(0.1),
+                        backgroundColor: theme.colorScheme.primary.withOpacity(
+                          0.1,
+                        ),
                         child: Text(
                           participant.name.isNotEmpty
                               ? participant.name[0].toUpperCase()

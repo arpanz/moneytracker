@@ -31,7 +31,7 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
 
   bool get _isEditing => widget.existingGoal != null;
 
-  static const _iconOptions = <String, IconData>{
+  static const _iconOptions = <String, FaIconData>{
     'piggy-bank': FontAwesomeIcons.piggyBank,
     'star': FontAwesomeIcons.star,
     'car': FontAwesomeIcons.car,

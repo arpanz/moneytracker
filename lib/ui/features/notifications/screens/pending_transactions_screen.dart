@@ -82,10 +82,10 @@ class PendingTransactionsScreen extends ConsumerWidget {
                   }
                   final tx = pending[index - 1];
                   return _PendingTransactionCard(
-                    transaction: tx,
-                    onSave: () => _saveTransaction(context, ref, tx),
-                    onDismiss: () => _dismissTransaction(ref, tx),
-                  )
+                        transaction: tx,
+                        onSave: () => _saveTransaction(context, ref, tx),
+                        onDismiss: () => _dismissTransaction(ref, tx),
+                      )
                       .animate()
                       .fadeIn(
                         duration: 300.ms,
@@ -105,9 +105,7 @@ class PendingTransactionsScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.primaryContainer.withOpacity(0.3),
         borderRadius: Radii.borderMd,
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
-        ),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.2)),
       ),
       child: Row(
         children: [
@@ -180,15 +178,14 @@ class PendingTransactionsScreen extends ConsumerWidget {
     // Create a pre-filled transaction and navigate to add screen
     final transaction = TransactionModel()
       ..amount = tx.amount
-      ..type = tx.isDebit ? 1 : 0 // 1 = expense, 0 = income
+      ..type = tx.isDebit
+          ? 1
+          : 0 // 1 = expense, 0 = income
       ..note = tx.merchant ?? tx.appName
       ..date = tx.timestamp
       ..createdAt = DateTime.now();
 
-    context.pushNamed(
-      RouteNames.addTransaction,
-      extra: transaction,
-    );
+    context.pushNamed(RouteNames.addTransaction, extra: transaction);
   }
 
   void _dismissTransaction(WidgetRef ref, PendingTransaction tx) {
@@ -241,14 +238,14 @@ class _PendingTransactionCard extends StatelessWidget {
   });
 
   /// Map app icon identifiers to FontAwesome icons.
-  static const _appIconMap = <String, IconData>{
+  static const _appIconMap = <String, FaIconData>{
     'gpay': FontAwesomeIcons.googlePay,
     'phonepe': FontAwesomeIcons.mobile,
     'paytm': FontAwesomeIcons.wallet,
     'bhim': FontAwesomeIcons.buildingColumns,
   };
 
-  IconData get _appIcon {
+  FaIconData get _appIcon {
     if (transaction.appIcon != null &&
         _appIconMap.containsKey(transaction.appIcon)) {
       return _appIconMap[transaction.appIcon]!;
@@ -269,7 +266,9 @@ class _PendingTransactionCard extends StatelessWidget {
 
     final amountPrefix = isDebit ? '-' : '+';
     final formattedAmount = _formatAmount(transaction.amount);
-    final formattedDate = DateFormat('dd MMM, hh:mm a').format(transaction.timestamp);
+    final formattedDate = DateFormat(
+      'dd MMM, hh:mm a',
+    ).format(transaction.timestamp);
 
     return Dismissible(
       key: ValueKey(transaction.id),
@@ -303,7 +302,9 @@ class _PendingTransactionCard extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer.withOpacity(0.5),
+                      color: theme.colorScheme.primaryContainer.withOpacity(
+                        0.5,
+                      ),
                       borderRadius: Radii.borderSm,
                     ),
                     child: Center(
@@ -407,11 +408,14 @@ class _PendingTransactionCard extends StatelessWidget {
                       icon: const FaIcon(FontAwesomeIcons.xmark, size: 14),
                       label: const Text('Dismiss'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: theme.colorScheme.onSurface.withOpacity(0.6),
+                        foregroundColor: theme.colorScheme.onSurface
+                            .withOpacity(0.6),
                         side: BorderSide(
                           color: theme.colorScheme.outline.withOpacity(0.3),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: Spacing.sm,
+                        ),
                       ),
                     ),
                   ),
@@ -422,7 +426,9 @@ class _PendingTransactionCard extends StatelessWidget {
                       icon: const FaIcon(FontAwesomeIcons.floppyDisk, size: 14),
                       label: const Text('Save'),
                       style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: Spacing.sm,
+                        ),
                       ),
                     ),
                   ),

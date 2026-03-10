@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/di/providers.dart';
@@ -93,10 +92,12 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
                 ),
               ),
               const SizedBox(height: Spacing.lg),
-              Text('Add Money',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      )),
+              Text(
+                'Add Money',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+              ),
               const SizedBox(height: Spacing.lg),
               TextField(
                 controller: amountController,
@@ -110,8 +111,8 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 autofocus: true,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: Spacing.md),
               TextField(
@@ -128,11 +129,11 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
                 child: FilledButton(
                   onPressed: () async {
                     final amt = double.tryParse(
-                        amountController.text.replaceAll(',', '').trim());
+                      amountController.text.replaceAll(',', '').trim(),
+                    );
                     if (amt == null || amt <= 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Enter a valid amount')),
+                        const SnackBar(content: Text('Enter a valid amount')),
                       );
                       return;
                     }
@@ -148,9 +149,7 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
                   },
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: Radii.borderMd,
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
                   ),
                   child: const Text('Add Contribution'),
                 ),
@@ -172,7 +171,8 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
       builder: (context) => AlertDialog(
         title: const Text('Delete Goal'),
         content: const Text(
-            'Are you sure you want to delete this goal? This cannot be undone.'),
+          'Are you sure you want to delete this goal? This cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -203,8 +203,7 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
     final currencySymbol = ref.watch(currencySymbolProvider);
 
     if (_isLoading) {
-      return const Scaffold(
-          body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (_goal == null) {
@@ -216,20 +215,24 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
 
     final goal = _goal!;
     final progress = goal.progress.clamp(0.0, 1.0);
-    final remaining = (goal.targetAmount - goal.currentAmount)
-        .clamp(0.0, double.infinity);
+    final remaining = (goal.targetAmount - goal.currentAmount).clamp(
+      0.0,
+      double.infinity,
+    );
 
     String projectionText = '';
     String suggestionText = '';
     if (!goal.isCompleted && goal.contributions.isNotEmpty) {
       final firstContrib = goal.contributions.first;
-      final daysSinceStart =
-          DateTime.now().difference(firstContrib.date).inDays;
+      final daysSinceStart = DateTime.now()
+          .difference(firstContrib.date)
+          .inDays;
       if (daysSinceStart > 0 && goal.currentAmount > 0) {
         final dailyRate = goal.currentAmount / daysSinceStart;
         final daysRemaining = remaining / dailyRate;
-        final projectedDate =
-            DateTime.now().add(Duration(days: daysRemaining.ceil()));
+        final projectedDate = DateTime.now().add(
+          Duration(days: daysRemaining.ceil()),
+        );
         projectionText =
             '${projectedDate.day}/${projectedDate.month}/${projectedDate.year}';
 
@@ -261,15 +264,11 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             onPressed: () {
-              context.pushNamed(
-                'add-goal',
-                extra: goal,
-              );
+              context.pushNamed('add-goal', extra: goal);
             },
           ),
           IconButton(
-            icon: Icon(Icons.delete_outline,
-                color: theme.colorScheme.error),
+            icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
             onPressed: _deleteGoal,
           ),
         ],
@@ -280,28 +279,29 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: SizedBox(
-                width: 200,
-                height: 240,
-                child: AnimatedBuilder(
-                  animation: _fillController,
-                  builder: (context, _) {
-                    return CustomPaint(
-                      painter: _AnimatedJarPainter(
-                        progress: _fillController.value,
-                        liquidColor: Color(goal.color),
-                        jarColor: theme.colorScheme.outlineVariant,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            )
+                  child: SizedBox(
+                    width: 200,
+                    height: 240,
+                    child: AnimatedBuilder(
+                      animation: _fillController,
+                      builder: (context, _) {
+                        return CustomPaint(
+                          painter: _AnimatedJarPainter(
+                            progress: _fillController.value,
+                            liquidColor: Color(goal.color),
+                            jarColor: theme.colorScheme.outlineVariant,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                )
                 .animate()
                 .fadeIn(duration: 500.ms)
                 .scale(
-                    begin: const Offset(0.8, 0.8),
-                    end: const Offset(1.0, 1.0)),
+                  begin: const Offset(0.8, 0.8),
+                  end: const Offset(1.0, 1.0),
+                ),
             const SizedBox(height: Spacing.lg),
 
             Center(
@@ -339,21 +339,24 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
                   padding: Spacing.paddingMd,
                   child: Row(
                     children: [
-                      Icon(Icons.trending_up,
-                          color: theme.colorScheme.primary),
+                      Icon(Icons.trending_up, color: theme.colorScheme.primary),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Projected completion',
-                                style: textTheme.labelLarge?.copyWith(
-                                    fontWeight: FontWeight.w600)),
-                            Text(projectionText,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color:
-                                      theme.colorScheme.onSurfaceVariant,
-                                )),
+                            Text(
+                              'Projected completion',
+                              style: textTheme.labelLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              projectionText,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -366,18 +369,21 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
               const SizedBox(height: Spacing.sm),
               Card(
                 // FIX: withOpacity → withValues
-                color: theme.colorScheme.primaryContainer
-                    .withValues(alpha: 0.3),
+                color: theme.colorScheme.primaryContainer.withValues(
+                  alpha: 0.3,
+                ),
                 child: Padding(
                   padding: Spacing.paddingMd,
                   child: Row(
                     children: [
-                      Icon(Icons.lightbulb_outline,
-                          color: theme.colorScheme.primary, size: 22),
+                      Icon(
+                        Icons.lightbulb_outline,
+                        color: theme.colorScheme.primary,
+                        size: 22,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text(suggestionText,
-                            style: textTheme.bodySmall),
+                        child: Text(suggestionText, style: textTheme.bodySmall),
                       ),
                     ],
                   ),
@@ -387,9 +393,12 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
 
             const SizedBox(height: Spacing.lg),
 
-            Text('Contribution History',
-                style: textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'Contribution History',
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: Spacing.sm),
 
             if (goal.contributions.isEmpty)
@@ -406,39 +415,44 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
                 ),
               )
             else
-              ...goal.contributions.reversed.toList().asMap().entries.map(
-                (entry) {
-                  final i = entry.key;
-                  final c = entry.value;
-                  return ListTile(
-                    leading: CircleAvatar(
-                      // FIX: withOpacity → withValues
-                      backgroundColor:
-                          Color(goal.color).withValues(alpha: 0.15),
-                      child: Icon(Icons.add,
-                          color: Color(goal.color), size: 18),
-                    ),
-                    // FIX #16: runtime currency symbol
-                    title: Text('$currencySymbol ${_formatIndian(c.amount)}'),
-                    subtitle: Text(
-                      c.note ?? '${c.date.day}/${c.date.month}/${c.date.year}',
-                      style: textTheme.bodySmall,
-                    ),
-                    trailing: Text(
-                      '${c.date.day}/${c.date.month}',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+              ...goal.contributions.reversed.toList().asMap().entries.map((
+                entry,
+              ) {
+                final i = entry.key;
+                final c = entry.value;
+                return ListTile(
+                      leading: CircleAvatar(
+                        // FIX: withOpacity → withValues
+                        backgroundColor: Color(
+                          goal.color,
+                        ).withValues(alpha: 0.15),
+                        child: Icon(
+                          Icons.add,
+                          color: Color(goal.color),
+                          size: 18,
+                        ),
                       ),
-                    ),
-                  )
-                      .animate()
-                      .fadeIn(
-                        delay: Duration(milliseconds: 50 * i),
-                        duration: 300.ms,
-                      )
-                      .slideX(begin: 0.1, end: 0);
-                },
-              ),
+                      // FIX #16: runtime currency symbol
+                      title: Text('$currencySymbol ${_formatIndian(c.amount)}'),
+                      subtitle: Text(
+                        c.note ??
+                            '${c.date.day}/${c.date.month}/${c.date.year}',
+                        style: textTheme.bodySmall,
+                      ),
+                      trailing: Text(
+                        '${c.date.day}/${c.date.month}',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(
+                      delay: Duration(milliseconds: 50 * i),
+                      duration: 300.ms,
+                    )
+                    .slideX(begin: 0.1, end: 0);
+              }),
           ],
         ),
       ),
@@ -535,17 +549,24 @@ class _AnimatedJarPainter extends CustomPainter {
       final liquidPath = Path();
       liquidPath.moveTo(jarLeft + 3, jarBottom - 12);
       liquidPath.quadraticBezierTo(
-          jarLeft + 3, jarBottom - 1, jarLeft + 14, jarBottom - 1);
+        jarLeft + 3,
+        jarBottom - 1,
+        jarLeft + 14,
+        jarBottom - 1,
+      );
       liquidPath.lineTo(jarRight - 14, jarBottom - 1);
       liquidPath.quadraticBezierTo(
-          jarRight - 3, jarBottom - 1, jarRight - 3, jarBottom - 12);
+        jarRight - 3,
+        jarBottom - 1,
+        jarRight - 3,
+        jarBottom - 12,
+      );
       liquidPath.lineTo(jarRight - 3, fillTop);
 
       const amp = 4.0;
       const steps = 24;
       for (int i = steps; i >= 0; i--) {
-        final x = jarRight - 3 -
-            ((jarRight - 3 - (jarLeft + 3)) * i / steps);
+        final x = jarRight - 3 - ((jarRight - 3 - (jarLeft + 3)) * i / steps);
         final y = fillTop + math.sin(i * math.pi / steps * 2.5) * amp;
         liquidPath.lineTo(x, y);
       }
@@ -559,8 +580,7 @@ class _AnimatedJarPainter extends CustomPainter {
         ..strokeWidth = 2;
       final wavePath = Path();
       for (int i = 0; i <= steps; i++) {
-        final x = jarLeft + 3 +
-            ((jarRight - 3 - (jarLeft + 3)) * i / steps);
+        final x = jarLeft + 3 + ((jarRight - 3 - (jarLeft + 3)) * i / steps);
         final y = fillTop + math.sin(i * math.pi / steps * 2.5) * amp;
         if (i == 0) {
           wavePath.moveTo(x, y);
