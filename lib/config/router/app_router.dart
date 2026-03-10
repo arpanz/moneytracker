@@ -1,3 +1,4 @@
+import 'package:cheddar/domain/models/transaction_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -141,7 +142,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       // ── Detail / Modal Routes ──
-
       GoRoute(
         path: '/transaction/add',
         name: RouteNames.addTransaction,
@@ -187,17 +187,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/goal/:id',
         name: RouteNames.goalDetail,
-<<<<<<< HEAD
-        builder: (context, state) =>
-            GoalDetailScreen(goalId: int.parse(state.pathParameters['id']!)),
-=======
         builder: (context, state) {
           // FIX: guard int.parse with tryParse.
           final id = int.tryParse(state.pathParameters['id'] ?? '');
           if (id == null) return const _NotFoundScreen();
           return GoalDetailScreen(goalId: id);
         },
->>>>>>> 77a295523bdc733138be3d49dfcad13168b226cd
       ),
       GoRoute(
         path: '/subscriptions',
@@ -290,9 +285,7 @@ class _NotFoundScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Not Found')),
-      body: const Center(
-        child: Text('The requested item could not be found.'),
-      ),
+      body: const Center(child: Text('The requested item could not be found.')),
     );
   }
 }
