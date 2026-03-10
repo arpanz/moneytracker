@@ -133,8 +133,9 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: isActive
                                       ? theme.colorScheme.onPrimary
-                                      : theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.5),
+                                      : theme.colorScheme.onSurface.withValues(
+                                          alpha: 0.5,
+                                        ),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -158,8 +159,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
                     color: isActive
                         ? theme.colorScheme.primary
                         : theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                    fontWeight:
-                        isActive ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
                   ),
                 ),
               ],
@@ -282,9 +282,7 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              _isEditing ? 'Budget updated' : 'Budget created',
-            ),
+            content: Text(_isEditing ? 'Budget updated' : 'Budget created'),
             behavior: SnackBarBehavior.floating,
             duration: AppConstants.snackBarDuration,
           ),
@@ -297,8 +295,9 @@ class _AddBudgetScreenState extends ConsumerState<AddBudgetScreen> {
           SnackBar(
             content: Text('Error: $e'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor:
-                Theme.of(context).extension<CheddarColors>()!.expense,
+            backgroundColor: Theme.of(
+              context,
+            ).extension<CheddarColors>()!.expense,
           ),
         );
       }
@@ -355,10 +354,9 @@ class _CategoryPickerStepState extends ConsumerState<_CategoryPickerStep> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Theme.of(ctx)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.2),
+                    color: Theme.of(
+                      ctx,
+                    ).colorScheme.onSurface.withValues(alpha: 0.2),
                     borderRadius: Radii.borderFull,
                   ),
                 ),
@@ -366,9 +364,9 @@ class _CategoryPickerStepState extends ConsumerState<_CategoryPickerStep> {
               const SizedBox(height: Spacing.md),
               Text(
                 'New Category',
-                style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  ctx,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: Spacing.md),
               TextField(
@@ -377,9 +375,7 @@ class _CategoryPickerStepState extends ConsumerState<_CategoryPickerStep> {
                 textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
                   labelText: 'Category name',
-                  border: OutlineInputBorder(
-                    borderRadius: Radii.borderMd,
-                  ),
+                  border: OutlineInputBorder(borderRadius: Radii.borderMd),
                 ),
                 onSubmitted: (_) async {
                   await _submitCustomCategory(ctx, nameCtrl.text);
@@ -403,7 +399,9 @@ class _CategoryPickerStepState extends ConsumerState<_CategoryPickerStep> {
   }
 
   Future<void> _submitCustomCategory(
-      BuildContext sheetCtx, String rawName) async {
+    BuildContext sheetCtx,
+    String rawName,
+  ) async {
     final name = rawName.trim();
     if (name.isEmpty) return;
 
@@ -412,12 +410,12 @@ class _CategoryPickerStepState extends ConsumerState<_CategoryPickerStep> {
       ..name = name
       ..icon = AssetPaths.categoryDefault
       ..color = 0xFF9E9E9E
-      ..type = 1 // expense
+      ..type = 0
       ..isCustom = true
       ..sortOrder = 999
       ..createdAt = DateTime.now();
 
-    await categoryRepo.save(newCat);
+    await categoryRepo.add(newCat);
 
     if (mounted) {
       setState(() => _localCustom.add(newCat));
@@ -470,8 +468,7 @@ class _CategoryPickerStepState extends ConsumerState<_CategoryPickerStep> {
               final existingNames = dbCats.map((c) => c.name).toSet();
               final merged = [
                 ...dbCats,
-                ..._localCustom
-                    .where((c) => !existingNames.contains(c.name)),
+                ..._localCustom.where((c) => !existingNames.contains(c.name)),
               ];
 
               final budgetedCategories =
@@ -479,8 +476,7 @@ class _CategoryPickerStepState extends ConsumerState<_CategoryPickerStep> {
 
               return GridView.builder(
                 padding: Spacing.horizontalMd,
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 4,
                   mainAxisSpacing: Spacing.sm,
                   crossAxisSpacing: Spacing.sm,
@@ -492,131 +488,130 @@ class _CategoryPickerStepState extends ConsumerState<_CategoryPickerStep> {
                   // Last tile: create custom category.
                   if (index == merged.length) {
                     return GestureDetector(
-                      onTap: () => _showCreateCategorySheet(context),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerLow,
-                          borderRadius: Radii.borderMd,
-                          border: Border.all(
-                            color: theme.colorScheme.outline
-                                .withValues(alpha: 0.4),
-                            width: 1.5,
-                            // dashed border approximation via solid thin line
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.add_rounded,
-                              size: 28,
-                              color: theme.colorScheme.primary,
-                            ),
-                            const SizedBox(height: Spacing.xs),
-                            Text(
-                              'New',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.primary,
+                          onTap: () => _showCreateCategorySheet(context),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerLow,
+                              borderRadius: Radii.borderMd,
+                              border: Border.all(
+                                color: theme.colorScheme.outline.withValues(
+                                  alpha: 0.4,
+                                ),
+                                width: 1.5,
+                                // dashed border approximation via solid thin line
                               ),
-                              textAlign: TextAlign.center,
                             ),
-                          ],
-                        ),
-                      ),
-                    )
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add_rounded,
+                                  size: 28,
+                                  color: theme.colorScheme.primary,
+                                ),
+                                const SizedBox(height: Spacing.xs),
+                                Text(
+                                  'New',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
                         .animate()
                         .fadeIn(
-                          delay: Duration(
-                              milliseconds: 30 * merged.length),
+                          delay: Duration(milliseconds: 30 * merged.length),
                           duration: 300.ms,
                         )
                         .scale(
                           begin: const Offset(0.9, 0.9),
                           end: const Offset(1.0, 1.0),
-                          delay: Duration(
-                              milliseconds: 30 * merged.length),
+                          delay: Duration(milliseconds: 30 * merged.length),
                           duration: 300.ms,
                         );
                   }
 
                   final cat = merged[index];
-                  final isSelected =
-                      widget.selectedCategory == cat.name;
-                  final isAlreadyBudgeted =
-                      budgetedCategories.contains(cat.name);
+                  final isSelected = widget.selectedCategory == cat.name;
+                  final isAlreadyBudgeted = budgetedCategories.contains(
+                    cat.name,
+                  );
                   final color =
-                      cheddarColors
-                              .categoryColors[cat.name.toLowerCase()] ??
-                          theme.colorScheme.primary;
+                      cheddarColors.categoryColors[cat.name.toLowerCase()] ??
+                      theme.colorScheme.primary;
 
                   return GestureDetector(
-                    onTap: isAlreadyBudgeted
-                        ? null
-                        : () => widget.onCategorySelected(cat.name),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? color.withValues(alpha: 0.15)
-                            : isAlreadyBudgeted
+                        onTap: isAlreadyBudgeted
+                            ? null
+                            : () => widget.onCategorySelected(cat.name),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? color.withValues(alpha: 0.15)
+                                : isAlreadyBudgeted
                                 ? theme.colorScheme.surfaceContainerHighest
-                                    .withValues(alpha: 0.5)
+                                      .withValues(alpha: 0.5)
                                 : theme.colorScheme.surfaceContainerLow,
-                        borderRadius: Radii.borderMd,
-                        border: Border.all(
-                          color:
-                              isSelected ? color : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            cat.icon,
-                            width: 28,
-                            height: 28,
-                            colorFilter: ColorFilter.mode(
-                              isAlreadyBudgeted
-                                  ? theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.3)
-                                  : color,
-                              BlendMode.srcIn,
+                            borderRadius: Radii.borderMd,
+                            border: Border.all(
+                              color: isSelected ? color : Colors.transparent,
+                              width: 2,
                             ),
                           ),
-                          const SizedBox(height: Spacing.xs),
-                          Text(
-                            cat.name,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontSize: 10,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
-                              color: isAlreadyBudgeted
-                                  ? theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.3)
-                                  : null,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          if (isAlreadyBudgeted)
-                            Text(
-                              'Budgeted',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontSize: 8,
-                                color: theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.3),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                cat.icon,
+                                width: 28,
+                                height: 28,
+                                colorFilter: ColorFilter.mode(
+                                  isAlreadyBudgeted
+                                      ? theme.colorScheme.onSurface.withValues(
+                                          alpha: 0.3,
+                                        )
+                                      : color,
+                                  BlendMode.srcIn,
+                                ),
                               ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  )
+                              const SizedBox(height: Spacing.xs),
+                              Text(
+                                cat.name,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontSize: 10,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w400,
+                                  color: isAlreadyBudgeted
+                                      ? theme.colorScheme.onSurface.withValues(
+                                          alpha: 0.3,
+                                        )
+                                      : null,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (isAlreadyBudgeted)
+                                Text(
+                                  'Budgeted',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontSize: 8,
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.3),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      )
                       .animate()
                       .fadeIn(
                         delay: Duration(milliseconds: 30 * index),
@@ -826,8 +821,7 @@ class _PeriodStep extends StatelessWidget {
                   const Spacer(),
                   Icon(
                     Icons.chevron_right_rounded,
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                 ],
               ),
@@ -855,8 +849,7 @@ class _PeriodStep extends StatelessWidget {
                   'This budget will reset ${_periodLabel(period).toLowerCase()} '
                   'starting ${DateFormat('MMM d, y').format(startDate)}.',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ],
