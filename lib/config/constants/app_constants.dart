@@ -54,4 +54,5 @@ abstract class AppConstants {
   static const String prefCurrency = 'currency';
   static const String prefUserName = 'user_name';
   static const String prefNotificationListener = 'notification_listener';
+  static const String prefShowValues = 'show_values';
 }

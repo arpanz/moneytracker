@@ -64,9 +64,9 @@ const CategoryModelSchema = CollectionSchema(
   deserializeProp: _categoryModelDeserializeProp,
   idName: r'id',
   indexes: {
-    r'name': IndexSchema(
-      id: 879695947855722453,
-      name: r'name',
+    r'name_type': IndexSchema(
+      id: 3048835663697072458,
+      name: r'name_type',
       unique: true,
       replace: false,
       properties: [
@@ -74,6 +74,11 @@ const CategoryModelSchema = CollectionSchema(
           name: r'name',
           type: IndexType.hash,
           caseSensitive: true,
+        ),
+        IndexPropertySchema(
+          name: r'type',
+          type: IndexType.value,
+          caseSensitive: false,
         )
       ],
     ),
@@ -206,57 +211,88 @@ void _categoryModelAttach(
 }
 
 extension CategoryModelByIndex on IsarCollection<CategoryModel> {
-  Future<CategoryModel?> getByName(String name) {
-    return getByIndex(r'name', [name]);
+  Future<CategoryModel?> getByNameType(String name, int type) {
+    return getByIndex(r'name_type', [name, type]);
   }
 
-  CategoryModel? getByNameSync(String name) {
-    return getByIndexSync(r'name', [name]);
+  CategoryModel? getByNameTypeSync(String name, int type) {
+    return getByIndexSync(r'name_type', [name, type]);
   }
 
-  Future<bool> deleteByName(String name) {
-    return deleteByIndex(r'name', [name]);
+  Future<bool> deleteByNameType(String name, int type) {
+    return deleteByIndex(r'name_type', [name, type]);
   }
 
-  bool deleteByNameSync(String name) {
-    return deleteByIndexSync(r'name', [name]);
+  bool deleteByNameTypeSync(String name, int type) {
+    return deleteByIndexSync(r'name_type', [name, type]);
   }
 
-  Future<List<CategoryModel?>> getAllByName(List<String> nameValues) {
-    final values = nameValues.map((e) => [e]).toList();
-    return getAllByIndex(r'name', values);
+  Future<List<CategoryModel?>> getAllByNameType(
+      List<String> nameValues, List<int> typeValues) {
+    final len = nameValues.length;
+    assert(
+        typeValues.length == len, 'All index values must have the same length');
+    final values = <List<dynamic>>[];
+    for (var i = 0; i < len; i++) {
+      values.add([nameValues[i], typeValues[i]]);
+    }
+
+    return getAllByIndex(r'name_type', values);
   }
 
-  List<CategoryModel?> getAllByNameSync(List<String> nameValues) {
-    final values = nameValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'name', values);
+  List<CategoryModel?> getAllByNameTypeSync(
+      List<String> nameValues, List<int> typeValues) {
+    final len = nameValues.length;
+    assert(
+        typeValues.length == len, 'All index values must have the same length');
+    final values = <List<dynamic>>[];
+    for (var i = 0; i < len; i++) {
+      values.add([nameValues[i], typeValues[i]]);
+    }
+
+    return getAllByIndexSync(r'name_type', values);
   }
 
-  Future<int> deleteAllByName(List<String> nameValues) {
-    final values = nameValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'name', values);
+  Future<int> deleteAllByNameType(
+      List<String> nameValues, List<int> typeValues) {
+    final len = nameValues.length;
+    assert(
+        typeValues.length == len, 'All index values must have the same length');
+    final values = <List<dynamic>>[];
+    for (var i = 0; i < len; i++) {
+      values.add([nameValues[i], typeValues[i]]);
+    }
+
+    return deleteAllByIndex(r'name_type', values);
   }
 
-  int deleteAllByNameSync(List<String> nameValues) {
-    final values = nameValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'name', values);
+  int deleteAllByNameTypeSync(List<String> nameValues, List<int> typeValues) {
+    final len = nameValues.length;
+    assert(
+        typeValues.length == len, 'All index values must have the same length');
+    final values = <List<dynamic>>[];
+    for (var i = 0; i < len; i++) {
+      values.add([nameValues[i], typeValues[i]]);
+    }
+
+    return deleteAllByIndexSync(r'name_type', values);
   }
 
-  Future<Id> putByName(CategoryModel object) {
-    return putByIndex(r'name', object);
+  Future<Id> putByNameType(CategoryModel object) {
+    return putByIndex(r'name_type', object);
   }
 
-  Id putByNameSync(CategoryModel object, {bool saveLinks = true}) {
-    return putByIndexSync(r'name', object, saveLinks: saveLinks);
+  Id putByNameTypeSync(CategoryModel object, {bool saveLinks = true}) {
+    return putByIndexSync(r'name_type', object, saveLinks: saveLinks);
   }
 
-  Future<List<Id>> putAllByName(List<CategoryModel> objects) {
-    return putAllByIndex(r'name', objects);
+  Future<List<Id>> putAllByNameType(List<CategoryModel> objects) {
+    return putAllByIndex(r'name_type', objects);
   }
 
-  List<Id> putAllByNameSync(List<CategoryModel> objects,
+  List<Id> putAllByNameTypeSync(List<CategoryModel> objects,
       {bool saveLinks = true}) {
-    return putAllByIndexSync(r'name', objects, saveLinks: saveLinks);
+    return putAllByIndexSync(r'name_type', objects, saveLinks: saveLinks);
   }
 }
 
@@ -356,29 +392,29 @@ extension CategoryModelQueryWhere
     });
   }
 
-  QueryBuilder<CategoryModel, CategoryModel, QAfterWhereClause> nameEqualTo(
-      String name) {
+  QueryBuilder<CategoryModel, CategoryModel, QAfterWhereClause>
+      nameEqualToAnyType(String name) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'name',
+        indexName: r'name_type',
         value: [name],
       ));
     });
   }
 
-  QueryBuilder<CategoryModel, CategoryModel, QAfterWhereClause> nameNotEqualTo(
-      String name) {
+  QueryBuilder<CategoryModel, CategoryModel, QAfterWhereClause>
+      nameNotEqualToAnyType(String name) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'name',
+              indexName: r'name_type',
               lower: [],
               upper: [name],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'name',
+              indexName: r'name_type',
               lower: [name],
               includeLower: false,
               upper: [],
@@ -386,18 +422,114 @@ extension CategoryModelQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'name',
+              indexName: r'name_type',
               lower: [name],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'name',
+              indexName: r'name_type',
               lower: [],
               upper: [name],
               includeUpper: false,
             ));
       }
+    });
+  }
+
+  QueryBuilder<CategoryModel, CategoryModel, QAfterWhereClause> nameTypeEqualTo(
+      String name, int type) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'name_type',
+        value: [name, type],
+      ));
+    });
+  }
+
+  QueryBuilder<CategoryModel, CategoryModel, QAfterWhereClause>
+      nameEqualToTypeNotEqualTo(String name, int type) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'name_type',
+              lower: [name],
+              upper: [name, type],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'name_type',
+              lower: [name, type],
+              includeLower: false,
+              upper: [name],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'name_type',
+              lower: [name, type],
+              includeLower: false,
+              upper: [name],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'name_type',
+              lower: [name],
+              upper: [name, type],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<CategoryModel, CategoryModel, QAfterWhereClause>
+      nameEqualToTypeGreaterThan(
+    String name,
+    int type, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'name_type',
+        lower: [name, type],
+        includeLower: include,
+        upper: [name],
+      ));
+    });
+  }
+
+  QueryBuilder<CategoryModel, CategoryModel, QAfterWhereClause>
+      nameEqualToTypeLessThan(
+    String name,
+    int type, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'name_type',
+        lower: [name],
+        upper: [name, type],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<CategoryModel, CategoryModel, QAfterWhereClause>
+      nameEqualToTypeBetween(
+    String name,
+    int lowerType,
+    int upperType, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'name_type',
+        lower: [name, lowerType],
+        includeLower: includeLower,
+        upper: [name, upperType],
+        includeUpper: includeUpper,
+      ));
     });
   }
 

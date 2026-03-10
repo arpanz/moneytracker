@@ -44,6 +44,8 @@ class _CategoryPickerRowState extends ConsumerState<CategoryPickerRow> {
   final List<CategoryModel> _localCustom = [];
   String? _restoredCategoryName;
 
+  static const _svgFallbackIcon = Icons.category_rounded;
+
   // Common FontAwesome icons available for custom categories.
   static const _iconOptions = [
     (icon: FontAwesomeIcons.utensils, label: 'Food'),
@@ -193,35 +195,15 @@ class _CategoryPickerRowState extends ConsumerState<CategoryPickerRow> {
                                   width: 2,
                                 ),
                               ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  FaIcon(
-                                    opt.icon,
-                                    size: 20,
-                                    color: isSel
-                                        ? Theme.of(ctx).colorScheme.primary
-                                        : Theme.of(ctx).colorScheme.onSurface
-                                              .withValues(alpha: 0.6),
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    opt.label,
-                                    style: TextStyle(
-                                      fontSize: 8,
-                                      fontWeight: isSel
-                                          ? FontWeight.w700
-                                          : FontWeight.w400,
-                                      color: isSel
-                                          ? Theme.of(ctx).colorScheme.primary
-                                          : Theme.of(ctx).colorScheme.onSurface
-                                                .withValues(alpha: 0.6),
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
+                              child: Center(
+                                child: FaIcon(
+                                  opt.icon,
+                                  size: 20,
+                                  color: isSel
+                                      ? Theme.of(ctx).colorScheme.primary
+                                      : Theme.of(ctx).colorScheme.onSurface
+                                            .withValues(alpha: 0.6),
+                                ),
                               ),
                             ),
                           );
@@ -255,9 +237,23 @@ class _CategoryPickerRowState extends ConsumerState<CategoryPickerRow> {
     FaIconData chosenIcon,
   ) async {
     final name = rawName.trim();
-    if (name.isEmpty) return;
+    if (name.isEmpty) {
+      _showMessage('Enter a category name.');
+      return;
+    }
 
     final categoryRepo = ref.read(categoryRepositoryProvider);
+    final existing = await categoryRepo.getByType(_categoryType);
+    final normalizedName = name.toLowerCase();
+    final duplicate = existing.any(
+      (category) => category.name.trim().toLowerCase() == normalizedName,
+    );
+
+    if (duplicate) {
+      _showMessage('A category named "$name" already exists.');
+      return;
+    }
+
     final newCat = CategoryModel()
       ..name = name
       ..icon = _assetPathFor(chosenIcon)
@@ -267,16 +263,28 @@ class _CategoryPickerRowState extends ConsumerState<CategoryPickerRow> {
       ..sortOrder = 999
       ..createdAt = DateTime.now();
 
-    await categoryRepo.add(newCat);
+    try {
+      final newId = await categoryRepo.add(newCat);
+      newCat.id = newId;
 
-    // Invalidate providers so the chip row refreshes from DB.
-    ref.invalidate(_categoriesProvider);
+      // Invalidate providers so the chip row refreshes from DB.
+      ref.invalidate(_categoriesProvider);
 
-    if (mounted) {
-      setState(() => _localCustom.add(newCat));
-      widget.onSelected(newCat);
+      if (mounted) {
+        setState(() => _localCustom.add(newCat));
+        widget.onSelected(newCat);
+      }
+      if (sheetCtx.mounted) Navigator.of(sheetCtx).pop();
+    } catch (_) {
+      _showMessage('Could not create category. Try a different name.');
     }
-    if (sheetCtx.mounted) Navigator.of(sheetCtx).pop();
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   String _iconLabelFor(FaIconData icon) {
@@ -536,7 +544,7 @@ class _CategoryPickerRowState extends ConsumerState<CategoryPickerRow> {
           ),
           decoration: BoxDecoration(
             color: isSelected
-                ? categoryColor.withValues(alpha: 0.18)
+                ? categoryColor.withValues(alpha: 0.14)
                 : theme.colorScheme.surfaceContainerLow,
             borderRadius: Radii.borderMd,
             border: Border.all(
@@ -559,18 +567,40 @@ class _CategoryPickerRowState extends ConsumerState<CategoryPickerRow> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 42,
-                height: 42,
+                width: 46,
+                height: 46,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: categoryColor.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      categoryColor.withValues(alpha: 0.18),
+                      categoryColor.withValues(alpha: 0.08),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: categoryColor.withValues(alpha: 0.16),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: categoryColor.withValues(alpha: 0.12),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
                 alignment: Alignment.center,
-                child: SvgPicture.asset(
-                  category.icon,
-                  width: 22,
-                  height: 22,
-                  colorFilter: ColorFilter.mode(categoryColor, BlendMode.srcIn),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: SvgPicture.asset(
+                    category.icon,
+                    width: 24,
+                    height: 24,
+                    fit: BoxFit.contain,
+                    placeholderBuilder: (_) =>
+                        Icon(_svgFallbackIcon, size: 22, color: categoryColor),
+                  ),
                 ),
               ),
               const SizedBox(height: Spacing.xs),

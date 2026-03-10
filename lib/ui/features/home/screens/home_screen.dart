@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/di/providers.dart';
+import '../../../../config/constants/app_constants.dart';
 import '../../../../config/constants/asset_paths.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
@@ -49,6 +51,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final colorScheme = theme.colorScheme;
     final userName = ref.watch(userNameProvider);
     final currencySymbol = ref.watch(currencySymbolProvider);
+    final showValues = ref.watch(showValuesProvider);
 
     ref.listen(transactionStreamProvider, (_, __) {
       ref.invalidate(totalBalanceProvider);
@@ -82,6 +85,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     greeting: _greeting(),
                     userName: userName,
                     theme: theme,
+                    showValues: showValues,
+                    onToggleVisibility: () async {
+                      final nextValue = !ref.read(showValuesProvider);
+                      ref.read(showValuesProvider.notifier).state = nextValue;
+                      final prefs = ref.read(sharedPreferencesProvider);
+                      await prefs.setBool(
+                        AppConstants.prefShowValues,
+                        nextValue,
+                      );
+                    },
                   ),
                 ),
               ),
@@ -90,7 +103,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: Spacing.horizontalLg,
-                  child: _BalanceSection(ref: ref),
+                  child: _BalanceSection(
+                    ref: ref,
+                    showValues: showValues,
+                    currencySymbol: currencySymbol,
+                  ),
                 ),
               ),
 
@@ -104,6 +121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ref: ref,
                     theme: theme,
                     currencySymbol: currencySymbol,
+                    showValues: showValues,
                   ),
                 ),
               ),
@@ -128,6 +146,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ref: ref,
                     theme: theme,
                     currencySymbol: currencySymbol,
+                    showValues: showValues,
                   ),
                 ),
               ),
@@ -169,12 +188,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ref: ref,
                 theme: theme,
                 currencySymbol: currencySymbol,
+                showValues: showValues,
               ),
 
               // FIX: Use MediaQuery-based bottom padding (dynamic nav bar height).
               SliverToBoxAdapter(
                 child: SizedBox(
-                  height: kBottomNavigationBarHeight +
+                  height:
+                      kBottomNavigationBarHeight +
                       MediaQuery.of(context).padding.bottom +
                       Spacing.md,
                 ),
@@ -193,11 +214,15 @@ class _GreetingHeader extends StatelessWidget {
   final String greeting;
   final String userName;
   final ThemeData theme;
+  final bool showValues;
+  final VoidCallback onToggleVisibility;
 
   const _GreetingHeader({
     required this.greeting,
     required this.userName,
     required this.theme,
+    required this.showValues,
+    required this.onToggleVisibility,
   });
 
   @override
@@ -208,20 +233,37 @@ class _GreetingHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-              '$greeting${userName.isNotEmpty ? ', $userName' : ''}',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            )
-            .animate()
-            .fadeIn(duration: AppDurations.medium)
-            .slideY(
-              begin: -0.1,
-              end: 0,
-              duration: AppDurations.medium,
-              curve: Curves.easeOut,
+        Row(
+          children: [
+            Expanded(
+              child:
+                  Text(
+                        '$greeting${userName.isNotEmpty ? ', $userName' : ''}',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(duration: AppDurations.medium)
+                      .slideY(
+                        begin: -0.1,
+                        end: 0,
+                        duration: AppDurations.medium,
+                        curve: Curves.easeOut,
+                      ),
             ),
+            IconButton(
+              onPressed: onToggleVisibility,
+              tooltip: showValues ? 'Hide values' : 'Show values',
+              icon: Icon(
+                showValues
+                    ? Icons.visibility_rounded
+                    : Icons.visibility_off_rounded,
+              ),
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
         const SizedBox(height: Spacing.xs),
         Text(
           dateStr,
@@ -241,25 +283,40 @@ class _GreetingHeader extends StatelessWidget {
 
 class _BalanceSection extends StatelessWidget {
   final WidgetRef ref;
+  final bool showValues;
+  final String currencySymbol;
 
-  const _BalanceSection({required this.ref});
+  const _BalanceSection({
+    required this.ref,
+    required this.showValues,
+    required this.currencySymbol,
+  });
 
   @override
   Widget build(BuildContext context) {
     final balanceAsync = ref.watch(totalBalanceProvider);
 
     return balanceAsync.when(
-      data: (balance) => BalanceCard(balance: balance)
-          .animate()
-          .fadeIn(duration: AppDurations.medium)
-          .slideY(
-            begin: 0.05,
-            end: 0,
-            duration: AppDurations.medium,
-            curve: Curves.easeOut,
-          ),
+      data: (balance) =>
+          BalanceCard(
+                balance: balance,
+                currencySymbol: currencySymbol,
+                obscureValues: !showValues,
+              )
+              .animate()
+              .fadeIn(duration: AppDurations.medium)
+              .slideY(
+                begin: 0.05,
+                end: 0,
+                duration: AppDurations.medium,
+                curve: Curves.easeOut,
+              ),
       loading: () => const _BalanceCardShimmer(),
-      error: (_, __) => const BalanceCard(balance: 0),
+      error: (_, __) => BalanceCard(
+        balance: 0,
+        currencySymbol: currencySymbol,
+        obscureValues: !showValues,
+      ),
     );
   }
 }
@@ -293,11 +350,13 @@ class _IncomeExpenseRow extends StatelessWidget {
   final WidgetRef ref;
   final ThemeData theme;
   final String currencySymbol;
+  final bool showValues;
 
   const _IncomeExpenseRow({
     required this.ref,
     required this.theme,
     required this.currencySymbol,
+    required this.showValues,
   });
 
   @override
@@ -317,6 +376,7 @@ class _IncomeExpenseRow extends StatelessWidget {
                 iconColor: cheddarColors?.income ?? Colors.green,
                 theme: theme,
                 currencySymbol: currencySymbol,
+                showValues: showValues,
               ),
             ),
             const SizedBox(width: Spacing.md),
@@ -329,6 +389,7 @@ class _IncomeExpenseRow extends StatelessWidget {
                 iconColor: cheddarColors?.expense ?? Colors.red,
                 theme: theme,
                 currencySymbol: currencySymbol,
+                showValues: showValues,
               ),
             ),
           ],
@@ -356,6 +417,7 @@ class _MiniStatCard extends StatelessWidget {
   final Color iconColor;
   final ThemeData theme;
   final String currencySymbol;
+  final bool showValues;
 
   const _MiniStatCard({
     required this.label,
@@ -365,6 +427,7 @@ class _MiniStatCard extends StatelessWidget {
     required this.iconColor,
     required this.theme,
     required this.currencySymbol,
+    required this.showValues,
   });
 
   @override
@@ -412,14 +475,19 @@ class _MiniStatCard extends StatelessWidget {
                           borderRadius: Radii.borderSm,
                         ),
                       )
-                    : Text(
-                        '$currencySymbol ${_formatCompact(amount)}',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: iconColor,
+                    : _BlurredValue(
+                        obscure: !showValues,
+                        child: Text(
+                          showValues
+                              ? '$currencySymbol ${_formatCompact(amount)}'
+                              : '$currencySymbol 0000',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: iconColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
               ],
             ),
@@ -460,10 +528,7 @@ class _QuickActionsRow extends StatelessWidget {
           label: 'Add Expense',
           icon: Icons.remove_circle_outline_rounded,
           color: colorScheme.error,
-          onTap: () => context.pushNamed(
-            RouteNames.addTransaction,
-            extra: 1,
-          ),
+          onTap: () => context.pushNamed(RouteNames.addTransaction, extra: 1),
           theme: theme,
         ),
         const SizedBox(width: Spacing.sm),
@@ -471,10 +536,7 @@ class _QuickActionsRow extends StatelessWidget {
           label: 'Add Income',
           icon: Icons.add_circle_outline_rounded,
           color: Colors.green.shade600,
-          onTap: () => context.pushNamed(
-            RouteNames.addTransaction,
-            extra: 0,
-          ),
+          onTap: () => context.pushNamed(RouteNames.addTransaction, extra: 0),
           theme: theme,
         ),
         const SizedBox(width: Spacing.sm),
@@ -552,11 +614,13 @@ class _SpendingChart extends StatelessWidget {
   final WidgetRef ref;
   final ThemeData theme;
   final String currencySymbol;
+  final bool showValues;
 
   const _SpendingChart({
     required this.ref,
     required this.theme,
     required this.currencySymbol,
+    required this.showValues,
   });
 
   @override
@@ -644,7 +708,7 @@ class _SpendingChart extends StatelessWidget {
                                   value: entry.value,
                                   color: chartColors[i % chartColors.length],
                                   radius: 28,
-                                  title: '${pct.round()}%',
+                                  title: showValues ? '${pct.round()}%' : '••',
                                   titleStyle: theme.textTheme.labelSmall
                                       ?.copyWith(
                                         color: Colors.white,
@@ -687,12 +751,17 @@ class _SpendingChart extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    Text(
-                                      '$currencySymbol ${_MiniStatCard._formatCompact(entry.value)}',
-                                      style: theme.textTheme.bodySmall
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                    _BlurredValue(
+                                      obscure: !showValues,
+                                      child: Text(
+                                        showValues
+                                            ? '$currencySymbol ${_MiniStatCard._formatCompact(entry.value)}'
+                                            : '$currencySymbol 0000',
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -742,11 +811,13 @@ class _RecentTransactionsList extends StatelessWidget {
   final WidgetRef ref;
   final ThemeData theme;
   final String currencySymbol;
+  final bool showValues;
 
   const _RecentTransactionsList({
     required this.ref,
     required this.theme,
     required this.currencySymbol,
+    required this.showValues,
   });
 
   @override
@@ -823,9 +894,7 @@ class _RecentTransactionsList extends StatelessWidget {
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
                       SnackBar(
-                        content: Text(
-                          '${deletedTxn.category} deleted',
-                        ),
+                        content: Text('${deletedTxn.category} deleted'),
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
                           borderRadius: Radii.borderMd,
@@ -853,6 +922,7 @@ class _RecentTransactionsList extends StatelessWidget {
                           theme: theme,
                           cheddarColors: cheddarColors,
                           currencySymbol: currencySymbol,
+                          showValues: showValues,
                           onTap: () {
                             context.pushNamed(
                               RouteNames.transactionDetail,
@@ -925,6 +995,7 @@ class _TransactionRow extends StatelessWidget {
   final ThemeData theme;
   final CheddarColors? cheddarColors;
   final String currencySymbol;
+  final bool showValues;
   final VoidCallback onTap;
 
   const _TransactionRow({
@@ -932,6 +1003,7 @@ class _TransactionRow extends StatelessWidget {
     required this.theme,
     required this.cheddarColors,
     required this.currencySymbol,
+    required this.showValues,
     required this.onTap,
   });
 
@@ -964,8 +1036,16 @@ class _TransactionRow extends StatelessWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    amountColor.withValues(alpha: 0.16),
+                    amountColor.withValues(alpha: 0.06),
+                  ],
+                ),
                 borderRadius: Radii.borderMd,
+                border: Border.all(color: amountColor.withValues(alpha: 0.14)),
               ),
               padding: const EdgeInsets.all(8),
               child: categoryIcon != null
@@ -973,7 +1053,7 @@ class _TransactionRow extends StatelessWidget {
                   : Icon(
                       Icons.receipt_long_rounded,
                       size: 22,
-                      color: theme.colorScheme.onSurfaceVariant,
+                      color: amountColor,
                     ),
             ),
 
@@ -1006,11 +1086,16 @@ class _TransactionRow extends StatelessWidget {
               ),
             ),
 
-            Text(
-              '$prefix$currencySymbol ${transaction.amount.toStringAsFixed(0)}',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: amountColor,
+            _BlurredValue(
+              obscure: !showValues,
+              child: Text(
+                showValues
+                    ? '$prefix$currencySymbol ${transaction.amount.toStringAsFixed(0)}'
+                    : '$prefix$currencySymbol 0000',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: amountColor,
+                ),
               ),
             ),
           ],
@@ -1044,6 +1129,24 @@ class _TransactionRow extends StatelessWidget {
 }
 
 // ── Transaction Shimmer ──────────────────────────────────────────────────────
+
+class _BlurredValue extends StatelessWidget {
+  final bool obscure;
+  final Widget child;
+
+  const _BlurredValue({required this.obscure, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return ImageFiltered(
+      imageFilter: ImageFilter.blur(
+        sigmaX: obscure ? 6 : 0,
+        sigmaY: obscure ? 6 : 0,
+      ),
+      child: child,
+    );
+  }
+}
 
 class _TransactionShimmer extends StatelessWidget {
   const _TransactionShimmer();

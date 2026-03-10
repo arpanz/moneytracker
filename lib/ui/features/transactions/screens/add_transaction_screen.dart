@@ -91,6 +91,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   void _tryRestoreAccounts(List<AccountModel> accounts) {
+    if (accounts.isEmpty) return;
+
     bool changed = false;
     if (_editAccountId != null && _selectedAccount == null) {
       final match = accounts
@@ -110,6 +112,23 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         changed = true;
       }
     }
+
+    if (!_isEditing && _selectedAccount == null) {
+      _selectedAccount = accounts.first;
+      changed = true;
+    }
+
+    if (_type == 2 && !_isEditing && _selectedToAccount == null) {
+      _selectedToAccount = accounts.last;
+      if (_selectedToAccount?.id == _selectedAccount?.id &&
+          accounts.length > 1) {
+        _selectedToAccount = accounts.firstWhere(
+          (account) => account.id != _selectedAccount?.id,
+        );
+      }
+      changed = true;
+    }
+
     if (changed && mounted) setState(() {});
   }
 
@@ -171,24 +190,47 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               const SizedBox(height: Spacing.lg),
 
               if (_type != 2) ...[
-                Text(
-                  'Category',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+                Container(
+                  padding: const EdgeInsets.all(Spacing.md),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerLow,
+                    borderRadius: Radii.borderLg,
+                    border: Border.all(
+                      color: theme.colorScheme.outlineVariant.withValues(
+                        alpha: 0.35,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: Spacing.sm),
-                // CategoryPickerRow shows a compact preview grid and a full picker dialog.
-                CategoryPickerRow(
-                  key: ValueKey('cat_picker_$_type'),
-                  selected: _selectedCategory,
-                  selectedCategoryName: _selectedCategory == null
-                      ? _editCategoryName
-                      : null,
-                  transactionType: _type,
-                  onSelected: (cat) {
-                    setState(() => _selectedCategory = cat);
-                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Category',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: Spacing.xs),
+                      Text(
+                        'Pick the bucket that fits this transaction.',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: Spacing.md),
+                      CategoryPickerRow(
+                        key: ValueKey('cat_picker_$_type'),
+                        selected: _selectedCategory,
+                        selectedCategoryName: _selectedCategory == null
+                            ? _editCategoryName
+                            : null,
+                        transactionType: _type,
+                        onSelected: (cat) {
+                          setState(() => _selectedCategory = cat);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: Spacing.lg),
               ],
@@ -516,12 +558,20 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     if (name.isEmpty) return;
 
     final accountRepo = ref.read(accountRepositoryProvider);
+    final currencyCode = ref.read(currencyCodeProvider);
     final newAccount = AccountModel()
       ..name = name
       ..accountType = accountType
       ..balance = 0.0
+      ..currency = currencyCode
       ..color = 0xFF9E9E9E
-      ..icon = 'wallet'
+      ..icon = switch (accountType) {
+        0 => 'building-columns',
+        1 => 'wallet',
+        2 => 'credit-card',
+        3 => 'money-bill',
+        _ => 'wallet',
+      }
       ..isArchived = false
       ..createdAt = DateTime.now();
 
@@ -580,6 +630,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       _type = option.value;
                       _selectedCategory = null;
                       _editCategoryName = null;
+                      if (_type != 2) {
+                        _selectedToAccount = null;
+                      }
                     }
                   }),
                   borderRadius: Radii.borderMd,

@@ -7,7 +7,7 @@ part 'category_model.g.dart';
 class CategoryModel {
   Id id = Isar.autoIncrement;
 
-  @Index(unique: true)
+  @Index(unique: true, composite: [CompositeIndex('type')])
   late String name;
 
   /// SVG asset path (e.g. 'assets/svg/categories/food.svg').
@@ -32,8 +32,8 @@ class CategoryModel {
   late DateTime createdAt;
 
   CategoryModel()
-      : type = 0,
-        isCustom = false,
-        sortOrder = 0,
-        createdAt = DateTime.now();
+    : type = 0,
+      isCustom = false,
+      sortOrder = 0,
+      createdAt = DateTime.now();
 }

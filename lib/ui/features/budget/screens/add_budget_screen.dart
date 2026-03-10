@@ -456,7 +456,7 @@ class _CategoryPickerStepState extends ConsumerState<_CategoryPickerStep> {
         const SizedBox(height: Spacing.md),
         Expanded(
           child: FutureBuilder<List<CategoryModel>>(
-            future: categoryRepo.getByType(1),
+            future: categoryRepo.getByType(0),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
@@ -568,19 +568,7 @@ class _CategoryPickerStepState extends ConsumerState<_CategoryPickerStep> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SvgPicture.asset(
-                                cat.icon,
-                                width: 28,
-                                height: 28,
-                                colorFilter: ColorFilter.mode(
-                                  isAlreadyBudgeted
-                                      ? theme.colorScheme.onSurface.withValues(
-                                          alpha: 0.3,
-                                        )
-                                      : color,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
+                              SvgPicture.asset(cat.icon, width: 28, height: 28),
                               const SizedBox(height: Spacing.xs),
                               Text(
                                 cat.name,

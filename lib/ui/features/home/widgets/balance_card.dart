@@ -17,11 +17,15 @@ class BalanceCard extends StatelessWidget {
 
   /// The currency symbol to prefix the amount.
   final String currencySymbol;
+  final bool obscureValues;
+  final VoidCallback? onToggleVisibility;
 
   const BalanceCard({
     super.key,
     required this.balance,
     this.currencySymbol = AppConstants.currencySymbol,
+    this.obscureValues = false,
+    this.onToggleVisibility,
   });
 
   @override
@@ -30,10 +34,9 @@ class BalanceCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final cheddarColors = theme.extension<CheddarColors>();
 
-    final gradient = cheddarColors?.cardGradient ??
-        LinearGradient(
-          colors: [colorScheme.primary, colorScheme.secondary],
-        );
+    final gradient =
+        cheddarColors?.cardGradient ??
+        LinearGradient(colors: [colorScheme.primary, colorScheme.secondary]);
 
     return ClipRRect(
       borderRadius: const BorderRadius.all(Radius.circular(20)),
@@ -49,12 +52,12 @@ class BalanceCard extends StatelessWidget {
             gradient: gradient,
             borderRadius: const BorderRadius.all(Radius.circular(20)),
             border: Border.all(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.25),
+                color: colorScheme.primary.withValues(alpha: 0.25),
                 blurRadius: 24,
                 offset: const Offset(0, 8),
               ),
@@ -64,12 +67,30 @@ class BalanceCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Total Balance',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.white.withOpacity(0.8),
-                  letterSpacing: 0.5,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Total Balance',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                  if (onToggleVisibility != null)
+                    IconButton(
+                      onPressed: onToggleVisibility,
+                      icon: Icon(
+                        obscureValues
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                      splashRadius: 18,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                ],
               ),
               const SizedBox(height: Spacing.sm),
               TweenAnimationBuilder<double>(
@@ -77,12 +98,20 @@ class BalanceCard extends StatelessWidget {
                 duration: const Duration(milliseconds: 800),
                 curve: Curves.easeOutCubic,
                 builder: (context, value, child) {
-                  return Text(
-                    '$currencySymbol ${_formatAmount(value)}',
-                    style: theme.textTheme.headlineLarge?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: -0.5,
+                  final text = '$currencySymbol ${_formatAmount(value)}';
+
+                  return ImageFiltered(
+                    imageFilter: ImageFilter.blur(
+                      sigmaX: obscureValues ? 7 : 0,
+                      sigmaY: obscureValues ? 7 : 0,
+                    ),
+                    child: Text(
+                      text,
+                      style: theme.textTheme.headlineLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.5,
+                      ),
                     ),
                   );
                 },
@@ -113,10 +142,12 @@ class BalanceCard extends StatelessWidget {
     } else {
       final lastThree = intStr.substring(intStr.length - 3);
       final remaining = intStr.substring(0, intStr.length - 3);
-      buffer.write(remaining.replaceAllMapped(
-        RegExp(r'(\d)(?=(\d{2})+$)'),
-        (match) => '${match[1]},',
-      ));
+      buffer.write(
+        remaining.replaceAllMapped(
+          RegExp(r'(\d)(?=(\d{2})+$)'),
+          (match) => '${match[1]},',
+        ),
+      );
       buffer.write(',');
       buffer.write(lastThree);
     }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/di/providers.dart';
 import '../../../../config/constants/app_constants.dart';
+import '../../../../config/constants/currency_catalog.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_provider.dart';
@@ -32,7 +33,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() {
       _biometricEnabled = prefs.getBool('biometric_enabled') ?? false;
       _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
-      _currency = prefs.getString('currency') ?? 'INR';
+      _currency =
+          prefs.getString(AppConstants.prefCurrency) ??
+          AppConstants.defaultCurrency;
     });
   }
 
@@ -42,10 +45,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final colors = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Settings'), centerTitle: true),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
         children: [
@@ -108,7 +108,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.currency_exchange_rounded),
             title: const Text('Currency'),
-            subtitle: Text(_currency),
+            subtitle: Text('${currencyOptionFor(_currency).name} ($_currency)'),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => _showCurrencyPicker(),
           ),
@@ -207,14 +207,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Text(
                   'Made with cheese in India',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: colors.onSurfaceVariant.withOpacity(0.6),
+                    color: colors.onSurfaceVariant.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: Spacing.xs),
                 Text(
                   'Cheddar v${AppConstants.appVersion}',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: colors.onSurfaceVariant.withOpacity(0.4),
+                    color: colors.onSurfaceVariant.withValues(alpha: 0.4),
                   ),
                 ),
               ],
@@ -229,44 +229,122 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   // ── Dialogs ───────────────────────────────────────────────────────────────
 
   void _showCurrencyPicker() {
-    final currencies = ['INR', 'USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'SGD'];
-    final symbols = {
-      'INR': 'Indian Rupee',
-      'USD': 'US Dollar',
-      'EUR': 'Euro',
-      'GBP': 'British Pound',
-      'JPY': 'Japanese Yen',
-      'AUD': 'Australian Dollar',
-      'CAD': 'Canadian Dollar',
-      'SGD': 'Singapore Dollar',
-    };
-
     showModalBottomSheet(
       context: context,
-      builder: (ctx) => ListView(
-        shrinkWrap: true,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Text('Select Currency',
-                style: Theme.of(context).textTheme.titleMedium),
+      isScrollControlled: true,
+      builder: (ctx) {
+        var query = '';
+
+        return FractionallySizedBox(
+          heightFactor: 0.84,
+          child: StatefulBuilder(
+            builder: (context, setModalState) {
+              final filtered = currencyCatalog.where((currency) {
+                final normalized = query.trim().toLowerCase();
+                if (normalized.isEmpty) return true;
+                return currency.code.toLowerCase().contains(normalized) ||
+                    currency.name.toLowerCase().contains(normalized) ||
+                    currency.symbol.toLowerCase().contains(normalized);
+              }).toList();
+
+              return SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: AppSpacing.md,
+                    right: AppSpacing.md,
+                    top: AppSpacing.md,
+                    bottom:
+                        MediaQuery.of(ctx).viewInsets.bottom + AppSpacing.md,
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Select Currency',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                          ),
+                          Text(
+                            '${filtered.length} options',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextField(
+                        onChanged: (value) {
+                          setModalState(() => query = value);
+                        },
+                        decoration: const InputDecoration(
+                          hintText: 'Search by code, name, or symbol',
+                          prefixIcon: Icon(Icons.search_rounded),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Expanded(
+                        child: ListView.separated(
+                          itemCount: filtered.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: AppSpacing.xs),
+                          itemBuilder: (context, index) {
+                            final currency = filtered[index];
+                            final isSelected = currency.code == _currency;
+
+                            return RadioListTile<String>(
+                              value: currency.code,
+                              groupValue: _currency,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.sm,
+                                vertical: AppSpacing.xs,
+                              ),
+                              secondary: _CurrencyBadge(currency: currency),
+                              title: Text(currency.name),
+                              subtitle: Text(
+                                '${currency.code} • ${currency.symbol}',
+                              ),
+                              selected: isSelected,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusMd,
+                                ),
+                              ),
+                              onChanged: (value) async {
+                                if (value == null) return;
+                                final prefs = ref.read(
+                                  sharedPreferencesProvider,
+                                );
+                                await prefs.setString(
+                                  AppConstants.prefCurrency,
+                                  value,
+                                );
+                                ref.read(currencyCodeProvider.notifier).state =
+                                    value;
+                                setState(() => _currency = value);
+                                if (ctx.mounted) Navigator.pop(ctx);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
-          ...currencies.map((c) => RadioListTile<String>(
-                title: Text(c),
-                subtitle: Text(symbols[c] ?? ''),
-                value: c,
-                groupValue: _currency,
-                onChanged: (v) async {
-                  if (v == null) return;
-                  final prefs = ref.read(sharedPreferencesProvider);
-                  await prefs.setString('currency', v);
-                  setState(() => _currency = v);
-                  if (mounted) Navigator.pop(ctx);
-                },
-              )),
-          const SizedBox(height: AppSpacing.md),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -356,23 +434,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   // ── Data Actions (stubs - Phase 18 will implement) ────────────────────────
 
   Future<void> _exportData(String format) async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Exporting as $format...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Exporting as $format...')));
     // TODO: Phase 18 - implement export via ExportService
   }
 
   Future<void> _createBackup() async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Creating backup...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Creating backup...')));
     // TODO: Phase 18 - implement backup via ExportService
   }
 
   Future<void> _restoreBackup() async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Select a backup file...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Select a backup file...')));
     // TODO: Phase 18 - implement restore via file_picker + ExportService
   }
 }
@@ -395,10 +473,10 @@ class _SectionHeader extends StatelessWidget {
       child: Text(
         title.toUpperCase(),
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }
@@ -429,7 +507,7 @@ class _QuickLink extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           child: Column(
@@ -445,6 +523,35 @@ class _QuickLink extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _CurrencyBadge extends StatelessWidget {
+  final CurrencyOption currency;
+
+  const _CurrencyBadge({required this.currency});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: colors.primary.withValues(alpha: 0.1),
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        currency.symbol,
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          color: colors.primary,
+          fontWeight: FontWeight.w700,
+        ),
+        maxLines: 1,
       ),
     );
   }
