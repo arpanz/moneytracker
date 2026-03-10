@@ -104,7 +104,7 @@ class _TransactionDetailContent extends ConsumerWidget {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          '${_amountPrefix}${AppConstants.currencySymbol}'
+                          '$_amountPrefix${AppConstants.currencySymbol}'
                           '${formatter.format(transaction.amount)}',
                           style: theme.textTheme.displayMedium?.copyWith(
                             fontSize: 42,

@@ -77,8 +77,9 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
 
   Future<void> _shareWrap() async {
     try {
-      final boundary = _screenshotKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
+      final boundary =
+          _screenshotKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) return;
 
       final image = await boundary.toImage(pixelRatio: 3.0);
@@ -90,8 +91,12 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
         mimeType: 'image/png',
         name: 'cheddar_weekly_wrap.png',
       );
-      await Share.shareXFiles([xFile],
-          text: 'Check out my weekly spending wrap on Cheddar!');
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [xFile],
+          text: 'Check out my weekly spending wrap on Cheddar!',
+        ),
+      );
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -108,20 +113,26 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: wrapAsync.when(
-        loading: () => const Center(
-            child: CircularProgressIndicator(color: Colors.white)),
+        loading: () =>
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
         error: (error, _) => Center(
           child: Padding(
             padding: Spacing.paddingLg,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, size: 48, color: Colors.white54),
+                const Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: Colors.white54,
+                ),
                 const SizedBox(height: Spacing.md),
-                Text('Could not load weekly wrap',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                        )),
+                Text(
+                  'Could not load weekly wrap',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium?.copyWith(color: Colors.white),
+                ),
                 const SizedBox(height: Spacing.sm),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
@@ -203,7 +214,8 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Your Week\nin Numbers',
+          Text(
+            'Your Week\nin Numbers',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
               color: Colors.white,
@@ -213,34 +225,39 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
           ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.3, end: 0),
           const SizedBox(height: Spacing.xxl),
           TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: data.totalSpent),
-            duration: const Duration(milliseconds: 1500),
-            curve: Curves.easeOutCubic,
-            builder: (context, value, _) {
-              return Text(
-                'Rs. ${_formatIndian(value)}',
-                style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 48,
-                ),
-              );
-            },
-          ).animate().fadeIn(delay: 400.ms, duration: 500.ms).scale(
+                tween: Tween(begin: 0, end: data.totalSpent),
+                duration: const Duration(milliseconds: 1500),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, _) {
+                  return Text(
+                    'Rs. ${_formatIndian(value)}',
+                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 48,
+                    ),
+                  );
+                },
+              )
+              .animate()
+              .fadeIn(delay: 400.ms, duration: 500.ms)
+              .scale(
                 begin: const Offset(0.8, 0.8),
                 end: const Offset(1.0, 1.0),
               ),
           const SizedBox(height: Spacing.sm),
-          Text('spent this week',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Colors.white70,
-            ),
+          Text(
+            'spent this week',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: Colors.white70),
           ).animate().fadeIn(delay: 600.ms),
           const SizedBox(height: Spacing.xl),
-          Text('across ${data.transactionCount} transactions',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.white60,
-            ),
+          Text(
+            'across ${data.transactionCount} transactions',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(color: Colors.white60),
           ).animate().fadeIn(delay: 800.ms),
         ],
       ),
@@ -255,7 +272,8 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Your Top\nCategory',
+          Text(
+            'Your Top\nCategory',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
               color: Colors.white,
@@ -265,42 +283,41 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
           ).animate().fadeIn(duration: 400.ms),
           const SizedBox(height: Spacing.xl),
           Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _getCategoryIcon(data.topCategory),
-              size: 64,
-              color: Colors.white,
-            ),
-          )
-              .animate()
-              .scale(
-                delay: 300.ms,
-                duration: 500.ms,
-                curve: Curves.elasticOut,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  _getCategoryIcon(data.topCategory),
+                  size: 64,
+                  color: Colors.white,
+                ),
               )
+              .animate()
+              .scale(delay: 300.ms, duration: 500.ms, curve: Curves.elasticOut)
               .fadeIn(delay: 300.ms),
           const SizedBox(height: Spacing.lg),
-          Text(data.topCategory,
+          Text(
+            data.topCategory,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w700,
             ),
           ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.3, end: 0),
           const SizedBox(height: Spacing.sm),
-          Text('Rs. ${_formatIndian(data.topCategoryAmount)}',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: Colors.white70,
-            ),
+          Text(
+            'Rs. ${_formatIndian(data.topCategoryAmount)}',
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: Colors.white70),
           ).animate().fadeIn(delay: 700.ms),
           const SizedBox(height: Spacing.xs),
-          Text('${data.topCategoryPercentage.toStringAsFixed(0)}% of spending',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.white54,
-            ),
+          Text(
+            '${data.topCategoryPercentage.toStringAsFixed(0)}% of spending',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(color: Colors.white54),
           ).animate().fadeIn(delay: 800.ms),
         ],
       ),
@@ -312,7 +329,8 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
   Widget _buildPage3(BuildContext context, WeeklyWrapData data) {
     final dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final dayName = dayNames[data.biggestExpenseDate.weekday - 1];
-    final dateStr = '$dayName, ${data.biggestExpenseDate.day}/'
+    final dateStr =
+        '$dayName, ${data.biggestExpenseDate.day}/'
         '${data.biggestExpenseDate.month}';
 
     return _WrapPageContainer(
@@ -320,7 +338,8 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Biggest\nExpense',
+          Text(
+            'Biggest\nExpense',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
               color: Colors.white,
@@ -349,16 +368,18 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             },
           ).animate().fadeIn(delay: 400.ms),
           const SizedBox(height: Spacing.sm),
-          Text(data.biggestExpenseName,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: Colors.white70,
-            ),
+          Text(
+            data.biggestExpenseName,
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: Colors.white70),
           ).animate().fadeIn(delay: 600.ms),
           const SizedBox(height: Spacing.xs),
-          Text(dateStr,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.white54,
-            ),
+          Text(
+            dateStr,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(color: Colors.white54),
           ).animate().fadeIn(delay: 700.ms),
         ],
       ),
@@ -370,8 +391,11 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
   Widget _buildPage4(BuildContext context, WeeklyWrapData data) {
     final dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final now = DateTime.now();
-    final weekStart = DateTime(now.year, now.month, now.day)
-        .subtract(const Duration(days: 6));
+    final weekStart = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 6));
 
     // Build bar groups from daily breakdown
     final maxVal = data.dailyBreakdown.values.fold<double>(
@@ -384,7 +408,8 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Daily\nBreakdown',
+          Text(
+            'Daily\nBreakdown',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
               color: Colors.white,
@@ -409,8 +434,9 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
                         showTitles: true,
                         getTitlesWidget: (value, _) {
                           final dayIndex = value.toInt();
-                          final dayDate =
-                              weekStart.add(Duration(days: dayIndex));
+                          final dayDate = weekStart.add(
+                            Duration(days: dayIndex),
+                          );
                           return Padding(
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
@@ -426,11 +452,14 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
                       ),
                     ),
                     leftTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                     topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                     rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                   ),
                   gridData: const FlGridData(show: false),
                   borderData: FlBorderData(show: false),
@@ -456,9 +485,9 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
           const SizedBox(height: Spacing.lg),
           Text(
             'Daily average: Rs. ${_formatIndian(data.dailyAverage)}',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Colors.white70,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: Colors.white70),
           ).animate().fadeIn(delay: 800.ms),
         ],
       ),
@@ -478,9 +507,11 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
     } else if (data.savingsRate > 10) {
       message = 'Good week! You managed to save while spending wisely.';
     } else if (data.savingsRate > 0) {
-      message = 'Decent week. Try cutting back a bit next week for better savings.';
+      message =
+          'Decent week. Try cutting back a bit next week for better savings.';
     } else {
-      message = 'Tough week. Consider setting a daily spending limit next week.';
+      message =
+          'Tough week. Consider setting a daily spending limit next week.';
     }
 
     return _WrapPageContainer(
@@ -488,7 +519,8 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('The Verdict',
+          Text(
+            'The Verdict',
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -497,29 +529,38 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
           const SizedBox(height: Spacing.xl),
           // Savings rate
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              borderRadius: Radii.borderLg,
-            ),
-            child: Column(
-              children: [
-                Text('Savings Rate',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.white60,
-                  ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${data.savingsRate.toStringAsFixed(1)}%',
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    color: savingsPositive ? Colors.white : Colors.redAccent,
-                    fontWeight: FontWeight.w900,
-                  ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: Radii.borderLg,
                 ),
-              ],
-            ),
-          ).animate().fadeIn(delay: 300.ms).scale(
+                child: Column(
+                  children: [
+                    Text(
+                      'Savings Rate',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: Colors.white60),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${data.savingsRate.toStringAsFixed(1)}%',
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        color: savingsPositive
+                            ? Colors.white
+                            : Colors.redAccent,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+              .animate()
+              .fadeIn(delay: 300.ms)
+              .scale(
                 begin: const Offset(0.8, 0.8),
                 end: const Offset(1.0, 1.0),
               ),
@@ -536,9 +577,9 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
               const SizedBox(width: 8),
               Text(
                 '${changeAbs.toStringAsFixed(1)}% ${isUp ? "more" : "less"} than last week',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white70,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: Colors.white70),
               ),
             ],
           ).animate().fadeIn(delay: 500.ms).slideX(begin: 0.3, end: 0),
@@ -565,9 +606,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
               backgroundColor: Colors.white,
               foregroundColor: _pageGradients[4][0],
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: Radii.borderMd,
-              ),
+              shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
             ),
           ).animate().fadeIn(delay: 900.ms).slideY(begin: 0.3, end: 0),
         ],
@@ -625,10 +664,7 @@ class _WrapPageContainer extends StatelessWidget {
   final List<Color> gradientColors;
   final Widget child;
 
-  const _WrapPageContainer({
-    required this.gradientColors,
-    required this.child,
-  });
+  const _WrapPageContainer({required this.gradientColors, required this.child});
 
   @override
   Widget build(BuildContext context) {

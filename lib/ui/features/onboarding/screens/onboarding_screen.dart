@@ -402,7 +402,7 @@ class _SetupPage extends StatelessWidget {
 
                   // ── Currency dropdown ──
                   DropdownButtonFormField<String>(
-                    value: state.currency,
+                    initialValue: state.currency,
                     decoration: InputDecoration(
                       labelText: 'Currency',
                       prefixIcon: const Icon(Icons.currency_exchange_rounded),

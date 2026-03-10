@@ -6,14 +6,12 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../local/database_service.dart';
 import '../repositories/transaction_repository.dart';
 import '../repositories/account_repository.dart';
 import '../repositories/budget_repository.dart';
 import '../repositories/goal_repository.dart';
 import '../repositories/subscription_repository.dart';
 import '../repositories/split_repository.dart';
-import '../repositories/category_repository.dart';
 import '../../domain/models/transaction_model.dart';
 import '../../domain/models/account_model.dart';
 import '../../domain/models/budget_model.dart';
@@ -37,12 +35,12 @@ class ExportService {
     required GoalRepository goalRepo,
     required SubscriptionRepository subscriptionRepo,
     required SplitRepository splitRepo,
-  })  : _txnRepo = transactionRepo,
-        _accountRepo = accountRepo,
-        _budgetRepo = budgetRepo,
-        _goalRepo = goalRepo,
-        _subRepo = subscriptionRepo,
-        _splitRepo = splitRepo;
+  }) : _txnRepo = transactionRepo,
+       _accountRepo = accountRepo,
+       _budgetRepo = budgetRepo,
+       _goalRepo = goalRepo,
+       _subRepo = subscriptionRepo,
+       _splitRepo = splitRepo;
 
   // ── CSV Export ────────────────────────────────────────────────────────────
 
@@ -62,23 +60,18 @@ class ExportService {
 
     final rows = <List<dynamic>>[
       // Header row
-      [
-        'Date',
-        'Type',
-        'Category',
-        'Amount',
-        'Note',
-        'Account ID',
-      ],
+      ['Date', 'Type', 'Category', 'Amount', 'Note', 'Account ID'],
       // Data rows
-      ...filtered.map((t) => [
-            dateFormat.format(t.date),
-            t.type == 0 ? 'Income' : 'Expense',
-            t.category,
-            t.amount.toStringAsFixed(2),
-            t.note ?? '',
-            t.accountId,
-          ]),
+      ...filtered.map(
+        (t) => [
+          dateFormat.format(t.date),
+          t.type == 0 ? 'Income' : 'Expense',
+          t.category,
+          t.amount.toStringAsFixed(2),
+          t.note ?? '',
+          t.accountId,
+        ],
+      ),
     ];
 
     final csv = const ListToCsvConverter().convert(rows);
@@ -99,9 +92,8 @@ class ExportService {
       startDate: startDate,
       endDate: endDate,
     );
-    await Share.shareXFiles(
-      [XFile(path)],
-      subject: 'Cheddar Transactions Export',
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(path)], subject: 'Cheddar Transactions Export'),
     );
   }
 
@@ -151,9 +143,8 @@ class ExportService {
   /// Share the JSON backup via the system share sheet.
   Future<void> shareBackup() async {
     final path = await createBackup();
-    await Share.shareXFiles(
-      [XFile(path)],
-      subject: 'Cheddar Backup',
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(path)], subject: 'Cheddar Backup'),
     );
   }
 
@@ -248,16 +239,16 @@ class ExportService {
   // ── JSON Serialization Helpers ────────────────────────────────────────────
 
   Map<String, dynamic> _txnToJson(TransactionModel t) => {
-        'amount': t.amount,
-        'type': t.type,
-        'category': t.category,
-        'note': t.note,
-        'date': t.date.toIso8601String(),
-        'accountId': t.accountId,
-        'receiptImagePath': t.receiptImagePath,
-        
-        'createdAt': t.createdAt.toIso8601String(),
-      };
+    'amount': t.amount,
+    'type': t.type,
+    'category': t.category,
+    'note': t.note,
+    'date': t.date.toIso8601String(),
+    'accountId': t.accountId,
+    'receiptImagePath': t.receiptImagePath,
+
+    'createdAt': t.createdAt.toIso8601String(),
+  };
 
   TransactionModel _txnFromJson(Map<String, dynamic> j) => TransactionModel()
     ..amount = (j['amount'] as num).toDouble()
@@ -267,14 +258,14 @@ class ExportService {
     ..date = DateTime.parse(j['date'] as String)
     ..accountId = j['accountId'] as String
     ..receiptImagePath = j['receiptImagePath'] as String?
-        ..createdAt = DateTime.parse(j['createdAt'] as String);
+    ..createdAt = DateTime.parse(j['createdAt'] as String);
 
   Map<String, dynamic> _accountToJson(AccountModel a) => {
-        'name': a.name,
-        'accountType': a.accountType,
-        'balance': a.balance,
-        'createdAt': a.createdAt.toIso8601String(),
-      };
+    'name': a.name,
+    'accountType': a.accountType,
+    'balance': a.balance,
+    'createdAt': a.createdAt.toIso8601String(),
+  };
 
   AccountModel _accountFromJson(Map<String, dynamic> j) => AccountModel()
     ..name = j['name'] as String
@@ -283,11 +274,11 @@ class ExportService {
     ..createdAt = DateTime.parse(j['createdAt'] as String);
 
   Map<String, dynamic> _budgetToJson(BudgetModel b) => {
-        'category': b.category,
-        'limitAmount': b.limitAmount,
-        'period': b.period,
-        'createdAt': b.createdAt.toIso8601String(),
-      };
+    'category': b.category,
+    'limitAmount': b.limitAmount,
+    'period': b.period,
+    'createdAt': b.createdAt.toIso8601String(),
+  };
 
   BudgetModel _budgetFromJson(Map<String, dynamic> j) => BudgetModel()
     ..category = j['category'] as String
@@ -296,15 +287,15 @@ class ExportService {
     ..createdAt = DateTime.parse(j['createdAt'] as String);
 
   Map<String, dynamic> _goalToJson(GoalModel g) => {
-        'name': g.name,
-        'targetAmount': g.targetAmount,
-        'currentAmount': g.currentAmount,
-        'deadline': g.deadline?.toIso8601String(),
-        'icon': g.icon,
-        'color': g.color,
-        'linkedAccountId': g.linkedAccountId,
-        'createdAt': g.createdAt.toIso8601String(),
-      };
+    'name': g.name,
+    'targetAmount': g.targetAmount,
+    'currentAmount': g.currentAmount,
+    'deadline': g.deadline?.toIso8601String(),
+    'icon': g.icon,
+    'color': g.color,
+    'linkedAccountId': g.linkedAccountId,
+    'createdAt': g.createdAt.toIso8601String(),
+  };
 
   GoalModel _goalFromJson(Map<String, dynamic> j) => GoalModel()
     ..name = j['name'] as String
@@ -317,17 +308,17 @@ class ExportService {
     ..createdAt = DateTime.parse(j['createdAt'] as String);
 
   Map<String, dynamic> _subscriptionToJson(SubscriptionModel s) => {
-        'name': s.name,
-        'amount': s.amount,
-        'frequency': s.frequency,
-        'nextBillDate': s.nextBillDate.toIso8601String(),
-        'category': s.category,
-        'logoUrl': s.logoUrl,
-        'notes': s.notes,
-        'isActive': s.isActive,
-        'isAutoDetected': s.isAutoDetected,
-        'createdAt': s.createdAt.toIso8601String(),
-      };
+    'name': s.name,
+    'amount': s.amount,
+    'frequency': s.frequency,
+    'nextBillDate': s.nextBillDate.toIso8601String(),
+    'category': s.category,
+    'logoUrl': s.logoUrl,
+    'notes': s.notes,
+    'isActive': s.isActive,
+    'isAutoDetected': s.isAutoDetected,
+    'createdAt': s.createdAt.toIso8601String(),
+  };
 
   SubscriptionModel _subscriptionFromJson(Map<String, dynamic> j) =>
       SubscriptionModel()
@@ -343,21 +334,23 @@ class ExportService {
         ..createdAt = DateTime.parse(j['createdAt'] as String);
 
   Map<String, dynamic> _splitToJson(SplitModel s) => {
-        'description': s.description,
-        'totalAmount': s.totalAmount,
-        'splitMethod': s.splitMethod,
-        'isFullySettled': s.isFullySettled,
-        'createdAt': s.createdAt.toIso8601String(),
-        'participants': s.participants
-            .map((p) => {
-                  'name': p.name,
-                  'contact': p.contact,
-                  'amount': p.amount,
-                  'percentage': p.percentage,
-                  'isSettled': p.isSettled,
-                })
-            .toList(),
-      };
+    'description': s.description,
+    'totalAmount': s.totalAmount,
+    'splitMethod': s.splitMethod,
+    'isFullySettled': s.isFullySettled,
+    'createdAt': s.createdAt.toIso8601String(),
+    'participants': s.participants
+        .map(
+          (p) => {
+            'name': p.name,
+            'contact': p.contact,
+            'amount': p.amount,
+            'percentage': p.percentage,
+            'isSettled': p.isSettled,
+          },
+        )
+        .toList(),
+  };
 
   SplitModel _splitFromJson(Map<String, dynamic> j) {
     final split = SplitModel()
@@ -367,17 +360,15 @@ class ExportService {
       ..isFullySettled = j['isFullySettled'] as bool? ?? false
       ..createdAt = DateTime.parse(j['createdAt'] as String);
 
-    split.participants = ((j['participants'] as List?) ?? [])
-        .map((pj) {
-          final p = SplitParticipant()
-            ..name = pj['name'] as String
-            ..contact = pj['contact'] as String?
-            ..amount = (pj['amount'] as num).toDouble()
-            ..percentage = (pj['percentage'] as num?)?.toDouble()
-            ..isSettled = pj['isSettled'] as bool? ?? false;
-          return p;
-        })
-        .toList();
+    split.participants = ((j['participants'] as List?) ?? []).map((pj) {
+      final p = SplitParticipant()
+        ..name = pj['name'] as String
+        ..contact = pj['contact'] as String?
+        ..amount = (pj['amount'] as num).toDouble()
+        ..percentage = (pj['percentage'] as num?)?.toDouble()
+        ..isSettled = pj['isSettled'] as bool? ?? false;
+      return p;
+    }).toList();
 
     return split;
   }

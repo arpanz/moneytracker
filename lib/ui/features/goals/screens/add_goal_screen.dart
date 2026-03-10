@@ -357,7 +357,7 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
                     ),
                     const SizedBox(height: Spacing.sm),
                     DropdownButtonFormField<String?>(
-                      value: _linkedAccountId,
+                      initialValue: _linkedAccountId,
                       decoration: const InputDecoration(
                         hintText: 'Select an account',
                         prefixIcon: Icon(Icons.account_balance_outlined),

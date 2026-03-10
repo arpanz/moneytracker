@@ -237,7 +237,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
             // Category dropdown
             DropdownButtonFormField<String>(
-              value: _category,
+              initialValue: _category,
               decoration: const InputDecoration(
                 labelText: 'Category',
                 prefixIcon: Icon(Icons.category_outlined),

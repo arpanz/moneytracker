@@ -6,7 +6,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:share_plus/share_plus.dart';
-import 'dart:typed_data';
 
 import '../../../../config/theme/spacing.dart';
 import '../providers/personality_provider.dart';
@@ -25,8 +24,9 @@ class _PersonalityScreenState extends ConsumerState<PersonalityScreen> {
 
   Future<void> _sharePersonality(PersonalityData data) async {
     try {
-      final boundary = _screenshotKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
+      final boundary =
+          _screenshotKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) return;
 
       final image = await boundary.toImage(pixelRatio: 3.0);
@@ -40,9 +40,11 @@ class _PersonalityScreenState extends ConsumerState<PersonalityScreen> {
         name: 'cheddar_personality.png',
       );
 
-      await Share.shareXFiles(
-        [xFile],
-        text: 'I\'m ${data.title} on Cheddar! ${data.description}',
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [xFile],
+          text: 'I\'m ${data.title} on Cheddar! ${data.description}',
+        ),
       );
     } catch (_) {
       if (mounted) {
@@ -68,14 +70,22 @@ class _PersonalityScreenState extends ConsumerState<PersonalityScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.error_outline, size: 48,
-                    color: theme.colorScheme.error),
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: theme.colorScheme.error,
+                ),
                 const SizedBox(height: Spacing.md),
-                Text('Could not analyze spending',
-                    style: textTheme.titleMedium),
+                Text(
+                  'Could not analyze spending',
+                  style: textTheme.titleMedium,
+                ),
                 const SizedBox(height: Spacing.sm),
-                Text('$error',
-                    style: textTheme.bodySmall, textAlign: TextAlign.center),
+                Text(
+                  '$error',
+                  style: textTheme.bodySmall,
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           ),
@@ -117,11 +127,15 @@ class _PersonalityScreenState extends ConsumerState<PersonalityScreen> {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                        icon: const Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.white,
+                        ),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const Spacer(),
-                      Text('My Spending Personality',
+                      Text(
+                        'My Spending Personality',
                         style: textTheme.titleMedium?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -142,11 +156,7 @@ class _PersonalityScreenState extends ConsumerState<PersonalityScreen> {
                     child: Column(
                       children: [
                         // SVG illustration
-                        SvgPicture.asset(
-                          data.svgPath,
-                          width: 180,
-                          height: 180,
-                        )
+                        SvgPicture.asset(data.svgPath, width: 180, height: 180)
                             .animate()
                             .scale(
                               begin: const Offset(0.5, 0.5),
@@ -170,12 +180,12 @@ class _PersonalityScreenState extends ConsumerState<PersonalityScreen> {
 
                         // Title
                         Text(
-                          data.title,
-                          style: textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        )
+                              data.title,
+                              style: textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            )
                             .animate()
                             .fadeIn(delay: 300.ms, duration: 400.ms)
                             .slideY(begin: 0.3, end: 0, duration: 400.ms),
@@ -191,9 +201,7 @@ class _PersonalityScreenState extends ConsumerState<PersonalityScreen> {
                               color: Colors.white.withOpacity(0.9),
                             ),
                           ),
-                        )
-                            .animate()
-                            .fadeIn(delay: 500.ms, duration: 400.ms),
+                        ).animate().fadeIn(delay: 500.ms, duration: 400.ms),
                       ],
                     ),
                   ),
@@ -271,10 +279,12 @@ class _PersonalityScreenState extends ConsumerState<PersonalityScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Category Breakdown',
-                  style: textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  )),
+              Text(
+                'Category Breakdown',
+                style: textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: Spacing.md),
               ...top5.asMap().entries.map((entry) {
                 final i = entry.key;
@@ -284,8 +294,9 @@ class _PersonalityScreenState extends ConsumerState<PersonalityScreen> {
                   child: _CategoryBar(
                     category: cat.key,
                     percentage: cat.value,
-                    color: data.gradientColors[0]
-                        .withOpacity(1.0 - (i * 0.15).clamp(0.0, 0.6)),
+                    color: data.gradientColors[0].withOpacity(
+                      1.0 - (i * 0.15).clamp(0.0, 0.6),
+                    ),
                   ),
                 );
               }),
@@ -308,21 +319,25 @@ class _PersonalityScreenState extends ConsumerState<PersonalityScreen> {
           padding: Spacing.paddingMd,
           child: Row(
             children: [
-              Icon(Icons.lightbulb_outline,
-                  color: theme.colorScheme.primary, size: 28),
+              Icon(
+                Icons.lightbulb_outline,
+                color: theme.colorScheme.primary,
+                size: 28,
+              ),
               const SizedBox(width: Spacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Fun Fact',
-                        style: textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.primary,
-                        )),
+                    Text(
+                      'Fun Fact',
+                      style: textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(data.funFact,
-                        style: textTheme.bodySmall),
+                    Text(data.funFact, style: textTheme.bodySmall),
                   ],
                 ),
               ),
@@ -383,10 +398,10 @@ class _CategoryBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(category, style: textTheme.bodySmall),
-            Text('${percentage.toStringAsFixed(1)}%',
-                style: textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                )),
+            Text(
+              '${percentage.toStringAsFixed(1)}%',
+              style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+            ),
           ],
         ),
         const SizedBox(height: 4),
