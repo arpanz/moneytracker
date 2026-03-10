@@ -28,6 +28,8 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final goalRepo = ref.watch(goalRepositoryProvider);
+    // FIX #16: runtime currency symbol
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -48,7 +50,7 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                       borderRadius: Radii.borderFull,
                     ),
                     child: Text(
-                      'Rs. ${_formatIndian(total)}',
+                      '$currencySymbol ${_formatIndian(total)}',
                       style: textTheme.labelLarge?.copyWith(
                         color: theme.colorScheme.onPrimaryContainer,
                         fontWeight: FontWeight.w600,
@@ -86,7 +88,6 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Active goals grid
                   if (activeGoals.isNotEmpty) ...[
                     Text('Active Goals',
                       style: textTheme.titleMedium?.copyWith(
@@ -106,7 +107,10 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                       ),
                       itemCount: activeGoals.length,
                       itemBuilder: (context, index) {
-                        return _GoalCard(goal: activeGoals[index])
+                        return _GoalCard(
+                          goal: activeGoals[index],
+                          currencySymbol: currencySymbol,
+                        )
                             .animate()
                             .fadeIn(
                               delay: Duration(milliseconds: 100 * index),
@@ -122,7 +126,6 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                     ),
                   ],
 
-                  // Completed goals section
                   if (completedGoals.isNotEmpty) ...[
                     const SizedBox(height: Spacing.lg),
                     InkWell(
@@ -170,6 +173,7 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
                           return _GoalCard(
                             goal: completedGoals[index],
                             isCompleted: true,
+                            currencySymbol: currencySymbol,
                           );
                         },
                       ),
@@ -249,8 +253,13 @@ class _GoalsScreenState extends ConsumerState<GoalsScreen> {
 class _GoalCard extends StatelessWidget {
   final GoalModel goal;
   final bool isCompleted;
+  final String currencySymbol;
 
-  const _GoalCard({required this.goal, this.isCompleted = false});
+  const _GoalCard({
+    required this.goal,
+    this.isCompleted = false,
+    required this.currencySymbol,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -270,7 +279,6 @@ class _GoalCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
-              // Jar illustration
               Expanded(
                 child: CustomPaint(
                   painter: _GoalJarPainter(
@@ -282,7 +290,6 @@ class _GoalCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              // Goal name
               Text(
                 goal.name,
                 style: textTheme.titleSmall?.copyWith(
@@ -293,10 +300,10 @@ class _GoalCard extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 4),
-              // Progress text
+              // FIX #16: runtime currency symbol
               Text(
-                'Rs. ${_formatCompact(goal.currentAmount)}'
-                ' / Rs. ${_formatCompact(goal.targetAmount)}',
+                '$currencySymbol ${_formatCompact(goal.currentAmount)}'
+                ' / $currencySymbol ${_formatCompact(goal.targetAmount)}',
                 style: textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -304,11 +311,11 @@ class _GoalCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
-              // Percentage badge
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
+                  // FIX: withOpacity → withValues
                   color: isCompleted
                       ? Colors.green.withValues(alpha: 0.15)
                       : theme.colorScheme.primaryContainer,
@@ -357,20 +364,17 @@ class _GoalJarPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Jar dimensions
     final jarLeft = w * 0.15;
     final jarRight = w * 0.85;
     final jarTop = h * 0.15;
     final jarBottom = h * 0.9;
     final jarHeight = jarBottom - jarTop;
 
-    // Neck dimensions
     final neckLeft = w * 0.3;
     final neckRight = w * 0.7;
     final neckTop = h * 0.02;
     final neckBottom = jarTop;
 
-    // Draw jar outline
     final jarPaint = Paint()
       ..color = jarColor
       ..style = PaintingStyle.stroke
@@ -378,55 +382,39 @@ class _GoalJarPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     final jarPath = Path()
-      // Neck
       ..moveTo(neckLeft, neckTop)
       ..lineTo(neckLeft, neckBottom)
-      // Left shoulder curve
       ..quadraticBezierTo(jarLeft, jarTop, jarLeft, jarTop + 20)
-      // Left side
       ..lineTo(jarLeft, jarBottom - 10)
-      // Bottom left curve
       ..quadraticBezierTo(jarLeft, jarBottom, jarLeft + 10, jarBottom)
-      // Bottom
       ..lineTo(jarRight - 10, jarBottom)
-      // Bottom right curve
       ..quadraticBezierTo(jarRight, jarBottom, jarRight, jarBottom - 10)
-      // Right side
       ..lineTo(jarRight, jarTop + 20)
-      // Right shoulder curve
       ..quadraticBezierTo(jarRight, jarTop, neckRight, neckBottom)
-      // Neck right
       ..lineTo(neckRight, neckTop);
 
-    // Neck rim
     final rimPath = Path()
       ..moveTo(neckLeft - 4, neckTop)
       ..lineTo(neckRight + 4, neckTop);
 
-    // Fill liquid
     if (progress > 0) {
       final fillHeight = jarHeight * progress;
       final fillTop = jarBottom - fillHeight;
 
-      // Create liquid fill with wave
+      // FIX: withOpacity → withValues
       final liquidPaint = Paint()
         ..color = liquidColor.withValues(alpha: 0.35)
         ..style = PaintingStyle.fill;
 
       final liquidPath = Path();
-
-      // Start at bottom left
       liquidPath.moveTo(jarLeft + 2, jarBottom - 10);
       liquidPath.quadraticBezierTo(
           jarLeft + 2, jarBottom, jarLeft + 12, jarBottom - 1);
       liquidPath.lineTo(jarRight - 12, jarBottom - 1);
       liquidPath.quadraticBezierTo(
           jarRight - 2, jarBottom, jarRight - 2, jarBottom - 10);
-
-      // Right side up to fill level
       liquidPath.lineTo(jarRight - 2, fillTop);
 
-      // Sine wave across the top of the liquid
       final waveAmplitude = 3.0;
       final steps = 20;
       for (int i = steps; i >= 0; i--) {
@@ -436,14 +424,10 @@ class _GoalJarPainter extends CustomPainter {
             fillTop + math.sin(i * math.pi / steps * 2) * waveAmplitude;
         liquidPath.lineTo(x, y);
       }
-
-      // Left side back down
-      liquidPath.lineTo(jarLeft + 2, jarBottom - 10);
       liquidPath.close();
-
       canvas.drawPath(liquidPath, liquidPaint);
 
-      // Draw a more opaque wave line at top
+      // FIX: withOpacity → withValues
       final wavePaint = Paint()
         ..color = liquidColor.withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
@@ -465,7 +449,6 @@ class _GoalJarPainter extends CustomPainter {
       canvas.drawPath(wavePath, wavePaint);
     }
 
-    // Draw jar outline on top
     canvas.drawPath(jarPath, jarPaint);
     canvas.drawPath(rimPath, jarPaint..strokeWidth = 3.0);
   }

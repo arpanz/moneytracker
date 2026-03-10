@@ -51,14 +51,14 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
   };
 
   static const _colorOptions = [
-    0xFF7C3AED, // Purple
-    0xFFEC4899, // Pink
-    0xFFFF6B6B, // Red
-    0xFFF59E0B, // Amber
-    0xFF22C55E, // Green
-    0xFF0D9488, // Teal
-    0xFF3B82F6, // Blue
-    0xFF6366F1, // Indigo
+    0xFF7C3AED,
+    0xFFEC4899,
+    0xFFFF6B6B,
+    0xFFF59E0B,
+    0xFF22C55E,
+    0xFF0D9488,
+    0xFF3B82F6,
+    0xFF6366F1,
   ];
 
   @override
@@ -142,6 +142,8 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    // FIX #16: runtime currency symbol
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(_isEditing ? 'Edit Goal' : 'New Goal')),
@@ -150,7 +152,6 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
-            // Name field
             TextFormField(
               controller: _nameController,
               decoration: const InputDecoration(
@@ -164,7 +165,6 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
             ),
             const SizedBox(height: Spacing.lg),
 
-            // Target amount
             Text(
               'Target Amount',
               style: textTheme.titleSmall?.copyWith(
@@ -174,10 +174,11 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
             const SizedBox(height: Spacing.sm),
             TextFormField(
               controller: _amountController,
-              decoration: const InputDecoration(
-                prefixText: 'Rs. ',
+              // FIX #16: runtime currency symbol as prefix
+              decoration: InputDecoration(
+                prefixText: '$currencySymbol ',
                 hintText: '50,000',
-                prefixIcon: Icon(Icons.savings_outlined),
+                prefixIcon: const Icon(Icons.savings_outlined),
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -193,7 +194,6 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
             ),
             const SizedBox(height: Spacing.lg),
 
-            // Deadline picker
             Text(
               'Deadline (Optional)',
               style: textTheme.titleSmall?.copyWith(
@@ -249,7 +249,6 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
             ),
             const SizedBox(height: Spacing.lg),
 
-            // Icon picker
             Text(
               'Icon',
               style: textTheme.titleSmall?.copyWith(
@@ -269,8 +268,9 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
+                      // FIX: withOpacity → withValues
                       color: isSelected
-                          ? Color(_selectedColor).withOpacity(0.15)
+                          ? Color(_selectedColor).withValues(alpha: 0.15)
                           : theme.colorScheme.surfaceContainerHighest,
                       borderRadius: Radii.borderMd,
                       border: isSelected
@@ -292,7 +292,6 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
             ),
             const SizedBox(height: Spacing.lg),
 
-            // Color picker
             Text(
               'Color',
               style: textTheme.titleSmall?.copyWith(
@@ -320,7 +319,8 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: Color(colorVal).withOpacity(0.5),
+                                  // FIX: withOpacity → withValues
+                                  color: Color(colorVal).withValues(alpha: 0.5),
                                   blurRadius: 8,
                                   spreadRadius: 1,
                                 ),
@@ -341,7 +341,6 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
             ),
             const SizedBox(height: Spacing.lg),
 
-            // Linked account (optional)
             FutureBuilder(
               future: ref.read(accountRepositoryProvider).getActive(),
               builder: (context, snapshot) {

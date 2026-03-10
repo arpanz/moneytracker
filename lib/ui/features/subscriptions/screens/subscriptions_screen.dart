@@ -25,6 +25,8 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
   double _monthlyTotal = 0;
   double _yearlyTotal = 0;
   bool _isLoading = true;
+  // FIX #16: store runtime currency symbol
+  String _currencySymbol = '\u20b9';
 
   @override
   void initState() {
@@ -37,12 +39,15 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
     final subs = await subRepo.getAll();
     final monthly = await subRepo.getMonthlyTotal();
     final yearly = await subRepo.getYearlyTotal();
+    // FIX #16: read live currency symbol on each load
+    final symbol = ref.read(currencySymbolProvider);
 
     if (mounted) {
       setState(() {
         _subscriptions = subs;
         _monthlyTotal = monthly;
         _yearlyTotal = yearly;
+        _currencySymbol = symbol;
         _isLoading = false;
       });
     }
@@ -86,6 +91,8 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    // Also watch the provider live so the UI rebuilds if currency changes
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     if (_isLoading) {
       return const Scaffold(
@@ -127,7 +134,8 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                   borderRadius: Radii.borderFull,
                 ),
                 child: Text(
-                  'Rs. ${_formatIndian(_monthlyTotal)}/mo',
+                  // FIX #16: runtime symbol
+                  '$currencySymbol ${_formatIndian(_monthlyTotal)}/mo',
                   style: textTheme.labelLarge?.copyWith(
                     color: theme.colorScheme.onErrorContainer,
                     fontWeight: FontWeight.w600,
@@ -143,21 +151,20 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
           children: [
-            // Summary card
-            _buildSummaryCard(context)
+            _buildSummaryCard(context, currencySymbol)
                 .animate()
                 .fadeIn(duration: 400.ms)
                 .slideY(begin: -0.1, end: 0),
             const SizedBox(height: Spacing.lg),
 
-            // Active subscriptions
             if (activeSubs.isNotEmpty) ...[
               Text('Active Subscriptions',
                   style: textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.w600)),
               const SizedBox(height: Spacing.sm),
               ...activeSubs.asMap().entries.map((entry) {
-                return _buildSubscriptionCard(context, entry.value)
+                return _buildSubscriptionCard(
+                        context, entry.value, currencySymbol)
                     .animate()
                     .fadeIn(
                       delay: Duration(milliseconds: 80 * entry.key),
@@ -167,7 +174,6 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
               }),
             ],
 
-            // Auto-detected section
             if (autoDetected.isNotEmpty) ...[
               const SizedBox(height: Spacing.lg),
               Row(
@@ -182,7 +188,9 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
               ),
               const SizedBox(height: Spacing.sm),
               Card(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.2),
+                // FIX: withOpacity → withValues
+                color: theme.colorScheme.primaryContainer
+                    .withValues(alpha: 0.2),
                 child: Padding(
                   padding: Spacing.paddingSm,
                   child: Column(
@@ -193,7 +201,8 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                                   color: theme.colorScheme.primary),
                               title: Text(s.name),
                               subtitle: Text(
-                                'Rs. ${s.amount.toStringAsFixed(0)} / ${_frequencyLabel(s.frequency)}',
+                                // FIX #16: runtime symbol
+                                '$currencySymbol ${s.amount.toStringAsFixed(0)} / ${_frequencyLabel(s.frequency)}',
                               ),
                               trailing: const Icon(Icons.chevron_right),
                             ))
@@ -203,13 +212,11 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
               ),
             ],
 
-            // Insights section
             if (_subscriptions.length > 1) ...[
               const SizedBox(height: Spacing.lg),
-              _buildInsightsCard(context, inactiveSubs),
+              _buildInsightsCard(context, inactiveSubs, currencySymbol),
             ],
 
-            // Inactive subscriptions
             if (inactiveSubs.isNotEmpty) ...[
               const SizedBox(height: Spacing.lg),
               Text('Inactive',
@@ -219,7 +226,8 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                   )),
               const SizedBox(height: Spacing.sm),
               ...inactiveSubs.map(
-                  (s) => _buildSubscriptionCard(context, s, isInactive: true)),
+                  (s) => _buildSubscriptionCard(context, s, currencySymbol,
+                      isInactive: true)),
             ],
           ],
         ),
@@ -235,7 +243,7 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
     );
   }
 
-  Widget _buildSummaryCard(BuildContext context) {
+  Widget _buildSummaryCard(BuildContext context, String currencySymbol) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
@@ -260,7 +268,8 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                               color: theme.colorScheme.onSurfaceVariant)),
                       const SizedBox(height: 4),
                       Text(
-                        'Rs. ${_formatIndian(_monthlyTotal)}',
+                        // FIX #16: runtime symbol
+                        '$currencySymbol ${_formatIndian(_monthlyTotal)}',
                         style: textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.error,
@@ -285,7 +294,8 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                                 color: theme.colorScheme.onSurfaceVariant)),
                         const SizedBox(height: 4),
                         Text(
-                          'Rs. ${_formatIndian(_yearlyTotal)}',
+                          // FIX #16: runtime symbol
+                          '$currencySymbol ${_formatIndian(_yearlyTotal)}',
                           style: textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -302,7 +312,8 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
     );
   }
 
-  Widget _buildSubscriptionCard(BuildContext context, SubscriptionModel sub,
+  Widget _buildSubscriptionCard(
+      BuildContext context, SubscriptionModel sub, String currencySymbol,
       {bool isInactive = false}) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
@@ -337,7 +348,6 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
             children: [
-              // Logo/icon
               Container(
                 width: 44,
                 height: 44,
@@ -358,7 +368,6 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              // Name + next bill
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -408,12 +417,12 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                   ],
                 ),
               ),
-              // Amount
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'Rs. ${sub.amount.toStringAsFixed(0)}',
+                    // FIX #16: runtime symbol
+                    '$currencySymbol ${sub.amount.toStringAsFixed(0)}',
                     style: textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: isInactive
@@ -424,7 +433,6 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                 ],
               ),
               const SizedBox(width: 8),
-              // Active toggle
               SizedBox(
                 height: 28,
                 child: Switch(
@@ -441,11 +449,12 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
   }
 
   Widget _buildInsightsCard(
-      BuildContext context, List<SubscriptionModel> inactiveSubs) {
+      BuildContext context,
+      List<SubscriptionModel> inactiveSubs,
+      String currencySymbol) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
-    // Find potentially wasteful subscriptions (inactive ones still with next bill)
     double wastedAmount = 0;
     final wasteful = <SubscriptionModel>[];
     for (final sub in _subscriptions) {
@@ -458,7 +467,8 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
     if (wastedAmount <= 0) return const SizedBox.shrink();
 
     return Card(
-      color: theme.colorScheme.tertiaryContainer.withOpacity(0.3),
+      // FIX: withOpacity → withValues
+      color: theme.colorScheme.tertiaryContainer.withValues(alpha: 0.3),
       child: Padding(
         padding: Spacing.paddingMd,
         child: Row(
@@ -477,8 +487,9 @@ class _SubscriptionsScreenState extends ConsumerState<SubscriptionsScreen> {
                       )),
                   const SizedBox(height: 4),
                   Text(
+                    // FIX #16: runtime symbol in insights text
                     'You have ${wasteful.length} inactive subscription(s) '
-                    'that could save you Rs. ${wastedAmount.toStringAsFixed(0)}/month '
+                    'that could save you $currencySymbol ${wastedAmount.toStringAsFixed(0)}/month '
                     'if cancelled.',
                     style: textTheme.bodySmall,
                   ),

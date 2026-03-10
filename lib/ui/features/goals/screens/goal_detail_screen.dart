@@ -60,7 +60,7 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
     }
   }
 
-  Future<void> _showAddMoneySheet() async {
+  Future<void> _showAddMoneySheet(String currencySymbol) async {
     final amountController = TextEditingController();
     final noteController = TextEditingController();
 
@@ -100,10 +100,11 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
               const SizedBox(height: Spacing.lg),
               TextField(
                 controller: amountController,
-                decoration: const InputDecoration(
+                // FIX #16: runtime currency symbol as prefix
+                decoration: InputDecoration(
                   labelText: 'Amount',
-                  prefixText: 'Rs. ',
-                  prefixIcon: Icon(Icons.currency_rupee),
+                  prefixText: '$currencySymbol ',
+                  prefixIcon: const Icon(Icons.savings_outlined),
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -198,6 +199,8 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    // FIX #16: runtime currency symbol
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     if (_isLoading) {
       return const Scaffold(
@@ -216,7 +219,6 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
     final remaining = (goal.targetAmount - goal.currentAmount)
         .clamp(0.0, double.infinity);
 
-    // Projected completion
     String projectionText = '';
     String suggestionText = '';
     if (!goal.isCompleted && goal.contributions.isNotEmpty) {
@@ -231,12 +233,12 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
         projectionText =
             '${projectedDate.day}/${projectedDate.month}/${projectedDate.year}';
 
-        // Suggestions
         final weeklySave = remaining / (daysRemaining / 7).ceil();
         final dailySave = remaining / daysRemaining.ceil();
+        // FIX #16: runtime currency symbol in suggestion text
         suggestionText =
-            'Save Rs. ${dailySave.toStringAsFixed(0)}/day or '
-            'Rs. ${weeklySave.toStringAsFixed(0)}/week to reach your goal';
+            'Save $currencySymbol ${dailySave.toStringAsFixed(0)}/day or '
+            '$currencySymbol ${weeklySave.toStringAsFixed(0)}/week to reach your goal';
       }
     }
 
@@ -245,9 +247,10 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
       if (daysLeft > 0 && remaining > 0) {
         final dailyNeeded = remaining / daysLeft;
         final weeklyNeeded = remaining / (daysLeft / 7).ceil();
+        // FIX #16: runtime currency symbol in deadline suggestion
         suggestionText =
-            'Save Rs. ${dailyNeeded.toStringAsFixed(0)}/day or '
-            'Rs. ${weeklyNeeded.toStringAsFixed(0)}/week to meet your deadline';
+            'Save $currencySymbol ${dailyNeeded.toStringAsFixed(0)}/day or '
+            '$currencySymbol ${weeklyNeeded.toStringAsFixed(0)}/week to meet your deadline';
       }
     }
 
@@ -276,7 +279,6 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Animated jar
             Center(
               child: SizedBox(
                 width: 200,
@@ -302,7 +304,6 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
                     end: const Offset(1.0, 1.0)),
             const SizedBox(height: Spacing.lg),
 
-            // Progress text
             Center(
               child: Column(
                 children: [
@@ -311,8 +312,9 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
                     duration: const Duration(milliseconds: 1200),
                     curve: Curves.easeOutCubic,
                     builder: (context, value, _) {
+                      // FIX #16: runtime symbol in animated counter
                       return Text(
-                        'Rs. ${_formatIndian(value)} of Rs. ${_formatIndian(goal.targetAmount)}',
+                        '$currencySymbol ${_formatIndian(value)} of $currencySymbol ${_formatIndian(goal.targetAmount)}',
                         style: textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
@@ -331,7 +333,6 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
             ),
             const SizedBox(height: Spacing.lg),
 
-            // Projection card
             if (projectionText.isNotEmpty)
               Card(
                 child: Padding(
@@ -364,8 +365,9 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
             if (suggestionText.isNotEmpty) ...[
               const SizedBox(height: Spacing.sm),
               Card(
-                color:
-                    theme.colorScheme.primaryContainer.withOpacity(0.3),
+                // FIX: withOpacity → withValues
+                color: theme.colorScheme.primaryContainer
+                    .withValues(alpha: 0.3),
                 child: Padding(
                   padding: Spacing.paddingMd,
                   child: Row(
@@ -385,7 +387,6 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
 
             const SizedBox(height: Spacing.lg),
 
-            // Contribution history
             Text('Contribution History',
                 style: textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.w600)),
@@ -411,12 +412,14 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
                   final c = entry.value;
                   return ListTile(
                     leading: CircleAvatar(
+                      // FIX: withOpacity → withValues
                       backgroundColor:
-                          Color(goal.color).withOpacity(0.15),
+                          Color(goal.color).withValues(alpha: 0.15),
                       child: Icon(Icons.add,
                           color: Color(goal.color), size: 18),
                     ),
-                    title: Text('Rs. ${_formatIndian(c.amount)}'),
+                    // FIX #16: runtime currency symbol
+                    title: Text('$currencySymbol ${_formatIndian(c.amount)}'),
                     subtitle: Text(
                       c.note ?? '${c.date.day}/${c.date.month}/${c.date.year}',
                       style: textTheme.bodySmall,
@@ -442,7 +445,7 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailScreen>
       floatingActionButton: goal.isCompleted
           ? null
           : FloatingActionButton.extended(
-              onPressed: _showAddMoneySheet,
+              onPressed: () => _showAddMoneySheet(currencySymbol),
               backgroundColor: Color(goal.color),
               foregroundColor: Colors.white,
               icon: const Icon(Icons.add),
@@ -492,14 +495,12 @@ class _AnimatedJarPainter extends CustomPainter {
     final neckRight = w * 0.72;
     final neckTop = h * 0.02;
 
-    // Jar outline paint
     final jarPaint = Paint()
       ..color = jarColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round;
 
-    // Jar body path
     final jarPath = Path()
       ..moveTo(neckLeft, neckTop)
       ..lineTo(neckLeft, jarTop)
@@ -512,7 +513,6 @@ class _AnimatedJarPainter extends CustomPainter {
       ..quadraticBezierTo(jarRight, jarTop, neckRight, jarTop)
       ..lineTo(neckRight, neckTop);
 
-    // Rim
     final rimPaint = Paint()
       ..color = jarColor
       ..style = PaintingStyle.stroke
@@ -523,13 +523,13 @@ class _AnimatedJarPainter extends CustomPainter {
       rimPaint,
     );
 
-    // Liquid fill
     if (progress > 0) {
       final fillHeight = jarHeight * progress;
       final fillTop = jarBottom - fillHeight;
 
+      // FIX: withOpacity → withValues
       final liquidPaint = Paint()
-        ..color = liquidColor.withOpacity(0.3)
+        ..color = liquidColor.withValues(alpha: 0.3)
         ..style = PaintingStyle.fill;
 
       final liquidPath = Path();
@@ -541,7 +541,6 @@ class _AnimatedJarPainter extends CustomPainter {
           jarRight - 3, jarBottom - 1, jarRight - 3, jarBottom - 12);
       liquidPath.lineTo(jarRight - 3, fillTop);
 
-      // Sine wave
       const amp = 4.0;
       const steps = 24;
       for (int i = steps; i >= 0; i--) {
@@ -553,9 +552,9 @@ class _AnimatedJarPainter extends CustomPainter {
       liquidPath.close();
       canvas.drawPath(liquidPath, liquidPaint);
 
-      // Wave line
+      // FIX: withOpacity → withValues
       final wavePaint = Paint()
-        ..color = liquidColor.withOpacity(0.6)
+        ..color = liquidColor.withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2;
       final wavePath = Path();
