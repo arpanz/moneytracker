@@ -12,6 +12,17 @@ class LoanRepayment {
   LoanRepayment() : amount = 0;
 }
 
+/// Embedded disbursement record for a loan ledger.
+@embedded
+class LoanDisbursement {
+  late double amount;
+  late DateTime date;
+  DateTime? dueDate;
+  String? note;
+
+  LoanDisbursement() : amount = 0;
+}
+
 /// Tracks money lent to or borrowed from a person.
 @collection
 class LoanModel {
@@ -44,6 +55,7 @@ class LoanModel {
   late DateTime createdAt;
   late DateTime updatedAt;
 
+  late List<LoanDisbursement> disbursements;
   late List<LoanRepayment> repayments;
 
   @ignore
@@ -57,17 +69,65 @@ class LoanModel {
 
   @ignore
   bool get isOverdue {
-    if (isClosed || dueDate == null) return false;
+    return overdueAmount > 0.01;
+  }
+
+  /// Amount past due, computed from outstanding allocations on disbursements.
+  @ignore
+  double get overdueAmount {
+    if (isClosed || disbursements.isEmpty) return 0;
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final due = DateTime(dueDate!.year, dueDate!.month, dueDate!.day);
-    return due.isBefore(today);
+    var remainingPaid = paidAmount;
+    var overdue = 0.0;
+
+    final sorted = [...disbursements]..sort((a, b) => a.date.compareTo(b.date));
+
+    for (final item in sorted) {
+      final covered = remainingPaid.clamp(0.0, item.amount).toDouble();
+      remainingPaid = (remainingPaid - covered).clamp(0.0, double.infinity);
+      final outstandingPart = (item.amount - covered).clamp(0.0, item.amount);
+      final due = item.dueDate;
+      if (due == null) continue;
+
+      final dueDateOnly = DateTime(due.year, due.month, due.day);
+      if (dueDateOnly.isBefore(today)) {
+        overdue += outstandingPart;
+      }
+    }
+
+    return overdue;
+  }
+
+  /// Nearest due date among disbursements that still have outstanding amount.
+  @ignore
+  DateTime? get nextDueDate {
+    if (disbursements.isEmpty || outstandingAmount <= 0.01) return dueDate;
+
+    var remainingPaid = paidAmount;
+    DateTime? nearest;
+    final sorted = [...disbursements]..sort((a, b) => a.date.compareTo(b.date));
+
+    for (final item in sorted) {
+      final covered = remainingPaid.clamp(0.0, item.amount).toDouble();
+      remainingPaid = (remainingPaid - covered).clamp(0.0, double.infinity);
+      final outstandingPart = (item.amount - covered).clamp(0.0, item.amount);
+      if (outstandingPart <= 0.01 || item.dueDate == null) continue;
+
+      if (nearest == null || item.dueDate!.isBefore(nearest)) {
+        nearest = item.dueDate;
+      }
+    }
+
+    return nearest ?? dueDate;
   }
 
   LoanModel()
     : type = 0,
       paidAmount = 0.0,
       isClosed = false,
+      disbursements = [],
       repayments = [],
       createdAt = DateTime.now(),
       updatedAt = DateTime.now();

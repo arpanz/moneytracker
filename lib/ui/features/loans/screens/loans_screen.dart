@@ -382,6 +382,7 @@ class _LoanCard extends StatelessWidget {
               Row(
                 children: [
                   Text(
+                    '${loan.disbursements.length} disbursement(s) · '
                     'Paid ${loan.paidAmount.toStringAsFixed(0)} / ${loan.principalAmount.toStringAsFixed(0)}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
@@ -407,8 +408,8 @@ class _LoanCard extends StatelessWidget {
   }
 
   static String _dueLabel(LoanModel loan) {
-    if (loan.dueDate == null) return 'No due date';
-    final due = loan.dueDate!;
+    final due = loan.nextDueDate;
+    if (due == null) return 'No due date';
     final now = DateTime.now();
     final delta = DateTime(
       due.year,

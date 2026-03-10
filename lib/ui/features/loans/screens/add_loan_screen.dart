@@ -76,6 +76,11 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
         ? null
         : double.parse(_interestController.text.trim());
     final existing = widget.existingLoan;
+    final title = _titleController.text.trim();
+    final notes = _noteController.text.trim();
+    final entryNote = title.isNotEmpty
+        ? title
+        : (notes.isNotEmpty ? notes : null);
 
     if (existing != null && principal < existing.paidAmount) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -100,7 +105,7 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
           ..title = _titleController.text.trim().isEmpty
               ? null
               : _titleController.text.trim()
-          ..principalAmount = principal
+          ..principalAmount = existing.principalAmount
           ..interestRate = interestRate
           ..dueDate = _dueDate
           ..note = _noteController.text.trim().isEmpty
@@ -117,20 +122,49 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
 
         await repo.update(existing);
       } else {
+        final personName = _personController.text.trim();
+        final activeLedger = await repo.findActiveLedger(personName, _type);
+        if (activeLedger != null && mounted) {
+          final appendToExisting = await _showLedgerMergeDialog(
+            existingLoan: activeLedger,
+            amount: principal,
+            currencySymbol: ref.read(currencySymbolProvider),
+          );
+          if (appendToExisting == null) {
+            if (mounted) setState(() => _isSaving = false);
+            return;
+          }
+
+          if (appendToExisting) {
+            await repo.addDisbursement(
+              activeLedger.id,
+              principal,
+              dueDate: _dueDate,
+              note: entryNote,
+            );
+            if (mounted) context.pop();
+            return;
+          }
+        }
+
+        final now = DateTime.now();
         final loan = LoanModel()
           ..type = _type
-          ..personName = _personController.text.trim()
-          ..title = _titleController.text.trim().isEmpty
-              ? null
-              : _titleController.text.trim()
+          ..personName = personName
+          ..title = title.isEmpty ? null : title
           ..principalAmount = principal
           ..interestRate = interestRate
           ..dueDate = _dueDate
-          ..note = _noteController.text.trim().isEmpty
-              ? null
-              : _noteController.text.trim()
-          ..createdAt = DateTime.now()
-          ..updatedAt = DateTime.now();
+          ..note = notes.isEmpty ? null : notes
+          ..disbursements = [
+            LoanDisbursement()
+              ..amount = principal
+              ..date = now
+              ..dueDate = _dueDate
+              ..note = entryNote,
+          ]
+          ..createdAt = now
+          ..updatedAt = now;
 
         await repo.add(loan);
       }
@@ -147,6 +181,45 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
         setState(() => _isSaving = false);
       }
     }
+  }
+
+  Future<bool?> _showLedgerMergeDialog({
+    required LoanModel existingLoan,
+    required double amount,
+    required String currencySymbol,
+  }) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        final theme = Theme.of(context);
+        return AlertDialog(
+          title: const Text('Existing Ledger Found'),
+          content: Text(
+            'An active ${_type == 0 ? 'lending' : 'borrowing'} ledger already '
+            'exists for ${existingLoan.personName}.\n\n'
+            'Add $currencySymbol ${amount.toStringAsFixed(0)} to this existing '
+            'ledger?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Create Separate'),
+            ),
+            OutlinedButton(
+              onPressed: () => Navigator.of(context).pop(null),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+              ),
+              child: const Text('Add To Existing'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -225,7 +298,11 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
                 labelText: 'Principal amount',
                 prefixText: '$currencySymbol ',
                 prefixIcon: const Icon(Icons.payments_outlined),
+                helperText: _isEditing
+                    ? 'Use "Add Entry" on detail screen to increase amount.'
+                    : null,
               ),
+              readOnly: _isEditing,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),

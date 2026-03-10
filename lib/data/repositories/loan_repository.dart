@@ -15,7 +15,21 @@ class LoanRepository {
 
   Future<int> add(LoanModel loan) async {
     return _isar.writeTxn(() async {
-      loan.updatedAt = DateTime.now();
+      final now = DateTime.now();
+      loan.updatedAt = now;
+
+      // Bootstrap a first disbursement for non-ledger legacy input.
+      if (loan.disbursements.isEmpty && loan.principalAmount > 0) {
+        loan.disbursements = [
+          LoanDisbursement()
+            ..amount = loan.principalAmount
+            ..date = loan.createdAt
+            ..dueDate = loan.dueDate
+            ..note = loan.title,
+        ];
+      }
+
+      _syncLegacyDueDate(loan);
       return _isar.loanModels.put(loan);
     });
   }
@@ -23,6 +37,7 @@ class LoanRepository {
   Future<void> update(LoanModel loan) async {
     await _isar.writeTxn(() async {
       loan.updatedAt = DateTime.now();
+      _syncLegacyDueDate(loan);
       await _isar.loanModels.put(loan);
     });
   }
@@ -74,7 +89,51 @@ class LoanRepository {
         .findAll();
   }
 
-  // -- LOAN ACTIONS ---------------------------------------------------------
+  Future<LoanModel?> findActiveLedger(String personName, int type) async {
+    final normalized = _normalizeName(personName);
+    final activeByType = await getByType(type, includeClosed: false);
+    for (final loan in activeByType) {
+      if (_normalizeName(loan.personName) == normalized) {
+        return loan;
+      }
+    }
+    return null;
+  }
+
+  // -- LEDGER ACTIONS -------------------------------------------------------
+
+  Future<void> addDisbursement(
+    int loanId,
+    double amount, {
+    DateTime? date,
+    DateTime? dueDate,
+    String? note,
+  }) async {
+    if (amount <= 0) {
+      throw ArgumentError('Disbursement amount must be greater than zero.');
+    }
+
+    await _isar.writeTxn(() async {
+      final loan = await _isar.loanModels.get(loanId);
+      if (loan == null) {
+        throw StateError('Loan not found.');
+      }
+
+      final disbursement = LoanDisbursement()
+        ..amount = amount
+        ..date = date ?? DateTime.now()
+        ..dueDate = dueDate
+        ..note = note;
+
+      loan.disbursements = [...loan.disbursements, disbursement];
+      loan.principalAmount += amount;
+      loan.isClosed = false;
+      loan.updatedAt = DateTime.now();
+
+      _syncLegacyDueDate(loan);
+      await _isar.loanModels.put(loan);
+    });
+  }
 
   Future<void> addRepayment(
     int loanId,
@@ -98,7 +157,10 @@ class LoanRepository {
         ..note = note;
 
       loan.repayments = [...loan.repayments, repayment];
-      loan.paidAmount += amount;
+      loan.paidAmount = (loan.paidAmount + amount).clamp(
+        0.0,
+        loan.principalAmount,
+      );
       loan.updatedAt = DateTime.now();
 
       if (loan.outstandingAmount <= 0.01) {
@@ -106,6 +168,7 @@ class LoanRepository {
         loan.isClosed = true;
       }
 
+      _syncLegacyDueDate(loan);
       await _isar.loanModels.put(loan);
     });
   }
@@ -120,6 +183,7 @@ class LoanRepository {
         loan.paidAmount = loan.principalAmount;
       }
       loan.updatedAt = DateTime.now();
+      _syncLegacyDueDate(loan);
       await _isar.loanModels.put(loan);
     });
   }
@@ -137,6 +201,7 @@ class LoanRepository {
         );
       }
       loan.updatedAt = DateTime.now();
+      _syncLegacyDueDate(loan);
       await _isar.loanModels.put(loan);
     });
   }
@@ -158,27 +223,31 @@ class LoanRepository {
   }
 
   Future<List<LoanModel>> getOverdue() async {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
     final loans = await getActive();
-    return loans
-        .where(
-          (loan) =>
-              loan.dueDate != null &&
-              DateTime(
-                loan.dueDate!.year,
-                loan.dueDate!.month,
-                loan.dueDate!.day,
-              ).isBefore(today) &&
-              loan.outstandingAmount > 0.01,
-        )
-        .toList()
-      ..sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
+    return loans.where((loan) => loan.isOverdue).toList()..sort((a, b) {
+      final aDue = a.nextDueDate;
+      final bDue = b.nextDueDate;
+      if (aDue == null && bDue == null) return 0;
+      if (aDue == null) return 1;
+      if (bDue == null) return -1;
+      return aDue.compareTo(bDue);
+    });
   }
 
   // -- REAL-TIME STREAM -----------------------------------------------------
 
   Stream<void> watchAll() {
     return _isar.loanModels.watchLazy();
+  }
+
+  // -- INTERNAL -------------------------------------------------------------
+
+  String _normalizeName(String value) {
+    return value.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+  }
+
+  void _syncLegacyDueDate(LoanModel loan) {
+    // Keep top-level dueDate aligned for existing queries/indexes.
+    loan.dueDate = loan.nextDueDate;
   }
 }

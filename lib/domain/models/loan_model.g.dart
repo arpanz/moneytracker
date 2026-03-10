@@ -22,59 +22,65 @@ const LoanModelSchema = CollectionSchema(
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
-    r'dueDate': PropertySchema(
+    r'disbursements': PropertySchema(
       id: 1,
+      name: r'disbursements',
+      type: IsarType.objectList,
+      target: r'LoanDisbursement',
+    ),
+    r'dueDate': PropertySchema(
+      id: 2,
       name: r'dueDate',
       type: IsarType.dateTime,
     ),
     r'interestRate': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'interestRate',
       type: IsarType.double,
     ),
     r'isClosed': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'isClosed',
       type: IsarType.bool,
     ),
     r'note': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'note',
       type: IsarType.string,
     ),
     r'paidAmount': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'paidAmount',
       type: IsarType.double,
     ),
     r'personName': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'personName',
       type: IsarType.string,
     ),
     r'principalAmount': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'principalAmount',
       type: IsarType.double,
     ),
     r'repayments': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'repayments',
       type: IsarType.objectList,
       target: r'LoanRepayment',
     ),
     r'title': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'title',
       type: IsarType.string,
     ),
     r'type': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'type',
       type: IsarType.long,
     ),
     r'updatedAt': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -126,7 +132,10 @@ const LoanModelSchema = CollectionSchema(
     )
   },
   links: {},
-  embeddedSchemas: {r'LoanRepayment': LoanRepaymentSchema},
+  embeddedSchemas: {
+    r'LoanDisbursement': LoanDisbursementSchema,
+    r'LoanRepayment': LoanRepaymentSchema
+  },
   getId: _loanModelGetId,
   getLinks: _loanModelGetLinks,
   attach: _loanModelAttach,
@@ -139,6 +148,15 @@ int _loanModelEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.disbursements.length * 3;
+  {
+    final offsets = allOffsets[LoanDisbursement]!;
+    for (var i = 0; i < object.disbursements.length; i++) {
+      final value = object.disbursements[i];
+      bytesCount +=
+          LoanDisbursementSchema.estimateSize(value, offsets, allOffsets);
+    }
+  }
   {
     final value = object.note;
     if (value != null) {
@@ -171,22 +189,28 @@ void _loanModelSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeDateTime(offsets[0], object.createdAt);
-  writer.writeDateTime(offsets[1], object.dueDate);
-  writer.writeDouble(offsets[2], object.interestRate);
-  writer.writeBool(offsets[3], object.isClosed);
-  writer.writeString(offsets[4], object.note);
-  writer.writeDouble(offsets[5], object.paidAmount);
-  writer.writeString(offsets[6], object.personName);
-  writer.writeDouble(offsets[7], object.principalAmount);
+  writer.writeObjectList<LoanDisbursement>(
+    offsets[1],
+    allOffsets,
+    LoanDisbursementSchema.serialize,
+    object.disbursements,
+  );
+  writer.writeDateTime(offsets[2], object.dueDate);
+  writer.writeDouble(offsets[3], object.interestRate);
+  writer.writeBool(offsets[4], object.isClosed);
+  writer.writeString(offsets[5], object.note);
+  writer.writeDouble(offsets[6], object.paidAmount);
+  writer.writeString(offsets[7], object.personName);
+  writer.writeDouble(offsets[8], object.principalAmount);
   writer.writeObjectList<LoanRepayment>(
-    offsets[8],
+    offsets[9],
     allOffsets,
     LoanRepaymentSchema.serialize,
     object.repayments,
   );
-  writer.writeString(offsets[9], object.title);
-  writer.writeLong(offsets[10], object.type);
-  writer.writeDateTime(offsets[11], object.updatedAt);
+  writer.writeString(offsets[10], object.title);
+  writer.writeLong(offsets[11], object.type);
+  writer.writeDateTime(offsets[12], object.updatedAt);
 }
 
 LoanModel _loanModelDeserialize(
@@ -197,24 +221,31 @@ LoanModel _loanModelDeserialize(
 ) {
   final object = LoanModel();
   object.createdAt = reader.readDateTime(offsets[0]);
-  object.dueDate = reader.readDateTimeOrNull(offsets[1]);
+  object.disbursements = reader.readObjectList<LoanDisbursement>(
+        offsets[1],
+        LoanDisbursementSchema.deserialize,
+        allOffsets,
+        LoanDisbursement(),
+      ) ??
+      [];
+  object.dueDate = reader.readDateTimeOrNull(offsets[2]);
   object.id = id;
-  object.interestRate = reader.readDoubleOrNull(offsets[2]);
-  object.isClosed = reader.readBool(offsets[3]);
-  object.note = reader.readStringOrNull(offsets[4]);
-  object.paidAmount = reader.readDouble(offsets[5]);
-  object.personName = reader.readString(offsets[6]);
-  object.principalAmount = reader.readDouble(offsets[7]);
+  object.interestRate = reader.readDoubleOrNull(offsets[3]);
+  object.isClosed = reader.readBool(offsets[4]);
+  object.note = reader.readStringOrNull(offsets[5]);
+  object.paidAmount = reader.readDouble(offsets[6]);
+  object.personName = reader.readString(offsets[7]);
+  object.principalAmount = reader.readDouble(offsets[8]);
   object.repayments = reader.readObjectList<LoanRepayment>(
-        offsets[8],
+        offsets[9],
         LoanRepaymentSchema.deserialize,
         allOffsets,
         LoanRepayment(),
       ) ??
       [];
-  object.title = reader.readStringOrNull(offsets[9]);
-  object.type = reader.readLong(offsets[10]);
-  object.updatedAt = reader.readDateTime(offsets[11]);
+  object.title = reader.readStringOrNull(offsets[10]);
+  object.type = reader.readLong(offsets[11]);
+  object.updatedAt = reader.readDateTime(offsets[12]);
   return object;
 }
 
@@ -228,20 +259,28 @@ P _loanModelDeserializeProp<P>(
     case 0:
       return (reader.readDateTime(offset)) as P;
     case 1:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readObjectList<LoanDisbursement>(
+            offset,
+            LoanDisbursementSchema.deserialize,
+            allOffsets,
+            LoanDisbursement(),
+          ) ??
+          []) as P;
     case 2:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 3:
-      return (reader.readBool(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 4:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 5:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 6:
-      return (reader.readString(offset)) as P;
-    case 7:
       return (reader.readDouble(offset)) as P;
+    case 7:
+      return (reader.readString(offset)) as P;
     case 8:
+      return (reader.readDouble(offset)) as P;
+    case 9:
       return (reader.readObjectList<LoanRepayment>(
             offset,
             LoanRepaymentSchema.deserialize,
@@ -249,11 +288,11 @@ P _loanModelDeserializeProp<P>(
             LoanRepayment(),
           ) ??
           []) as P;
-    case 9:
-      return (reader.readStringOrNull(offset)) as P;
     case 10:
-      return (reader.readLong(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 11:
+      return (reader.readLong(offset)) as P;
+    case 12:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -670,6 +709,95 @@ extension LoanModelQueryFilter
         upper: upper,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<LoanModel, LoanModel, QAfterFilterCondition>
+      disbursementsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'disbursements',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<LoanModel, LoanModel, QAfterFilterCondition>
+      disbursementsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'disbursements',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<LoanModel, LoanModel, QAfterFilterCondition>
+      disbursementsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'disbursements',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<LoanModel, LoanModel, QAfterFilterCondition>
+      disbursementsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'disbursements',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<LoanModel, LoanModel, QAfterFilterCondition>
+      disbursementsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'disbursements',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<LoanModel, LoanModel, QAfterFilterCondition>
+      disbursementsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'disbursements',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 
@@ -1641,6 +1769,13 @@ extension LoanModelQueryFilter
 
 extension LoanModelQueryObject
     on QueryBuilder<LoanModel, LoanModel, QFilterCondition> {
+  QueryBuilder<LoanModel, LoanModel, QAfterFilterCondition>
+      disbursementsElement(FilterQuery<LoanDisbursement> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.object(q, r'disbursements');
+    });
+  }
+
   QueryBuilder<LoanModel, LoanModel, QAfterFilterCondition> repaymentsElement(
       FilterQuery<LoanRepayment> q) {
     return QueryBuilder.apply(this, (query) {
@@ -2016,6 +2151,13 @@ extension LoanModelQueryProperty
   QueryBuilder<LoanModel, DateTime, QQueryOperations> createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
+    });
+  }
+
+  QueryBuilder<LoanModel, List<LoanDisbursement>, QQueryOperations>
+      disbursementsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'disbursements');
     });
   }
 
@@ -2456,3 +2598,454 @@ extension LoanRepaymentQueryFilter
 
 extension LoanRepaymentQueryObject
     on QueryBuilder<LoanRepayment, LoanRepayment, QFilterCondition> {}
+
+// coverage:ignore-file
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
+
+const LoanDisbursementSchema = Schema(
+  name: r'LoanDisbursement',
+  id: 4461994981977370328,
+  properties: {
+    r'amount': PropertySchema(
+      id: 0,
+      name: r'amount',
+      type: IsarType.double,
+    ),
+    r'date': PropertySchema(
+      id: 1,
+      name: r'date',
+      type: IsarType.dateTime,
+    ),
+    r'dueDate': PropertySchema(
+      id: 2,
+      name: r'dueDate',
+      type: IsarType.dateTime,
+    ),
+    r'note': PropertySchema(
+      id: 3,
+      name: r'note',
+      type: IsarType.string,
+    )
+  },
+  estimateSize: _loanDisbursementEstimateSize,
+  serialize: _loanDisbursementSerialize,
+  deserialize: _loanDisbursementDeserialize,
+  deserializeProp: _loanDisbursementDeserializeProp,
+);
+
+int _loanDisbursementEstimateSize(
+  LoanDisbursement object,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  var bytesCount = offsets.last;
+  {
+    final value = object.note;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  return bytesCount;
+}
+
+void _loanDisbursementSerialize(
+  LoanDisbursement object,
+  IsarWriter writer,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  writer.writeDouble(offsets[0], object.amount);
+  writer.writeDateTime(offsets[1], object.date);
+  writer.writeDateTime(offsets[2], object.dueDate);
+  writer.writeString(offsets[3], object.note);
+}
+
+LoanDisbursement _loanDisbursementDeserialize(
+  Id id,
+  IsarReader reader,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  final object = LoanDisbursement();
+  object.amount = reader.readDouble(offsets[0]);
+  object.date = reader.readDateTime(offsets[1]);
+  object.dueDate = reader.readDateTimeOrNull(offsets[2]);
+  object.note = reader.readStringOrNull(offsets[3]);
+  return object;
+}
+
+P _loanDisbursementDeserializeProp<P>(
+  IsarReader reader,
+  int propertyId,
+  int offset,
+  Map<Type, List<int>> allOffsets,
+) {
+  switch (propertyId) {
+    case 0:
+      return (reader.readDouble(offset)) as P;
+    case 1:
+      return (reader.readDateTime(offset)) as P;
+    case 2:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 3:
+      return (reader.readStringOrNull(offset)) as P;
+    default:
+      throw IsarError('Unknown property with id $propertyId');
+  }
+}
+
+extension LoanDisbursementQueryFilter
+    on QueryBuilder<LoanDisbursement, LoanDisbursement, QFilterCondition> {
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      amountEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'amount',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      amountGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'amount',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      amountLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'amount',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      amountBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'amount',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      dateEqualTo(DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'date',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      dateGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'date',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      dateLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'date',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      dateBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'date',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      dueDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'dueDate',
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      dueDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'dueDate',
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      dueDateEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'dueDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      dueDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'dueDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      dueDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'dueDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      dueDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'dueDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'note',
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'note',
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'note',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'note',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'note',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'note',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'note',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'note',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'note',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'note',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'note',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<LoanDisbursement, LoanDisbursement, QAfterFilterCondition>
+      noteIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'note',
+        value: '',
+      ));
+    });
+  }
+}
+
+extension LoanDisbursementQueryObject
+    on QueryBuilder<LoanDisbursement, LoanDisbursement, QFilterCondition> {}

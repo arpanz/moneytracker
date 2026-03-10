@@ -68,22 +68,15 @@ final closedLoansProvider = Provider<List<LoanModel>>((ref) {
 });
 
 final overdueLoansProvider = Provider<List<LoanModel>>((ref) {
-  final now = DateTime.now();
-  final today = DateTime(now.year, now.month, now.day);
-  return ref
-      .watch(activeLoansProvider)
-      .where(
-        (loan) =>
-            loan.dueDate != null &&
-            DateTime(
-              loan.dueDate!.year,
-              loan.dueDate!.month,
-              loan.dueDate!.day,
-            ).isBefore(today) &&
-            loan.outstandingAmount > 0.01,
-      )
-      .toList()
-    ..sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
+  return ref.watch(activeLoansProvider).where((loan) => loan.isOverdue).toList()
+    ..sort((a, b) {
+      final aDue = a.nextDueDate;
+      final bDue = b.nextDueDate;
+      if (aDue == null && bDue == null) return 0;
+      if (aDue == null) return 1;
+      if (bDue == null) return -1;
+      return aDue.compareTo(bDue);
+    });
 });
 
 final loanSummaryProvider = Provider<LoanSummary>((ref) {
