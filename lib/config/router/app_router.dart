@@ -1,3 +1,4 @@
+import 'package:cheddar/domain/models/transaction_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -150,8 +151,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/transaction/add',
         name: RouteNames.addTransaction,
         builder: (context, state) {
-          final initialType = state.extra is int ? state.extra as int : null;
-          return AddTransactionScreen(initialType: initialType);
+          final extra = state.extra;
+          return AddTransactionScreen(
+            existingTransaction: extra is TransactionModel ? extra : null,
+            initialType: extra is int ? extra : null,
+          );
         },
       ),
       GoRoute(
@@ -169,9 +173,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/budget/:id',
         name: RouteNames.budgetDetail,
-        builder: (context, state) => BudgetDetailScreen(
-          budgetId: state.pathParameters['id']!,
-        ),
+        builder: (context, state) =>
+            BudgetDetailScreen(budgetId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/goals',
@@ -186,9 +189,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/goal/:id',
         name: RouteNames.goalDetail,
-        builder: (context, state) => GoalDetailScreen(
-          goalId: int.parse(state.pathParameters['id']!),
-        ),
+        builder: (context, state) =>
+            GoalDetailScreen(goalId: int.parse(state.pathParameters['id']!)),
       ),
       GoRoute(
         path: '/subscriptions',

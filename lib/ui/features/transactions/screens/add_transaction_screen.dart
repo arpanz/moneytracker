@@ -383,14 +383,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         'Expense',
         1,
         cheddarColors.expense,
-        FontAwesomeIcons.arrowDown as IconData,
+        FontAwesomeIcons.arrowDown,
       ),
-      _TypeOption('Income', 0, cheddarColors.income, FontAwesomeIcons.arrowUp as IconData),
+      _TypeOption('Income', 0, cheddarColors.income, FontAwesomeIcons.arrowUp),
       _TypeOption(
         'Transfer',
         2,
         cheddarColors.transfer,
-        FontAwesomeIcons.arrowRightArrowLeft as IconData,
+        FontAwesomeIcons.arrowRightArrowLeft,
       ),
     ];
 
@@ -435,7 +435,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         FaIcon(
-                          option.icon as FaIconData?,
+                          option.icon,
                           size: 14,
                           color: isSelected
                               ? option.color
@@ -586,7 +586,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 FaIcon(
-                  _accountIcon(account.icon) as FaIconData?,
+                  _accountIcon(account.icon),
                   size: 14,
                   color: isSelected
                       ? accountColor
@@ -1030,7 +1030,7 @@ class _TypeOption {
   final String label;
   final int value;
   final Color color;
-  final IconData icon;
+  final FaIconData icon;
 
   const _TypeOption(this.label, this.value, this.color, this.icon);
 }
@@ -1128,17 +1128,15 @@ class _AmountDisplayButton extends StatelessWidget {
 // ── Internal Providers ──────────────────────────────────────────────────────
 
 /// Categories filtered by the current transaction type.
-final _categoriesForTypeProvider = FutureProvider.family<List<CategoryModel>, int>((
-  ref,
-  type,
-) async {
-  final repo = ref.watch(categoryRepositoryProvider);
-  // FIX #1: type 2 (transfer) was incorrectly mapping to 0 (income).
-  // Transfers should show expense categories (type 1) as the most sensible
-  // default, but since the category section is now hidden for transfers (#9)
-  // this provider is only called for type 0 and 1.
-  return repo.getByType(type);
-});
+final _categoriesForTypeProvider =
+    FutureProvider.family<List<CategoryModel>, int>((ref, type) async {
+      final repo = ref.watch(categoryRepositoryProvider);
+      // FIX #1: type 2 (transfer) was incorrectly mapping to 0 (income).
+      // Transfers should show expense categories (type 1) as the most sensible
+      // default, but since the category section is now hidden for transfers (#9)
+      // this provider is only called for type 0 and 1.
+      return repo.getByType(type);
+    });
 
 /// All active (non-archived) accounts.
 final _activeAccountsProvider = FutureProvider<List<AccountModel>>((ref) async {
