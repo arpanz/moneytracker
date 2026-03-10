@@ -113,3 +113,8 @@ final loanByIdProvider = FutureProvider.family<LoanModel?, int>((ref, id) {
   final repo = ref.watch(loanRepositoryProvider);
   return repo.getById(id);
 });
+
+final loanPersonNameSuggestionsProvider = FutureProvider<List<String>>((ref) {
+  final repo = ref.watch(loanRepositoryProvider);
+  return repo.getDistinctPersonNames();
+});

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -29,8 +31,7 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
   }
 
   Future<void> _loadLoan() async {
-    final repo = ref.read(loanRepositoryProvider);
-    final loan = await repo.getById(widget.loanId);
+    final loan = await ref.read(loanRepositoryProvider).getById(widget.loanId);
     if (!mounted) return;
     setState(() {
       _loan = loan;
@@ -38,8 +39,52 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
     });
   }
 
+  Future<void> _showRepaymentSheet() async {
+    final loan = _loan;
+    if (loan == null) return;
+    final symbol = ref.read(currencySymbolProvider);
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.lg)),
+      ),
+      builder: (_) => _RepaymentSheet(loanId: loan.id, currencySymbol: symbol),
+    );
+    if (result == true) await _loadLoan();
+  }
+
+  Future<void> _showDisbursementSheet() async {
+    final loan = _loan;
+    if (loan == null) return;
+    final symbol = ref.read(currencySymbolProvider);
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.lg)),
+      ),
+      builder: (_) =>
+          _DisbursementSheet(loanId: loan.id, currencySymbol: symbol),
+    );
+    if (result == true) await _loadLoan();
+  }
+
+  Future<void> _toggleClosed() async {
+    final loan = _loan;
+    if (loan == null) return;
+    if (loan.isClosed) {
+      await ref.read(loanRepositoryProvider).reopenLoan(loan.id);
+    } else {
+      await ref.read(loanRepositoryProvider).closeLoan(loan.id);
+    }
+    await _loadLoan();
+  }
+
   Future<void> _deleteLoan() async {
-    final confirmed = await showDialog<bool>(
+    final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Loan'),
@@ -51,77 +96,20 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
             child: const Text('Delete'),
           ),
         ],
       ),
     );
-
-    if (confirmed != true || !mounted) return;
+    if (ok != true || !mounted) return;
     await ref.read(loanRepositoryProvider).delete(widget.loanId);
     if (mounted) context.pop();
-  }
-
-  Future<void> _toggleClosed() async {
-    final loan = _loan;
-    if (loan == null) return;
-    final repo = ref.read(loanRepositoryProvider);
-    if (loan.isClosed) {
-      await repo.reopenLoan(loan.id);
-    } else {
-      await repo.closeLoan(loan.id);
-    }
-    await _loadLoan();
-  }
-
-  Future<void> _showAddRepaymentSheet() async {
-    final loan = _loan;
-    if (loan == null) return;
-    final currencySymbol = ref.read(currencySymbolProvider);
-    final result = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.lg)),
-      ),
-      builder: (context) =>
-          _RepaymentSheet(loanId: loan.id, currencySymbol: currencySymbol),
-    );
-
-    if (result == true) {
-      await _loadLoan();
-    }
-  }
-
-  Future<void> _showAddDisbursementSheet() async {
-    final loan = _loan;
-    if (loan == null) return;
-    final currencySymbol = ref.read(currencySymbolProvider);
-    final result = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.lg)),
-      ),
-      builder: (context) =>
-          _DisbursementSheet(loanId: loan.id, currencySymbol: currencySymbol),
-    );
-
-    if (result == true) {
-      await _loadLoan();
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final currencySymbol = ref.watch(currencySymbolProvider);
-
+    final symbol = ref.watch(currencySymbolProvider);
     if (_isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -134,12 +122,16 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
       );
     }
 
-    final isLending = loan.type == 0;
     final accent = loan.isClosed
         ? theme.colorScheme.outline
-        : isLending
+        : loan.type == 0
         ? Colors.green
         : theme.colorScheme.error;
+
+    final breakdownMap = {
+      for (final b in _buildDisbursementBreakdown(loan)) b.sourceIndex: b,
+    };
+    final timeline = loan.timeline.reversed.toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -154,32 +146,25 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
-              if (value == 'disburse') {
-                _showAddDisbursementSheet();
-              } else if (value == 'toggle') {
-                _toggleClosed();
-              } else if (value == 'delete') {
-                _deleteLoan();
-              }
+              if (value == 'add') _showDisbursementSheet();
+              if (value == 'toggle') _toggleClosed();
+              if (value == 'delete') _deleteLoan();
             },
-            itemBuilder: (context) => [
+            itemBuilder: (_) => [
               if (!loan.isClosed)
-                PopupMenuItem<String>(
-                  value: 'disburse',
+                PopupMenuItem(
+                  value: 'add',
                   child: Text(
                     loan.type == 0
                         ? 'Add Lending Entry'
                         : 'Add Borrowing Entry',
                   ),
                 ),
-              PopupMenuItem<String>(
+              PopupMenuItem(
                 value: 'toggle',
                 child: Text(loan.isClosed ? 'Reopen Loan' : 'Mark Closed'),
               ),
-              const PopupMenuItem<String>(
-                value: 'delete',
-                child: Text('Delete Loan'),
-              ),
+              const PopupMenuItem(value: 'delete', child: Text('Delete Loan')),
             ],
           ),
         ],
@@ -194,151 +179,178 @@ class _LoanDetailScreenState extends ConsumerState<LoanDetailScreen> {
             96,
           ),
           children: [
-            _LoanHeaderCard(
-              loan: loan,
-              accent: accent,
-              currencySymbol: currencySymbol,
+            Card(
+              child: Padding(
+                padding: Spacing.paddingMd,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$symbol ${loan.outstandingAmount.toStringAsFixed(0)}',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: accent,
+                      ),
+                    ),
+                    const SizedBox(height: Spacing.xs),
+                    Text(
+                      'Paid ${loan.paidAmount.toStringAsFixed(0)} / ${loan.principalAmount.toStringAsFixed(0)}',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: Spacing.sm),
+                    LinearProgressIndicator(value: loan.progress, minHeight: 6),
+                  ],
+                ),
+              ),
             ).animate().fadeIn(duration: AppDurations.medium),
-            const SizedBox(height: Spacing.md),
-            if (loan.isOverdue)
+            if (loan.isOverdue) ...[
+              const SizedBox(height: Spacing.md),
               _InfoBanner(
                 icon: Icons.warning_amber_rounded,
                 color: theme.colorScheme.error,
                 title:
-                    'Overdue amount: $currencySymbol ${loan.overdueAmount.toStringAsFixed(0)}',
-                subtitle: loan.type == 0
-                    ? 'Follow up to collect pending amount.'
-                    : 'Pay pending amount to close the overdue.',
+                    'Overdue: $symbol ${loan.overdueAmount.toStringAsFixed(0)}',
+                subtitle: 'Pending amount is past due date.',
               ),
-            if (loan.isOverdue) const SizedBox(height: Spacing.md),
-            _LoanMetaCard(loan: loan),
+            ],
             const SizedBox(height: Spacing.md),
-            Text(
-              'Disbursement Ledger',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            Text('Disbursement Ledger', style: theme.textTheme.titleMedium),
             const SizedBox(height: Spacing.sm),
-            if (loan.disbursements.isEmpty)
-              _InfoBanner(
-                icon: Icons.account_balance_wallet_outlined,
-                color: theme.colorScheme.onSurfaceVariant,
-                title: 'No disbursements',
-                subtitle: 'Entries will appear when money is added.',
-              )
-            else
-              ...loan.disbursements.reversed.toList().asMap().entries.map((
-                entry,
-              ) {
-                final disbursement = entry.value;
-                return Card(
-                      margin: const EdgeInsets.only(bottom: Spacing.sm),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: accent.withValues(alpha: 0.12),
-                          child: Icon(
-                            loan.type == 0
-                                ? Icons.call_received_rounded
-                                : Icons.call_made_rounded,
-                            color: accent,
-                            size: 20,
-                          ),
-                        ),
-                        title: Text(
-                          '$currencySymbol ${disbursement.amount.toStringAsFixed(0)}',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        subtitle: Text(
-                          disbursement.note?.trim().isNotEmpty == true
-                              ? disbursement.note!
-                              : 'Added on ${_formatDate(disbursement.date)}',
-                        ),
-                        trailing: Text(
-                          disbursement.dueDate == null
-                              ? 'No due'
-                              : 'Due ${_formatDate(disbursement.dueDate!)}',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    )
-                    .animate(delay: Duration(milliseconds: entry.key * 60))
-                    .fadeIn(duration: AppDurations.fast)
-                    .slideX(begin: 0.05, end: 0);
-              }),
+            ...loan.disbursements.reversed.toList().asMap().entries.map((
+              entry,
+            ) {
+              final sourceIndex = loan.disbursements.length - 1 - entry.key;
+              final d = entry.value;
+              final b = breakdownMap[sourceIndex];
+              return Card(
+                child: ListTile(
+                  title: Text('$symbol ${d.amount.toStringAsFixed(0)}'),
+                  subtitle: Text(
+                    'Paid $symbol ${(b?.covered ?? 0).toStringAsFixed(0)} • '
+                    'Open $symbol ${(b?.outstanding ?? d.amount).toStringAsFixed(0)}',
+                  ),
+                  trailing: Text(
+                    d.dueDate == null ? 'No due' : _formatDate(d.dueDate!),
+                  ),
+                ),
+              );
+            }),
             const SizedBox(height: Spacing.md),
-            Text(
-              'Repayment History',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            Text('Ledger Timeline', style: theme.textTheme.titleMedium),
             const SizedBox(height: Spacing.sm),
-            if (loan.repayments.isEmpty)
-              _InfoBanner(
-                icon: Icons.history_rounded,
-                color: theme.colorScheme.onSurfaceVariant,
-                title: 'No repayments yet',
-                subtitle: 'Use "Add Repayment" to record payments.',
-              )
-            else
-              ...loan.repayments.reversed.toList().asMap().entries.map((entry) {
-                final repayment = entry.value;
-                return Card(
-                      margin: const EdgeInsets.only(bottom: Spacing.sm),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: accent.withValues(alpha: 0.12),
-                          child: Icon(
-                            Icons.check_rounded,
-                            color: accent,
-                            size: 20,
-                          ),
-                        ),
-                        title: Text(
-                          '$currencySymbol ${repayment.amount.toStringAsFixed(0)}',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        subtitle: Text(
-                          repayment.note?.trim().isNotEmpty == true
-                              ? repayment.note!
-                              : _formatDate(repayment.date),
-                        ),
-                        trailing: Text(
-                          _formatDate(repayment.date),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
+            ...timeline.asMap().entries.map((entry) {
+              final row = entry.value;
+              final isDisbursement =
+                  row.type == LoanLedgerEntryType.disbursement;
+              return Card(
+                    child: ListTile(
+                      leading: Icon(
+                        isDisbursement
+                            ? Icons.arrow_upward_rounded
+                            : Icons.arrow_downward_rounded,
+                        color: accent,
                       ),
-                    )
-                    .animate(delay: Duration(milliseconds: entry.key * 60))
-                    .fadeIn(duration: AppDurations.fast)
-                    .slideX(begin: 0.05, end: 0);
-              }),
+                      title: Text(
+                        '${isDisbursement ? '+' : '-'}$symbol ${row.amount.toStringAsFixed(0)}',
+                      ),
+                      subtitle: Text(_formatDate(row.date)),
+                      trailing: Text(
+                        'Bal $symbol ${row.runningOutstanding.toStringAsFixed(0)}',
+                        style: theme.textTheme.labelSmall,
+                      ),
+                    ),
+                  )
+                  .animate(delay: Duration(milliseconds: entry.key * 50))
+                  .fadeIn(duration: AppDurations.fast);
+            }),
           ],
         ),
       ),
       floatingActionButton: loan.isClosed
           ? null
           : FloatingActionButton.extended(
-              onPressed: _showAddRepaymentSheet,
+              onPressed: _showRepaymentSheet,
               icon: const Icon(Icons.add_rounded),
               label: const Text('Add Repayment'),
             ),
     );
   }
 
+  List<_DisbursementBreakdown> _buildDisbursementBreakdown(LoanModel loan) {
+    final sorted = loan.disbursements.asMap().entries.toList()
+      ..sort((a, b) => a.value.date.compareTo(b.value.date));
+    var remaining = loan.paidAmount;
+    final out = <_DisbursementBreakdown>[];
+    for (final item in sorted) {
+      final covered = math.min(remaining, item.value.amount);
+      remaining = (remaining - covered).clamp(0.0, double.infinity);
+      out.add(
+        _DisbursementBreakdown(
+          sourceIndex: item.key,
+          covered: covered,
+          outstanding: (item.value.amount - covered).clamp(
+            0.0,
+            item.value.amount,
+          ),
+        ),
+      );
+    }
+    return out;
+  }
+
   static String _formatDate(DateTime date) {
     final dd = date.day.toString().padLeft(2, '0');
     final mm = date.month.toString().padLeft(2, '0');
     return '$dd/$mm/${date.year}';
+  }
+}
+
+class _DisbursementBreakdown {
+  final int sourceIndex;
+  final double covered;
+  final double outstanding;
+
+  const _DisbursementBreakdown({
+    required this.sourceIndex,
+    required this.covered,
+    required this.outstanding,
+  });
+}
+
+class _InfoBanner extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
+
+  const _InfoBanner({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: Spacing.paddingMd,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: Radii.borderMd,
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(width: Spacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [Text(title), Text(subtitle)],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -355,7 +367,7 @@ class _RepaymentSheet extends ConsumerStatefulWidget {
 class _RepaymentSheetState extends ConsumerState<_RepaymentSheet> {
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
+  DateTime _date = DateTime.now();
   bool _isSaving = false;
 
   @override
@@ -381,7 +393,7 @@ class _RepaymentSheetState extends ConsumerState<_RepaymentSheet> {
           .addRepayment(
             widget.loanId,
             amount,
-            date: _selectedDate,
+            date: _date,
             note: _noteController.text.trim().isEmpty
                 ? null
                 : _noteController.text.trim(),
@@ -408,26 +420,7 @@ class _RepaymentSheetState extends ConsumerState<_RepaymentSheet> {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.outlineVariant,
-                borderRadius: Radii.borderFull,
-              ),
-            ),
-          ),
-          const SizedBox(height: Spacing.lg),
-          Text(
-            'Record Repayment',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: Spacing.md),
           TextField(
             controller: _amountController,
             decoration: InputDecoration(
@@ -442,42 +435,27 @@ class _RepaymentSheetState extends ConsumerState<_RepaymentSheet> {
             autofocus: true,
           ),
           const SizedBox(height: Spacing.md),
-          InkWell(
-            onTap: () async {
-              final picked = await showDatePicker(
-                context: context,
-                initialDate: _selectedDate,
-                firstDate: DateTime.now().subtract(const Duration(days: 3650)),
-                lastDate: DateTime.now().add(const Duration(days: 3650)),
-              );
-              if (picked != null && mounted) {
-                setState(() => _selectedDate = picked);
-              }
-            },
-            borderRadius: Radii.borderMd,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: Spacing.md,
-                vertical: 14,
+          Row(
+            children: [
+              const Icon(Icons.calendar_today_outlined, size: 18),
+              const SizedBox(width: Spacing.sm),
+              Text(_LoanDetailScreenState._formatDate(_date)),
+              const Spacer(),
+              TextButton(
+                onPressed: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _date,
+                    firstDate: DateTime.now().subtract(
+                      const Duration(days: 3650),
+                    ),
+                    lastDate: DateTime.now().add(const Duration(days: 3650)),
+                  );
+                  if (picked != null && mounted) setState(() => _date = picked);
+                },
+                child: const Text('Change'),
               ),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                ),
-                borderRadius: Radii.borderMd,
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today_outlined,
-                    size: 18,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: Spacing.sm),
-                  Text(_LoanDetailScreenState._formatDate(_selectedDate)),
-                ],
-              ),
-            ),
+            ],
           ),
           const SizedBox(height: Spacing.md),
           TextField(
@@ -486,17 +464,12 @@ class _RepaymentSheetState extends ConsumerState<_RepaymentSheet> {
               labelText: 'Note (optional)',
               prefixIcon: Icon(Icons.notes_outlined),
             ),
-            textCapitalization: TextCapitalization.sentences,
           ),
           const SizedBox(height: Spacing.lg),
           SizedBox(
             width: double.infinity,
             child: FilledButton(
               onPressed: _isSaving ? null : _submit,
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
-              ),
               child: _isSaving
                   ? const SizedBox(
                       width: 20,
@@ -581,26 +554,7 @@ class _DisbursementSheetState extends ConsumerState<_DisbursementSheet> {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.outlineVariant,
-                borderRadius: Radii.borderFull,
-              ),
-            ),
-          ),
-          const SizedBox(height: Spacing.lg),
-          Text(
-            'Add New Entry',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: Spacing.md),
           TextField(
             controller: _amountController,
             decoration: InputDecoration(
@@ -615,55 +569,32 @@ class _DisbursementSheetState extends ConsumerState<_DisbursementSheet> {
             autofocus: true,
           ),
           const SizedBox(height: Spacing.md),
-          InkWell(
-            onTap: () async {
-              final now = DateTime.now();
-              final picked = await showDatePicker(
-                context: context,
-                initialDate: _dueDate ?? now,
-                firstDate: DateTime(now.year - 5),
-                lastDate: DateTime(now.year + 20),
-              );
-              if (picked != null && mounted) {
-                setState(() => _dueDate = picked);
-              }
-            },
-            borderRadius: Radii.borderMd,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: Spacing.md,
-                vertical: 14,
+          Row(
+            children: [
+              const Icon(Icons.event_outlined, size: 18),
+              const SizedBox(width: Spacing.sm),
+              Text(
+                _dueDate == null
+                    ? 'No due date'
+                    : _LoanDetailScreenState._formatDate(_dueDate!),
               ),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                ),
-                borderRadius: Radii.borderMd,
+              const Spacer(),
+              TextButton(
+                onPressed: () async {
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _dueDate ?? now,
+                    firstDate: DateTime(now.year - 5),
+                    lastDate: DateTime(now.year + 20),
+                  );
+                  if (picked != null && mounted) {
+                    setState(() => _dueDate = picked);
+                  }
+                },
+                child: const Text('Change'),
               ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.event_outlined,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: Spacing.sm),
-                  Expanded(
-                    child: Text(
-                      _dueDate == null
-                          ? 'No due date'
-                          : _LoanDetailScreenState._formatDate(_dueDate!),
-                    ),
-                  ),
-                  if (_dueDate != null)
-                    IconButton(
-                      onPressed: () => setState(() => _dueDate = null),
-                      icon: const Icon(Icons.close_rounded, size: 18),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                ],
-              ),
-            ),
+            ],
           ),
           const SizedBox(height: Spacing.md),
           TextField(
@@ -678,10 +609,6 @@ class _DisbursementSheetState extends ConsumerState<_DisbursementSheet> {
             width: double.infinity,
             child: FilledButton(
               onPressed: _isSaving ? null : _submit,
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
-              ),
               child: _isSaving
                   ? const SizedBox(
                       width: 20,
@@ -689,256 +616,6 @@ class _DisbursementSheetState extends ConsumerState<_DisbursementSheet> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Text('Add Entry'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LoanHeaderCard extends StatelessWidget {
-  final LoanModel loan;
-  final Color accent;
-  final String currencySymbol;
-
-  const _LoanHeaderCard({
-    required this.loan,
-    required this.accent,
-    required this.currencySymbol,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isLending = loan.type == 0;
-
-    return Card(
-      child: Padding(
-        padding: Spacing.paddingMd,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: Spacing.sm,
-                    vertical: Spacing.xs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.12),
-                    borderRadius: Radii.borderFull,
-                  ),
-                  child: Text(
-                    loan.isClosed
-                        ? 'Closed'
-                        : (isLending ? 'Lending' : 'Borrowing'),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: accent,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  loan.title?.trim().isNotEmpty == true
-                      ? loan.title!
-                      : 'Untitled',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: Spacing.md),
-            Text(
-              '$currencySymbol ${loan.outstandingAmount.toStringAsFixed(0)}',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                color: accent,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: Spacing.xs),
-            Text(
-              'Outstanding amount',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: Spacing.md),
-            ClipRRect(
-              borderRadius: Radii.borderSm,
-              child: LinearProgressIndicator(
-                value: loan.progress,
-                minHeight: 6,
-                backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                valueColor: AlwaysStoppedAnimation(accent),
-              ),
-            ),
-            const SizedBox(height: Spacing.sm),
-            Row(
-              children: [
-                Text(
-                  'Paid ${loan.paidAmount.toStringAsFixed(0)} / ${loan.principalAmount.toStringAsFixed(0)}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  '${(loan.progress * 100).toStringAsFixed(0)}%',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: accent,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _LoanMetaCard extends StatelessWidget {
-  final LoanModel loan;
-
-  const _LoanMetaCard({required this.loan});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      child: Padding(
-        padding: Spacing.paddingMd,
-        child: Column(
-          children: [
-            _MetaRow(
-              label: 'Type',
-              value: loan.type == 0 ? 'Lending' : 'Borrowing',
-            ),
-            const SizedBox(height: Spacing.sm),
-            _MetaRow(
-              label: 'Next due',
-              value: loan.nextDueDate == null
-                  ? 'Not set'
-                  : _LoanDetailScreenState._formatDate(loan.nextDueDate!),
-            ),
-            const SizedBox(height: Spacing.sm),
-            _MetaRow(
-              label: 'Entries',
-              value: '${loan.disbursements.length} disbursement(s)',
-            ),
-            const SizedBox(height: Spacing.sm),
-            _MetaRow(
-              label: 'Interest',
-              value: loan.interestRate == null
-                  ? 'Not set'
-                  : '${loan.interestRate!.toStringAsFixed(2)}%',
-            ),
-            if ((loan.note ?? '').trim().isNotEmpty) ...[
-              const SizedBox(height: Spacing.sm),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 84,
-                    child: Text(
-                      'Notes',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(loan.note!, style: theme.textTheme.bodySmall),
-                  ),
-                ],
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MetaRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _MetaRow({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      children: [
-        SizedBox(
-          width: 84,
-          child: Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _InfoBanner extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String title;
-  final String subtitle;
-
-  const _InfoBanner({
-    required this.icon,
-    required this.color,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: Spacing.paddingMd,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: Radii.borderMd,
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: color),
-          const SizedBox(width: Spacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(subtitle, style: theme.textTheme.bodySmall),
-              ],
             ),
           ),
         ],

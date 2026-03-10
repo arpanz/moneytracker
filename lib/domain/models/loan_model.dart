@@ -23,6 +23,33 @@ class LoanDisbursement {
   LoanDisbursement() : amount = 0;
 }
 
+enum LoanLedgerEntryType { disbursement, repayment }
+
+/// Derived, non-persisted row for a merged chronological ledger view.
+class LoanLedgerEntry {
+  final LoanLedgerEntryType type;
+  final double amount;
+  final DateTime date;
+  final DateTime? dueDate;
+  final String? note;
+  final double runningPrincipal;
+  final double runningPaid;
+  final double runningOutstanding;
+  final int sourceIndex;
+
+  const LoanLedgerEntry({
+    required this.type,
+    required this.amount,
+    required this.date,
+    required this.dueDate,
+    required this.note,
+    required this.runningPrincipal,
+    required this.runningPaid,
+    required this.runningOutstanding,
+    required this.sourceIndex,
+  });
+}
+
 /// Tracks money lent to or borrowed from a person.
 @collection
 class LoanModel {
@@ -121,6 +148,89 @@ class LoanModel {
     }
 
     return nearest ?? dueDate;
+  }
+
+  /// Unified timeline of disbursements + repayments sorted chronologically.
+  ///
+  /// Running totals allow UI to render a true ledger history without
+  /// duplicating relationships in persisted embedded objects.
+  @ignore
+  List<LoanLedgerEntry> get timeline {
+    final events =
+        <
+          ({
+            LoanLedgerEntryType type,
+            double amount,
+            DateTime date,
+            DateTime? dueDate,
+            String? note,
+            int sourceIndex,
+          })
+        >[];
+
+    for (var i = 0; i < disbursements.length; i++) {
+      final d = disbursements[i];
+      events.add((
+        type: LoanLedgerEntryType.disbursement,
+        amount: d.amount,
+        date: d.date,
+        dueDate: d.dueDate,
+        note: d.note,
+        sourceIndex: i,
+      ));
+    }
+
+    for (var i = 0; i < repayments.length; i++) {
+      final r = repayments[i];
+      events.add((
+        type: LoanLedgerEntryType.repayment,
+        amount: r.amount,
+        date: r.date,
+        dueDate: null,
+        note: r.note,
+        sourceIndex: i,
+      ));
+    }
+
+    events.sort((a, b) {
+      final byDate = a.date.compareTo(b.date);
+      if (byDate != 0) return byDate;
+      if (a.type != b.type) {
+        return a.type == LoanLedgerEntryType.disbursement ? -1 : 1;
+      }
+      return a.sourceIndex.compareTo(b.sourceIndex);
+    });
+
+    var runningPrincipal = 0.0;
+    var runningPaid = 0.0;
+    final timeline = <LoanLedgerEntry>[];
+
+    for (final event in events) {
+      if (event.type == LoanLedgerEntryType.disbursement) {
+        runningPrincipal += event.amount;
+      } else {
+        runningPaid = (runningPaid + event.amount).clamp(0.0, runningPrincipal);
+      }
+
+      timeline.add(
+        LoanLedgerEntry(
+          type: event.type,
+          amount: event.amount,
+          date: event.date,
+          dueDate: event.dueDate,
+          note: event.note,
+          sourceIndex: event.sourceIndex,
+          runningPrincipal: runningPrincipal,
+          runningPaid: runningPaid,
+          runningOutstanding: (runningPrincipal - runningPaid).clamp(
+            0.0,
+            double.infinity,
+          ),
+        ),
+      );
+    }
+
+    return timeline;
   }
 
   LoanModel()

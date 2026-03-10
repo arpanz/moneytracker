@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/di/providers.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../domain/models/loan_model.dart';
+import '../providers/loan_providers.dart';
 
 class AddLoanScreen extends ConsumerStatefulWidget {
   final LoanModel? existingLoan;
@@ -18,12 +19,12 @@ class AddLoanScreen extends ConsumerStatefulWidget {
 
 class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _personController = TextEditingController();
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   final _interestController = TextEditingController();
   final _noteController = TextEditingController();
 
+  String _personName = '';
   int _type = 0;
   DateTime? _dueDate;
   bool _isSaving = false;
@@ -36,7 +37,7 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
     final loan = widget.existingLoan;
     if (loan != null) {
       _type = loan.type;
-      _personController.text = loan.personName;
+      _personName = loan.personName;
       _titleController.text = loan.title ?? '';
       _amountController.text = loan.principalAmount.toStringAsFixed(0);
       _interestController.text = loan.interestRate?.toStringAsFixed(2) ?? '';
@@ -47,7 +48,6 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
 
   @override
   void dispose() {
-    _personController.dispose();
     _titleController.dispose();
     _amountController.dispose();
     _interestController.dispose();
@@ -101,7 +101,7 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
       if (existing != null) {
         existing
           ..type = _type
-          ..personName = _personController.text.trim()
+          ..personName = _personName.trim()
           ..title = _titleController.text.trim().isEmpty
               ? null
               : _titleController.text.trim()
@@ -122,7 +122,7 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
 
         await repo.update(existing);
       } else {
-        final personName = _personController.text.trim();
+        final personName = _personName.trim();
         final activeLedger = await repo.findActiveLedger(personName, _type);
         if (activeLedger != null && mounted) {
           final appendToExisting = await _showLedgerMergeDialog(
@@ -226,6 +226,9 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currencySymbol = ref.watch(currencySymbolProvider);
+    final personSuggestions =
+        ref.watch(loanPersonNameSuggestionsProvider).valueOrNull ??
+        const <String>[];
     final typeLabel = _type == 0 ? 'Lending' : 'Borrowing';
 
     return Scaffold(
@@ -266,19 +269,62 @@ class _AddLoanScreenState extends ConsumerState<AddLoanScreen> {
               ),
             ),
             const SizedBox(height: Spacing.md),
-            TextFormField(
-              controller: _personController,
-              decoration: InputDecoration(
-                labelText: _type == 0 ? 'Borrower name' : 'Lender name',
-                hintText: 'e.g. Rahul Sharma',
-                prefixIcon: const Icon(Icons.person_outline_rounded),
-              ),
-              textCapitalization: TextCapitalization.words,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
+            FormField<String>(
+              initialValue: _personName,
+              validator: (_) {
+                if (_personName.trim().isEmpty) {
                   return 'Please enter a name';
                 }
                 return null;
+              },
+              builder: (state) {
+                return Autocomplete<String>(
+                  initialValue: TextEditingValue(text: _personName),
+                  optionsBuilder: (textEditingValue) {
+                    final query = textEditingValue.text.trim().toLowerCase();
+                    if (query.isEmpty) {
+                      return personSuggestions.take(8);
+                    }
+                    return personSuggestions
+                        .where((name) => name.toLowerCase().contains(query))
+                        .take(8);
+                  },
+                  onSelected: (value) {
+                    setState(() => _personName = value);
+                    state.didChange(value);
+                  },
+                  fieldViewBuilder:
+                      (context, controller, focusNode, onFieldSubmitted) {
+                        if (controller.text != _personName) {
+                          controller.value = TextEditingValue(
+                            text: _personName,
+                            selection: TextSelection.collapsed(
+                              offset: _personName.length,
+                            ),
+                          );
+                        }
+                        return TextFormField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          decoration: InputDecoration(
+                            labelText: _type == 0
+                                ? 'Borrower name'
+                                : 'Lender name',
+                            hintText: 'e.g. Rahul Sharma',
+                            prefixIcon: const Icon(
+                              Icons.person_outline_rounded,
+                            ),
+                            errorText: state.errorText,
+                          ),
+                          textCapitalization: TextCapitalization.words,
+                          onChanged: (value) {
+                            _personName = value;
+                            state.didChange(value);
+                          },
+                          onFieldSubmitted: (_) => onFieldSubmitted(),
+                        );
+                      },
+                );
               },
             ),
             const SizedBox(height: Spacing.md),

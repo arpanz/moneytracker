@@ -89,6 +89,19 @@ class LoanRepository {
         .findAll();
   }
 
+  Future<List<String>> getDistinctPersonNames() async {
+    final loans = await getAll();
+    final namesByKey = <String, String>{};
+    for (final loan in loans) {
+      final raw = loan.personName.trim();
+      if (raw.isEmpty) continue;
+      namesByKey.putIfAbsent(_normalizeName(raw), () => raw);
+    }
+    final names = namesByKey.values.toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return names;
+  }
+
   Future<LoanModel?> findActiveLedger(String personName, int type) async {
     final normalized = _normalizeName(personName);
     final activeByType = await getByType(type, includeClosed: false);
