@@ -16,10 +16,10 @@ import '../../../../config/theme/theme_extensions.dart';
 import '../../../../domain/models/account_model.dart';
 import '../../../../domain/models/category_model.dart';
 import '../../../../domain/models/transaction_model.dart';
+import '../../../widgets/category_picker.dart';
 import '../providers/transaction_providers.dart';
 import '../widgets/amount_input_widget.dart';
 
-/// Full add / edit transaction screen.
 class AddTransactionScreen extends ConsumerStatefulWidget {
   final TransactionModel? existingTransaction;
   final int? initialType;
@@ -146,7 +146,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cheddarColors = theme.extension<CheddarColors>()!;
-    final categoriesAsync = ref.watch(_categoriesForTypeProvider(_type));
     final accountsAsync = ref.watch(_activeAccountsProvider);
     final currencySymbol = ref.watch(currencySymbolProvider);
 
@@ -182,40 +181,22 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               const SizedBox(height: Spacing.lg),
 
               if (_type != 2) ...[
-                Row(
-                  children: [
-                    Text(
-                      'Category',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const Spacer(),
-                    // FIX: inline '+ New Category' button.
-                    TextButton.icon(
-                      onPressed: () => _showCreateCategorySheet(context, _type),
-                      icon: const Icon(Icons.add_rounded, size: 16),
-                      label: const Text('New'),
-                      style: TextButton.styleFrom(
-                        visualDensity: VisualDensity.compact,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: Spacing.sm,
-                        ),
-                      ),
-                    ),
-                  ],
+                Text(
+                  'Category',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: Spacing.sm),
-                categoriesAsync.when(
-                  data: (categories) {
-                    _tryRestoreCategory(categories);
-                    return _buildCategoryGrid(categories, cheddarColors);
+                // FIX: replaced full-grid with compact chip row.
+                // CategoryPickerRow handles its own FutureProvider + New sheet.
+                CategoryPickerRow(
+                  key: ValueKey('cat_picker_$_type'),
+                  selected: _selectedCategory,
+                  transactionType: _type,
+                  onSelected: (cat) {
+                    setState(() => _selectedCategory = cat);
                   },
-                  loading: () => const SizedBox(
-                    height: 120,
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                  error: (e, _) => Text('Error loading categories: $e'),
                 ),
                 const SizedBox(height: Spacing.lg),
               ],
@@ -229,7 +210,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     ),
                   ),
                   const Spacer(),
-                  // FIX: inline '+ New Account' button.
                   TextButton.icon(
                     onPressed: () => _showCreateAccountSheet(context),
                     icon: const Icon(Icons.add_rounded, size: 16),
@@ -237,8 +217,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     style: TextButton.styleFrom(
                       visualDensity: VisualDensity.compact,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: Spacing.sm,
-                      ),
+                          horizontal: Spacing.sm),
                     ),
                   ),
                 ],
@@ -285,8 +264,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 controller: _noteController,
                 decoration: InputDecoration(
                   hintText: 'Add a note...',
-                  prefixIcon: const Icon(Icons.note_alt_outlined, size: 20),
-                  border: OutlineInputBorder(borderRadius: Radii.borderMd),
+                  prefixIcon:
+                      const Icon(Icons.note_alt_outlined, size: 20),
+                  border: OutlineInputBorder(
+                      borderRadius: Radii.borderMd),
                 ),
                 textCapitalization: TextCapitalization.sentences,
                 maxLength: 200,
@@ -299,12 +280,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               const SizedBox(height: Spacing.md),
 
               OutlinedButton.icon(
-                onPressed: () => context.pushNamed(RouteNames.scanner),
+                onPressed: () =>
+                    context.pushNamed(RouteNames.scanner),
                 icon: const FaIcon(FontAwesomeIcons.camera, size: 16),
                 label: const Text('Attach Receipt'),
                 style: OutlinedButton.styleFrom(
                   padding: Spacing.paddingMd,
-                  shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: Radii.borderMd),
                 ),
               ),
 
@@ -323,7 +306,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 child: FilledButton(
                   onPressed: _isSaving ? null : _onSave,
                   style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: Radii.borderMd),
                   ),
                   child: _isSaving
                       ? const SizedBox(
@@ -374,7 +358,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(Radii.xl)),
       ),
       builder: (ctx) {
         return Padding(
@@ -382,7 +367,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             top: Spacing.lg,
             left: Spacing.md,
             right: Spacing.md,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + Spacing.lg,
+            bottom:
+                MediaQuery.of(ctx).viewInsets.bottom + Spacing.lg,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -391,9 +377,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(
-                    ctx,
-                  ).colorScheme.onSurface.withValues(alpha: 0.2),
+                  color: Theme.of(ctx)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.2),
                   borderRadius: Radii.borderFull,
                 ),
               ),
@@ -413,11 +400,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   onPressed: () => Navigator.of(ctx).pop(),
                   style: FilledButton.styleFrom(
                     backgroundColor: accentColor,
-                    shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: Radii.borderMd),
                   ),
                   child: const Text(
                     'Done',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -426,127 +415,20 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         );
       },
     );
-  }
-
-  // ── Inline Category Creation Sheet ──
-
-  /// FIX: Shows a bottom-sheet mini form to create a custom category
-  /// directly from the add-transaction screen without navigating away.
-  void _showCreateCategorySheet(BuildContext context, int type) {
-    final nameCtrl = TextEditingController();
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl)),
-      ),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            top: Spacing.lg,
-            left: Spacing.md,
-            right: Spacing.md,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + Spacing.lg,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      ctx,
-                    ).colorScheme.onSurface.withValues(alpha: 0.2),
-                    borderRadius: Radii.borderFull,
-                  ),
-                ),
-              ),
-              const SizedBox(height: Spacing.md),
-              Text(
-                'New Category',
-                style: Theme.of(
-                  ctx,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: Spacing.xs),
-              Text(
-                'This category will be saved for future use.',
-                style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(
-                    ctx,
-                  ).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-              ),
-              const SizedBox(height: Spacing.md),
-              TextField(
-                controller: nameCtrl,
-                autofocus: true,
-                textCapitalization: TextCapitalization.words,
-                decoration: InputDecoration(
-                  labelText: 'Category name',
-                  border: OutlineInputBorder(borderRadius: Radii.borderMd),
-                ),
-                onSubmitted: (_) async {
-                  await _submitNewCategory(ctx, nameCtrl.text, type);
-                },
-              ),
-              const SizedBox(height: Spacing.md),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () async {
-                    await _submitNewCategory(ctx, nameCtrl.text, type);
-                  },
-                  child: const Text('Create & Select'),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _submitNewCategory(
-    BuildContext sheetCtx,
-    String rawName,
-    int type,
-  ) async {
-    final name = rawName.trim();
-    if (name.isEmpty) return;
-
-    final categoryRepo = ref.read(categoryRepositoryProvider);
-    final newCat = CategoryModel()
-      ..name = name
-      ..icon = AssetPaths.categoryDefault
-      ..color = 0xFF9E9E9E
-      ..type = _categoryTypeForTransactionType(type)
-      ..isCustom = true
-      ..sortOrder = 999
-      ..createdAt = DateTime.now();
-
-    await categoryRepo.add(newCat);
-
-    // Invalidate provider so the grid refreshes.
-    ref.invalidate(_categoriesForTypeProvider);
-
-    if (mounted) setState(() => _selectedCategory = newCat);
-    if (sheetCtx.mounted) Navigator.of(sheetCtx).pop();
   }
 
   // ── Inline Account Creation Sheet ──
 
-  /// FIX: Shows a bottom-sheet mini form to create an account inline
-  /// without leaving the add-transaction screen.
   void _showCreateAccountSheet(BuildContext context) {
     final nameCtrl = TextEditingController();
-    int selectedType = 0; // 0=Bank, 1=Wallet, 2=Card, 3=Cash
+    int selectedType = 0;
     final accountTypes = [
       (label: 'Bank', value: 0, icon: Icons.account_balance_rounded),
-      (label: 'Wallet', value: 1, icon: Icons.account_balance_wallet_rounded),
+      (
+        label: 'Wallet',
+        value: 1,
+        icon: Icons.account_balance_wallet_rounded
+      ),
       (label: 'Card', value: 2, icon: Icons.credit_card_rounded),
       (label: 'Cash', value: 3, icon: Icons.money_rounded),
     ];
@@ -555,7 +437,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(Radii.xl)),
       ),
       builder: (ctx) {
         return StatefulBuilder(
@@ -565,7 +448,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 top: Spacing.lg,
                 left: Spacing.md,
                 right: Spacing.md,
-                bottom: MediaQuery.of(ctx).viewInsets.bottom + Spacing.lg,
+                bottom:
+                    MediaQuery.of(ctx).viewInsets.bottom + Spacing.lg,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -576,9 +460,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Theme.of(
-                          ctx,
-                        ).colorScheme.onSurface.withValues(alpha: 0.2),
+                        color: Theme.of(ctx)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.2),
                         borderRadius: Radii.borderFull,
                       ),
                     ),
@@ -587,8 +472,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   Text(
                     'New Account',
                     style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                   const SizedBox(height: Spacing.md),
                   TextField(
@@ -597,15 +482,17 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     textCapitalization: TextCapitalization.words,
                     decoration: InputDecoration(
                       labelText: 'Account name',
-                      border: OutlineInputBorder(borderRadius: Radii.borderMd),
+                      border: OutlineInputBorder(
+                        borderRadius: Radii.borderMd,
+                      ),
                     ),
                   ),
                   const SizedBox(height: Spacing.md),
                   Text(
                     'Account type',
                     style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                   const SizedBox(height: Spacing.sm),
                   Wrap(
@@ -615,8 +502,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                         avatar: Icon(t.icon, size: 16),
                         label: Text(t.label),
                         selected: selectedType == t.value,
-                        onSelected: (_) =>
-                            setSheetState(() => selectedType = t.value),
+                        onSelected: (_) => setSheetState(
+                            () => selectedType = t.value),
                         shape: RoundedRectangleBorder(
                           borderRadius: Radii.borderFull,
                         ),
@@ -629,10 +516,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     child: FilledButton(
                       onPressed: () async {
                         await _submitNewAccount(
-                          ctx,
-                          nameCtrl.text,
-                          selectedType,
-                        );
+                            ctx, nameCtrl.text, selectedType);
                       },
                       child: const Text('Create & Select'),
                     ),
@@ -647,10 +531,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   Future<void> _submitNewAccount(
-    BuildContext sheetCtx,
-    String rawName,
-    int accountType,
-  ) async {
+      BuildContext sheetCtx, String rawName, int accountType) async {
     final name = rawName.trim();
     if (name.isEmpty) return;
 
@@ -661,14 +542,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       ..balance = 0.0
       ..color = 0xFF9E9E9E
       ..icon = 'wallet'
-      ..isArchived = false
+      ..isActive = true
       ..createdAt = DateTime.now();
 
-    await accountRepo.add(newAccount);
-
-    // Invalidate provider so the chip row refreshes.
+    await accountRepo.save(newAccount);
     ref.invalidate(_activeAccountsProvider);
-
     if (mounted) setState(() => _selectedAccount = newAccount);
     if (sheetCtx.mounted) Navigator.of(sheetCtx).pop();
   }
@@ -678,18 +556,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget _buildTypeSelector(CheddarColors cheddarColors) {
     final types = [
       _TypeOption(
-        'Expense',
-        1,
-        cheddarColors.expense,
-        FontAwesomeIcons.arrowDown,
-      ),
-      _TypeOption('Income', 0, cheddarColors.income, FontAwesomeIcons.arrowUp),
+          'Expense', 1, cheddarColors.expense, FontAwesomeIcons.arrowDown),
       _TypeOption(
-        'Transfer',
-        2,
-        cheddarColors.transfer,
-        FontAwesomeIcons.arrowRightArrowLeft,
-      ),
+          'Income', 0, cheddarColors.income, FontAwesomeIcons.arrowUp),
+      _TypeOption('Transfer', 2, cheddarColors.transfer,
+          FontAwesomeIcons.arrowRightArrowLeft),
     ];
 
     return Row(
@@ -708,9 +579,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 border: Border.all(
                   color: isSelected
                       ? option.color
-                      : Theme.of(
-                          context,
-                        ).colorScheme.outline.withValues(alpha: 0.3),
+                      : Theme.of(context)
+                          .colorScheme
+                          .outline
+                          .withValues(alpha: 0.3),
                   width: isSelected ? 2 : 1,
                 ),
               ),
@@ -764,105 +636,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     );
   }
 
-  // ── Category Grid ──
-
-  Widget _buildCategoryGrid(
-    List<CategoryModel> categories,
-    CheddarColors cheddarColors,
-  ) {
-    if (categories.isEmpty) {
-      return Container(
-        padding: Spacing.paddingMd,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
-          borderRadius: Radii.borderMd,
-        ),
-        child: const Text(
-          'No categories available. Tap \'New\' to create one.',
-        ),
-      );
-    }
-
-    final rowCount = (categories.length / 4).ceil();
-    final gridHeight = (rowCount * 100.0).clamp(100.0, 420.0);
-
-    return SizedBox(
-      height: gridHeight,
-      child: GridView.builder(
-        physics: const BouncingScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          mainAxisSpacing: Spacing.sm,
-          crossAxisSpacing: Spacing.sm,
-          childAspectRatio: 0.85,
-        ),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final cat = categories[index];
-          final isSelected = _selectedCategory?.id == cat.id;
-          final catColor = Color(cat.color);
-
-          return GestureDetector(
-            onTap: () => setState(() => _selectedCategory = cat),
-            child: AnimatedContainer(
-              duration: AppDurations.fast,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? catColor.withValues(alpha: 0.15)
-                    : Theme.of(context).colorScheme.surfaceContainerLow,
-                borderRadius: Radii.borderMd,
-                border: Border.all(
-                  color: isSelected ? catColor : Colors.transparent,
-                  width: 2,
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: catColor.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: SvgPicture.asset(
-                        cat.icon,
-                        width: 22,
-                        height: 22,
-                        colorFilter: ColorFilter.mode(
-                          catColor,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    cat.name,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: isSelected
-                          ? FontWeight.w700
-                          : FontWeight.w500,
-                      color: isSelected
-                          ? catColor
-                          : Theme.of(context).colorScheme.onSurface,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   // ── Account Chips ──
 
   Widget _buildAccountChips(List<AccountModel> accounts, bool isToAccount) {
@@ -909,11 +682,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             side: BorderSide(
               color: isSelected
                   ? accountColor
-                  : Theme.of(
-                      context,
-                    ).colorScheme.outline.withValues(alpha: 0.3),
+                  : Theme.of(context)
+                      .colorScheme
+                      .outline
+                      .withValues(alpha: 0.3),
             ),
-            shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
+            shape:
+                RoundedRectangleBorder(borderRadius: Radii.borderFull),
           );
         },
       ),
@@ -939,7 +714,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               ),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                  color:
+                      theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
                 borderRadius: Radii.borderMd,
               ),
@@ -973,7 +749,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             ),
             decoration: BoxDecoration(
               border: Border.all(
-                color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                color:
+                    theme.colorScheme.outline.withValues(alpha: 0.3),
               ),
               borderRadius: Radii.borderMd,
             ),
@@ -987,7 +764,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 const SizedBox(width: Spacing.sm),
                 Text(
                   timeFormat.format(
-                    DateTime(0, 1, 1, _selectedTime.hour, _selectedTime.minute),
+                    DateTime(
+                        0, 1, 1, _selectedTime.hour, _selectedTime.minute),
                   ),
                   style: theme.textTheme.bodyMedium,
                 ),
@@ -1007,9 +785,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime(now.year + 10, now.month, now.day),
     );
-    if (picked != null) {
-      setState(() => _selectedDate = picked);
-    }
+    if (picked != null) setState(() => _selectedDate = picked);
   }
 
   Future<void> _pickTime() async {
@@ -1017,9 +793,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       context: context,
       initialTime: _selectedTime,
     );
-    if (picked != null) {
-      setState(() => _selectedTime = picked);
-    }
+    if (picked != null) setState(() => _selectedTime = picked);
   }
 
   // ── Tags Section ──
@@ -1044,14 +818,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 label: Text(tag),
                 onDeleted: () => setState(() => _tags.remove(tag)),
                 deleteIcon: const Icon(Icons.close, size: 16),
-                shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
+                shape: RoundedRectangleBorder(
+                    borderRadius: Radii.borderFull),
               );
             }),
             ActionChip(
               avatar: const Icon(Icons.add, size: 16),
               label: const Text('Add Tag'),
               onPressed: () => _showAddTagDialog(theme),
-              shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
+              shape: RoundedRectangleBorder(
+                  borderRadius: Radii.borderFull),
             ),
           ],
         ),
@@ -1125,7 +901,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 ),
                 Switch(
                   value: _isRecurring,
-                  onChanged: (val) => setState(() => _isRecurring = val),
+                  onChanged: (val) =>
+                      setState(() => _isRecurring = val),
                 ),
               ],
             ),
@@ -1139,7 +916,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
                       child: ChoiceChip(
-                        label: Text(freq, style: const TextStyle(fontSize: 12)),
+                        label: Text(freq,
+                            style: const TextStyle(fontSize: 12)),
                         selected: isSelected,
                         onSelected: (sel) {
                           if (sel) {
@@ -1190,9 +968,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               value: _isSplit,
               onChanged: (val) {
                 setState(() => _isSplit = val);
-                if (val) {
-                  context.pushNamed(RouteNames.addSplit);
-                }
+                if (val) context.pushNamed(RouteNames.addSplit);
               },
             ),
           ],
@@ -1221,7 +997,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       return;
     }
     if (_type == 2 && _selectedAccount?.id == _selectedToAccount?.id) {
-      _showSnackBar('Source and destination accounts must be different.');
+      _showSnackBar(
+          'Source and destination accounts must be different.');
       return;
     }
 
@@ -1245,9 +1022,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
       txn.amount = _amount;
       txn.type = _type;
-      txn.category = _type == 2 ? 'Transfer' : _selectedCategory!.name;
+      txn.category =
+          _type == 2 ? 'Transfer' : _selectedCategory!.name;
       txn.accountId = _selectedAccount!.id.toString();
-      txn.toAccountId = _type == 2 ? _selectedToAccount?.id.toString() : null;
+      txn.toAccountId =
+          _type == 2 ? _selectedToAccount?.id.toString() : null;
       txn.date = dateTime;
       txn.note = _noteController.text.trim().isEmpty
           ? null
@@ -1268,15 +1047,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         await ref.read(addTransactionProvider(txn).future);
       }
 
-      if (mounted) {
-        context.pop();
-      }
+      if (mounted) context.pop();
     } catch (e) {
       _showSnackBar('Failed to save transaction: $e');
     } finally {
-      if (mounted) {
-        setState(() => _isSaving = false);
-      }
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -1313,7 +1088,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 }
 
-// ── Type Option Model ───────────────────────────────────────────────────────
+// ── Type Option ────────────────────────────────────────────────────────────────
 
 class _TypeOption {
   final String label;
@@ -1324,7 +1099,7 @@ class _TypeOption {
   const _TypeOption(this.label, this.value, this.color, this.icon);
 }
 
-// ── Amount Display Button ───────────────────────────────────────────────────
+// ── Amount Display Button ─────────────────────────────────────────────────────
 
 class _AmountDisplayButton extends StatelessWidget {
   final double amount;
@@ -1356,7 +1131,8 @@ class _AmountDisplayButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final formatter = NumberFormat('#,##,###.##', 'en_IN');
-    final displayAmount = amount == 0 ? '0' : formatter.format(amount);
+    final displayAmount =
+        amount == 0 ? '0' : formatter.format(amount);
 
     return InkWell(
       onTap: onTap,
@@ -1369,7 +1145,8 @@ class _AmountDisplayButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: _amountColor.withValues(alpha: 0.08),
           borderRadius: Radii.borderLg,
-          border: Border.all(color: _amountColor.withValues(alpha: 0.2)),
+          border:
+              Border.all(color: _amountColor.withValues(alpha: 0.2)),
         ),
         child: Column(
           children: [
@@ -1414,26 +1191,10 @@ class _AmountDisplayButton extends StatelessWidget {
   }
 }
 
-// ── Internal Providers ──────────────────────────────────────────────────────
+// ── Internal Provider ────────────────────────────────────────────────────────────
 
-int _categoryTypeForTransactionType(int transactionType) {
-  switch (transactionType) {
-    case 0:
-      return 1;
-    case 1:
-      return 0;
-    default:
-      return 2;
-  }
-}
-
-final _categoriesForTypeProvider =
-    FutureProvider.family<List<CategoryModel>, int>((ref, type) async {
-      final repo = ref.watch(categoryRepositoryProvider);
-      return repo.getByType(_categoryTypeForTransactionType(type));
-    });
-
-final _activeAccountsProvider = FutureProvider<List<AccountModel>>((ref) async {
+final _activeAccountsProvider =
+    FutureProvider<List<AccountModel>>((ref) async {
   final repo = ref.watch(accountRepositoryProvider);
   return repo.getActive();
 });

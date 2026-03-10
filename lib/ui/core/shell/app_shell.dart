@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../config/theme/spacing.dart';
 
-/// Data class describing a single bottom navigation tab.
 class _NavTab {
   final String label;
   final FaIconData icon;
@@ -19,7 +18,6 @@ class _NavTab {
   });
 }
 
-/// The tabs displayed in the bottom navigation bar.
 const List<_NavTab> _tabs = [
   _NavTab(
     label: 'Home',
@@ -53,26 +51,13 @@ const List<_NavTab> _tabs = [
   ),
 ];
 
-/// Height of the floating nav bar including its bottom margin, for use as
-/// bottom inset on screens with FABs or bottom-anchored content.
-/// = container height (56 label+icon) + Spacing.sm (vertical padding * 2)
-/// + Spacing.lg (bottom margin from LTRB) + system nav bar is handled by
-/// SafeArea inside the nav bar itself.
 const double kFloatingNavBarHeight = 80.0;
 
-/// Main application shell that wraps [ShellRoute] children with a
-/// floating-style bottom navigation bar.
-///
-/// extendBody is intentionally set to FALSE so that FABs declared in child
-/// Scaffold widgets are not obscured by the floating nav bar. Screens that
-/// want edge-to-edge scrolling behind the nav bar should add a
-/// SizedBox(height: kFloatingNavBarHeight) footer manually.
 class AppShell extends StatelessWidget {
   final Widget child;
 
   const AppShell({super.key, required this.child});
 
-  /// Resolves the selected tab index from the current GoRouter location.
   int _currentIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
     for (int i = 0; i < _tabs.length; i++) {
@@ -94,10 +79,6 @@ class AppShell extends StatelessWidget {
     final selectedIndex = _currentIndex(context);
 
     return Scaffold(
-      // FIX: extendBody was true, which caused FABs in child Scaffolds
-      // (budget, accounts) to render behind the floating nav bar. Setting
-      // it to false ensures the system correctly insets FABs above the
-      // bottom navigation bar.
       extendBody: false,
       body: child,
       bottomNavigationBar: _FloatingNavBar(
@@ -109,8 +90,6 @@ class AppShell extends StatelessWidget {
   }
 }
 
-/// A floating-style bottom navigation bar with rounded corners,
-/// subtle elevation, and an animated selection indicator.
 class _FloatingNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -124,8 +103,20 @@ class _FloatingNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // FIX: Read the system bottom inset (home indicator / gesture bar) here
+    // and add it to the container's bottom margin so the floating pill sits
+    // above the system UI, and the items inside are vertically centred
+    // without SafeArea consuming inset and pushing them up.
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+
     return Container(
-      margin: const EdgeInsets.fromLTRB(Spacing.md, 0, Spacing.md, Spacing.lg),
+      // Margin: sides + gap above system bar.
+      margin: EdgeInsets.fromLTRB(
+        Spacing.md,
+        0,
+        Spacing.md,
+        Spacing.lg + bottomInset,
+      ),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: const BorderRadius.all(Radius.circular(Radii.xl)),
@@ -144,26 +135,25 @@ class _FloatingNavBar extends StatelessWidget {
           ),
         ],
       ),
+      // FIX: No SafeArea here. The bottomInset is already consumed by the
+      // container margin above, so items sit centred in the pill.
       child: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(Radii.xl)),
-        child: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: Spacing.xs,
-              vertical: Spacing.sm,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(_tabs.length, (index) {
-                return _NavBarItem(
-                  tab: _tabs[index],
-                  isSelected: index == currentIndex,
-                  colorScheme: colorScheme,
-                  onTap: () => onTap(index),
-                );
-              }),
-            ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Spacing.xs,
+            vertical: Spacing.sm,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(_tabs.length, (index) {
+              return _NavBarItem(
+                tab: _tabs[index],
+                isSelected: index == currentIndex,
+                colorScheme: colorScheme,
+                onTap: () => onTap(index),
+              );
+            }),
           ),
         ),
       ),

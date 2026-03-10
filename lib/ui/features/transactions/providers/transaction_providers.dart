@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/di/providers.dart';
 import '../../../../domain/models/transaction_model.dart';
+import '../../home/providers/home_provider.dart';
 
-// ── Filter State ────────────────────────────────────────────────────────────
+// ── Filter State ──────────────────────────────────────────────────────────────────
 
 /// Immutable filter state applied to the transaction list.
 class TransactionFilter {
@@ -48,7 +49,7 @@ class TransactionFilter {
       searchQuery.isNotEmpty;
 }
 
-// ── Filter Notifier ─────────────────────────────────────────────────────────
+// ── Filter Notifier ─────────────────────────────────────────────────────────────────
 
 class TransactionFilterNotifier extends StateNotifier<TransactionFilter> {
   TransactionFilterNotifier() : super(const TransactionFilter());
@@ -74,7 +75,7 @@ class TransactionFilterNotifier extends StateNotifier<TransactionFilter> {
   }
 }
 
-// ── Providers ───────────────────────────────────────────────────────────────
+// ── Providers ───────────────────────────────────────────────────────────────────
 
 /// Notifier that manages the current filter state.
 final transactionFilterProvider =
@@ -136,13 +137,9 @@ final groupedTransactionsProvider =
       .toList();
 });
 
-// ── Mutation Providers ──────────────────────────────────────────────────────
+// ── Mutation Providers ────────────────────────────────────────────────────────────────
 
 /// Adds a new transaction, updates account balance(s), and invalidates caches.
-///
-/// FIX: Previously only inserted the transaction record without adjusting
-/// account balances. Now applies the correct delta to the source account
-/// and — for transfers — also credits the destination account.
 final addTransactionProvider =
     FutureProvider.family<int, TransactionModel>((ref, transaction) async {
   final txnRepo = ref.read(transactionRepositoryProvider);
@@ -150,27 +147,25 @@ final addTransactionProvider =
 
   final id = await txnRepo.add(transaction);
 
-  // Adjust source account balance.
   final srcId = int.tryParse(transaction.accountId);
   if (srcId != null) {
     final src = await accRepo.getById(srcId);
     if (src != null) {
       final double delta;
       switch (transaction.type) {
-        case 0: // income
+        case 0:
           delta = transaction.amount;
           break;
-        case 2: // transfer — debit source
+        case 2:
           delta = -transaction.amount;
           break;
-        default: // expense
+        default:
           delta = -transaction.amount;
       }
       await accRepo.updateBalance(srcId, src.balance + delta);
     }
   }
 
-  // Credit destination account for transfers.
   if (transaction.type == 2 && transaction.toAccountId != null) {
     final dstId = int.tryParse(transaction.toAccountId!);
     if (dstId != null) {
@@ -184,12 +179,16 @@ final addTransactionProvider =
   ref.invalidate(allTransactionsProvider);
   ref.invalidate(filteredTransactionsProvider);
   ref.invalidate(groupedTransactionsProvider);
+  // FIX: invalidate home providers so home screen syncs immediately.
+  ref.invalidate(recentTransactionsProvider);
+  ref.invalidate(totalBalanceProvider);
+  ref.invalidate(monthlyIncomeProvider);
+  ref.invalidate(monthlyExpenseProvider);
+  ref.invalidate(categoryTotalsProvider);
   return id;
 });
 
 /// Updates an existing transaction and invalidates caches.
-/// Note: balance recalculation on edit is left to a future pass because it
-/// requires knowing the *previous* amount/type to reverse the old delta.
 final updateTransactionProvider =
     FutureProvider.family<void, TransactionModel>((ref, transaction) async {
   final repo = ref.read(transactionRepositoryProvider);
@@ -198,6 +197,13 @@ final updateTransactionProvider =
   ref.invalidate(filteredTransactionsProvider);
   ref.invalidate(groupedTransactionsProvider);
   ref.invalidate(transactionByIdProvider(transaction.id));
+  // FIX: also invalidate home screen providers so recent transactions
+  // and balance reflect edits immediately without needing a manual refresh.
+  ref.invalidate(recentTransactionsProvider);
+  ref.invalidate(totalBalanceProvider);
+  ref.invalidate(monthlyIncomeProvider);
+  ref.invalidate(monthlyExpenseProvider);
+  ref.invalidate(categoryTotalsProvider);
 });
 
 /// Deletes a transaction by id and invalidates caches.
@@ -208,9 +214,15 @@ final deleteTransactionProvider =
   ref.invalidate(allTransactionsProvider);
   ref.invalidate(filteredTransactionsProvider);
   ref.invalidate(groupedTransactionsProvider);
+  // FIX: invalidate home providers on delete too.
+  ref.invalidate(recentTransactionsProvider);
+  ref.invalidate(totalBalanceProvider);
+  ref.invalidate(monthlyIncomeProvider);
+  ref.invalidate(monthlyExpenseProvider);
+  ref.invalidate(categoryTotalsProvider);
 });
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────────
 
 /// A date-keyed group of transactions for list display.
 class TransactionDateGroup {
@@ -222,7 +234,6 @@ class TransactionDateGroup {
     required this.transactions,
   });
 
-  /// Sum of income minus expenses for this day.
   double get dayTotal {
     double total = 0;
     for (final txn in transactions) {
@@ -236,21 +247,17 @@ class TransactionDateGroup {
   }
 }
 
-/// Applies type and category filters (but not search or dateRange)
-/// to an already-fetched list.
+/// Applies type and category filters to an already-fetched list.
 List<TransactionModel> _applyNonSearchFilters(
   List<TransactionModel> transactions,
   TransactionFilter filter,
 ) {
   var result = transactions;
-
   if (filter.type != null) {
     result = result.where((t) => t.type == filter.type).toList();
   }
-
   if (filter.category != null) {
     result = result.where((t) => t.category == filter.category).toList();
   }
-
   return result;
 }
