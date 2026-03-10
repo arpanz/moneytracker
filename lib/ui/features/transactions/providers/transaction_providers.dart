@@ -90,21 +90,16 @@ final allTransactionsProvider =
 });
 
 /// Applies the current [TransactionFilter] to the full transaction list.
-///
-/// Filtering is done client-side for simplicity. For large datasets
-/// the repository query methods could be used instead.
 final filteredTransactionsProvider =
     FutureProvider<List<TransactionModel>>((ref) async {
   final repo = ref.watch(transactionRepositoryProvider);
   final filter = ref.watch(transactionFilterProvider);
 
-  // If a search query is active, use the repository search method.
   if (filter.searchQuery.isNotEmpty) {
     final results = await repo.search(filter.searchQuery);
     return _applyNonSearchFilters(results, filter);
   }
 
-  // If a date range is set, use the date range query.
   if (filter.dateRange != null) {
     final results = await repo.getByDateRange(
       filter.dateRange!.start,
@@ -113,7 +108,6 @@ final filteredTransactionsProvider =
     return _applyNonSearchFilters(results, filter);
   }
 
-  // Otherwise fetch all and filter in memory.
   final all = await repo.getAll();
   return _applyNonSearchFilters(all, filter);
 });
@@ -126,9 +120,6 @@ final transactionByIdProvider =
 });
 
 /// Groups filtered transactions by date for section-header display.
-///
-/// Returns a list of `(DateTime date, List<TransactionModel> items)` pairs
-/// ordered by date descending. Each date represents midnight of that day.
 final groupedTransactionsProvider =
     FutureProvider<List<TransactionDateGroup>>((ref) async {
   final transactions = await ref.watch(filteredTransactionsProvider.future);
@@ -147,11 +138,49 @@ final groupedTransactionsProvider =
 
 // ── Mutation Providers ──────────────────────────────────────────────────────
 
-/// Adds a new transaction and invalidates the list cache.
+/// Adds a new transaction, updates account balance(s), and invalidates caches.
+///
+/// FIX: Previously only inserted the transaction record without adjusting
+/// account balances. Now applies the correct delta to the source account
+/// and — for transfers — also credits the destination account.
 final addTransactionProvider =
     FutureProvider.family<int, TransactionModel>((ref, transaction) async {
-  final repo = ref.read(transactionRepositoryProvider);
-  final id = await repo.add(transaction);
+  final txnRepo = ref.read(transactionRepositoryProvider);
+  final accRepo = ref.read(accountRepositoryProvider);
+
+  final id = await txnRepo.add(transaction);
+
+  // Adjust source account balance.
+  final srcId = int.tryParse(transaction.accountId);
+  if (srcId != null) {
+    final src = await accRepo.getById(srcId);
+    if (src != null) {
+      final double delta;
+      switch (transaction.type) {
+        case 0: // income
+          delta = transaction.amount;
+          break;
+        case 2: // transfer — debit source
+          delta = -transaction.amount;
+          break;
+        default: // expense
+          delta = -transaction.amount;
+      }
+      await accRepo.updateBalance(srcId, src.balance + delta);
+    }
+  }
+
+  // Credit destination account for transfers.
+  if (transaction.type == 2 && transaction.toAccountId != null) {
+    final dstId = int.tryParse(transaction.toAccountId!);
+    if (dstId != null) {
+      final dst = await accRepo.getById(dstId);
+      if (dst != null) {
+        await accRepo.updateBalance(dstId, dst.balance + transaction.amount);
+      }
+    }
+  }
+
   ref.invalidate(allTransactionsProvider);
   ref.invalidate(filteredTransactionsProvider);
   ref.invalidate(groupedTransactionsProvider);
@@ -159,6 +188,8 @@ final addTransactionProvider =
 });
 
 /// Updates an existing transaction and invalidates caches.
+/// Note: balance recalculation on edit is left to a future pass because it
+/// requires knowing the *previous* amount/type to reverse the old delta.
 final updateTransactionProvider =
     FutureProvider.family<void, TransactionModel>((ref, transaction) async {
   final repo = ref.read(transactionRepositoryProvider);
