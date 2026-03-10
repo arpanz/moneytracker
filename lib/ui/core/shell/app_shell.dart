@@ -53,14 +53,20 @@ const List<_NavTab> _tabs = [
   ),
 ];
 
-/// Height of the floating nav bar including padding, for use as bottom inset.
-const double kFloatingNavBarHeight = 72.0;
+/// Height of the floating nav bar including its bottom margin, for use as
+/// bottom inset on screens with FABs or bottom-anchored content.
+/// = container height (56 label+icon) + Spacing.sm (vertical padding * 2)
+/// + Spacing.lg (bottom margin from LTRB) + system nav bar is handled by
+/// SafeArea inside the nav bar itself.
+const double kFloatingNavBarHeight = 80.0;
 
 /// Main application shell that wraps [ShellRoute] children with a
 /// floating-style bottom navigation bar.
 ///
-/// The current tab is derived from the active [GoRouter] location so
-/// deep-link navigation and back-button behavior remain consistent.
+/// extendBody is intentionally set to FALSE so that FABs declared in child
+/// Scaffold widgets are not obscured by the floating nav bar. Screens that
+/// want edge-to-edge scrolling behind the nav bar should add a
+/// SizedBox(height: kFloatingNavBarHeight) footer manually.
 class AppShell extends StatelessWidget {
   final Widget child;
 
@@ -77,7 +83,7 @@ class AppShell extends StatelessWidget {
 
   void _onTabTapped(BuildContext context, int index) {
     final current = _currentIndex(context);
-    if (index == current) return; // already on this tab
+    if (index == current) return;
     context.go(_tabs[index].path);
   }
 
@@ -88,8 +94,12 @@ class AppShell extends StatelessWidget {
     final selectedIndex = _currentIndex(context);
 
     return Scaffold(
+      // FIX: extendBody was true, which caused FABs in child Scaffolds
+      // (budget, accounts) to render behind the floating nav bar. Setting
+      // it to false ensures the system correctly insets FABs above the
+      // bottom navigation bar.
+      extendBody: false,
       body: child,
-      extendBody: true,
       bottomNavigationBar: _FloatingNavBar(
         currentIndex: selectedIndex,
         onTap: (index) => _onTabTapped(context, index),
@@ -161,9 +171,6 @@ class _FloatingNavBar extends StatelessWidget {
   }
 }
 
-/// FIX: Each nav item now uses a fixed-width SizedBox instead of Expanded,
-/// and the Column is explicitly center-aligned. Icons are wrapped in a
-/// fixed-size box for consistent optical sizing across different FA icons.
 class _NavBarItem extends StatelessWidget {
   final _NavTab tab;
   final bool isSelected;
@@ -182,9 +189,6 @@ class _NavBarItem extends StatelessWidget {
     final Color activeColor = colorScheme.primary;
     final Color inactiveColor = colorScheme.onSurface.withValues(alpha: 0.40);
 
-    // FIX: Use fixed-width container instead of Expanded to prevent
-    // variable-width labels ("Home" vs "Transactions") from causing
-    // uneven spacing. 64dp accommodates the longest label.
     return SizedBox(
       width: 64,
       child: GestureDetector(
@@ -202,13 +206,8 @@ class _NavBarItem extends StatelessWidget {
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            // FIX: Explicitly center children to prevent vertical misalignment
-            // across devices with different safe area insets.
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // -- Icon --
-              // FIX: Wrap icon in fixed-size box so all FA icons occupy the
-              // same optical space regardless of their intrinsic glyph width.
               SizedBox(
                 width: 24,
                 height: 24,
@@ -225,7 +224,6 @@ class _NavBarItem extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              // -- Label --
               AnimatedDefaultTextStyle(
                 duration: AppDurations.fast,
                 style: TextStyle(

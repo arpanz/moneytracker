@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/di/providers.dart';
 import '../../../../config/constants/app_constants.dart';
+import '../../../../config/constants/asset_paths.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_extensions.dart';
@@ -19,16 +20,8 @@ import '../providers/transaction_providers.dart';
 import '../widgets/amount_input_widget.dart';
 
 /// Full add / edit transaction screen.
-///
-/// Pass an existing [TransactionModel] via `extra` in GoRouter to enter edit mode.
-/// Pass an int (0=income, 1=expense, 2=transfer) as [initialType] to pre-select
-/// the transaction type tab (used by home screen quick-action buttons).
 class AddTransactionScreen extends ConsumerStatefulWidget {
-  /// If non-null the screen operates in edit mode.
   final TransactionModel? existingTransaction;
-
-  /// Optional initial type so home quick-action chips can pre-select
-  /// Income or Expense without the user having to change it manually.
   final int? initialType;
 
   const AddTransactionScreen({
@@ -43,12 +36,11 @@ class AddTransactionScreen extends ConsumerStatefulWidget {
 }
 
 class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
-  // ── Form State ──
   double _amount = 0.0;
   late int _type;
   CategoryModel? _selectedCategory;
   AccountModel? _selectedAccount;
-  AccountModel? _selectedToAccount; // for transfers
+  AccountModel? _selectedToAccount;
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   final _noteController = TextEditingController();
@@ -59,8 +51,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   bool _isSplit = false;
   bool _isSaving = false;
 
-  // FIX: Track the original category name so we can match it back to a
-  // CategoryModel object once the async categories list loads.
   String? _editCategoryName;
   String? _editAccountId;
   String? _editToAccountId;
@@ -70,7 +60,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   @override
   void initState() {
     super.initState();
-    _type = widget.initialType ?? 1; // default: expense
+    _type = widget.initialType ?? 1;
     if (_isEditing) {
       _populateFromExisting();
     }
@@ -85,8 +75,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     _noteController.text = txn.note ?? '';
     _tags.addAll(txn.tags);
     _isRecurring = txn.isRecurring;
-    // FIX: Store raw IDs/names; the actual model objects are matched once
-    // the async providers load (see _tryRestoreSelections).
     _editCategoryName = txn.category;
     _editAccountId = txn.accountId;
     _editToAccountId = txn.toAccountId;
@@ -104,8 +92,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     _isSplit = txn.splitId != null;
   }
 
-  /// FIX: Called from the category / account builders once the async data
-  /// is available, so edit mode pre-selects the correct objects.
   void _tryRestoreCategory(List<CategoryModel> cats) {
     if (_editCategoryName == null || _selectedCategory != null) return;
     final match = cats.where((c) => c.name == _editCategoryName).firstOrNull;
@@ -144,7 +130,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     super.dispose();
   }
 
-  // ── Title based on mode ──
   String get _appBarTitle {
     if (_isEditing) return 'Edit Transaction';
     switch (_type) {
@@ -182,7 +167,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             children: [
               const SizedBox(height: Spacing.md),
 
-              // ── Amount Display (tap to open numpad) ──
               _AmountDisplayButton(
                 amount: _amount,
                 type: _type,
@@ -193,23 +177,37 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               const SizedBox(height: Spacing.lg),
 
-              // ── Type Selector ──
               _buildTypeSelector(cheddarColors),
 
               const SizedBox(height: Spacing.lg),
 
-              // ── Category Picker (hidden for Transfer) ──
               if (_type != 2) ...[
-                Text(
-                  'Category',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'Category',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    // FIX: inline '+ New Category' button.
+                    TextButton.icon(
+                      onPressed: () =>
+                          _showCreateCategorySheet(context, _type),
+                      icon: const Icon(Icons.add_rounded, size: 16),
+                      label: const Text('New'),
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: Spacing.sm),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: Spacing.sm),
                 categoriesAsync.when(
                   data: (categories) {
-                    // FIX: restore selection on edit mode.
                     _tryRestoreCategory(categories);
                     return _buildCategoryGrid(categories, cheddarColors);
                   },
@@ -222,17 +220,31 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 const SizedBox(height: Spacing.lg),
               ],
 
-              // ── Account Selector ──
-              Text(
-                _type == 2 ? 'From Account' : 'Account',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                children: [
+                  Text(
+                    _type == 2 ? 'From Account' : 'Account',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Spacer(),
+                  // FIX: inline '+ New Account' button.
+                  TextButton.icon(
+                    onPressed: () => _showCreateAccountSheet(context),
+                    icon: const Icon(Icons.add_rounded, size: 16),
+                    label: const Text('New'),
+                    style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: Spacing.sm),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: Spacing.sm),
               accountsAsync.when(
                 data: (accounts) {
-                  // FIX: restore account selection on edit mode.
                   _tryRestoreAccounts(accounts);
                   return _buildAccountChips(accounts, false);
                 },
@@ -243,7 +255,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 error: (e, _) => Text('Error loading accounts: $e'),
               ),
 
-              // ── To Account (transfers only) ──
               if (_type == 2) ...[
                 const SizedBox(height: Spacing.md),
                 Text(
@@ -265,12 +276,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               const SizedBox(height: Spacing.lg),
 
-              // ── Date & Time Picker ──
               _buildDateTimePicker(theme),
 
               const SizedBox(height: Spacing.lg),
 
-              // ── Note TextField ──
               TextField(
                 controller: _noteController,
                 decoration: InputDecoration(
@@ -284,41 +293,38 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               const SizedBox(height: Spacing.md),
 
-              // ── Tags ──
               _buildTagsSection(theme),
 
               const SizedBox(height: Spacing.md),
 
-              // ── Receipt Button ──
               OutlinedButton.icon(
                 onPressed: () => context.pushNamed(RouteNames.scanner),
                 icon: const FaIcon(FontAwesomeIcons.camera, size: 16),
                 label: const Text('Attach Receipt'),
                 style: OutlinedButton.styleFrom(
                   padding: Spacing.paddingMd,
-                  shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
+                  shape:
+                      RoundedRectangleBorder(borderRadius: Radii.borderMd),
                 ),
               ),
 
               const SizedBox(height: Spacing.md),
 
-              // ── Recurring Toggle ──
               _buildRecurringSection(theme),
 
               const SizedBox(height: Spacing.sm),
 
-              // ── Split Toggle ──
               _buildSplitSection(theme),
 
               const SizedBox(height: Spacing.xl),
 
-              // ── Save Button ──
               SizedBox(
                 height: 56,
                 child: FilledButton(
                   onPressed: _isSaving ? null : _onSave,
                   style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: Radii.borderMd),
                   ),
                   child: _isSaving
                       ? const SizedBox(
@@ -369,7 +375,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(Radii.xl)),
       ),
       builder: (ctx) {
         return Padding(
@@ -382,7 +389,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // FIX: .withOpacity → .withValues
               Container(
                 width: 40,
                 height: 4,
@@ -410,11 +416,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   onPressed: () => Navigator.of(ctx).pop(),
                   style: FilledButton.styleFrom(
                     backgroundColor: accentColor,
-                    shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: Radii.borderMd),
                   ),
                   child: const Text(
                     'Done',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -423,6 +431,251 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         );
       },
     );
+  }
+
+  // ── Inline Category Creation Sheet ──
+
+  /// FIX: Shows a bottom-sheet mini form to create a custom category
+  /// directly from the add-transaction screen without navigating away.
+  void _showCreateCategorySheet(BuildContext context, int type) {
+    final nameCtrl = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(Radii.xl)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            top: Spacing.lg,
+            left: Spacing.md,
+            right: Spacing.md,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + Spacing.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Theme.of(ctx)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.2),
+                    borderRadius: Radii.borderFull,
+                  ),
+                ),
+              ),
+              const SizedBox(height: Spacing.md),
+              Text(
+                'New Category',
+                style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(height: Spacing.xs),
+              Text(
+                'This category will be saved for future use.',
+                style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(ctx)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.6),
+                    ),
+              ),
+              const SizedBox(height: Spacing.md),
+              TextField(
+                controller: nameCtrl,
+                autofocus: true,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: 'Category name',
+                  border: OutlineInputBorder(
+                    borderRadius: Radii.borderMd,
+                  ),
+                ),
+                onSubmitted: (_) async {
+                  await _submitNewCategory(ctx, nameCtrl.text, type);
+                },
+              ),
+              const SizedBox(height: Spacing.md),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () async {
+                    await _submitNewCategory(ctx, nameCtrl.text, type);
+                  },
+                  child: const Text('Create & Select'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _submitNewCategory(
+      BuildContext sheetCtx, String rawName, int type) async {
+    final name = rawName.trim();
+    if (name.isEmpty) return;
+
+    final categoryRepo = ref.read(categoryRepositoryProvider);
+    final newCat = CategoryModel()
+      ..name = name
+      ..icon = AssetPaths.categoryDefault
+      ..color = 0xFF9E9E9E
+      ..type = type
+      ..isCustom = true
+      ..sortOrder = 999
+      ..createdAt = DateTime.now();
+
+    await categoryRepo.save(newCat);
+
+    // Invalidate provider so the grid refreshes.
+    ref.invalidate(_categoriesForTypeProvider);
+
+    if (mounted) setState(() => _selectedCategory = newCat);
+    if (sheetCtx.mounted) Navigator.of(sheetCtx).pop();
+  }
+
+  // ── Inline Account Creation Sheet ──
+
+  /// FIX: Shows a bottom-sheet mini form to create an account inline
+  /// without leaving the add-transaction screen.
+  void _showCreateAccountSheet(BuildContext context) {
+    final nameCtrl = TextEditingController();
+    int selectedType = 0; // 0=Bank, 1=Wallet, 2=Card, 3=Cash
+    final accountTypes = [
+      (label: 'Bank', value: 0, icon: Icons.account_balance_rounded),
+      (label: 'Wallet', value: 1, icon: Icons.account_balance_wallet_rounded),
+      (label: 'Card', value: 2, icon: Icons.credit_card_rounded),
+      (label: 'Cash', value: 3, icon: Icons.money_rounded),
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(Radii.xl)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                top: Spacing.lg,
+                left: Spacing.md,
+                right: Spacing.md,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + Spacing.lg,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Theme.of(ctx)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.2),
+                        borderRadius: Radii.borderFull,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                  Text(
+                    'New Account',
+                    style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                  TextField(
+                    controller: nameCtrl,
+                    autofocus: true,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: InputDecoration(
+                      labelText: 'Account name',
+                      border: OutlineInputBorder(
+                        borderRadius: Radii.borderMd,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                  Text(
+                    'Account type',
+                    style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  const SizedBox(height: Spacing.sm),
+                  Wrap(
+                    spacing: Spacing.sm,
+                    children: accountTypes.map((t) {
+                      return ChoiceChip(
+                        avatar: Icon(t.icon, size: 16),
+                        label: Text(t.label),
+                        selected: selectedType == t.value,
+                        onSelected: (_) =>
+                            setSheetState(() => selectedType = t.value),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: Radii.borderFull,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: Spacing.md),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () async {
+                        await _submitNewAccount(
+                            ctx, nameCtrl.text, selectedType);
+                      },
+                      child: const Text('Create & Select'),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _submitNewAccount(
+      BuildContext sheetCtx, String rawName, int accountType) async {
+    final name = rawName.trim();
+    if (name.isEmpty) return;
+
+    final accountRepo = ref.read(accountRepositoryProvider);
+    final newAccount = AccountModel()
+      ..name = name
+      ..accountType = accountType
+      ..balance = 0.0
+      ..color = 0xFF9E9E9E
+      ..icon = 'wallet'
+      ..isActive = true
+      ..createdAt = DateTime.now();
+
+    await accountRepo.save(newAccount);
+
+    // Invalidate provider so the chip row refreshes.
+    ref.invalidate(_activeAccountsProvider);
+
+    if (mounted) setState(() => _selectedAccount = newAccount);
+    if (sheetCtx.mounted) Navigator.of(sheetCtx).pop();
   }
 
   // ── Type Selector ──
@@ -453,7 +706,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             child: AnimatedContainer(
               duration: AppDurations.fast,
               decoration: BoxDecoration(
-                // FIX: .withOpacity → .withValues
                 color: isSelected
                     ? option.color.withValues(alpha: 0.15)
                     : Colors.transparent,
@@ -531,7 +783,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           color: Theme.of(context).colorScheme.surfaceContainerLow,
           borderRadius: Radii.borderMd,
         ),
-        child: const Text('No categories available for this type.'),
+        child: const Text('No categories available. Tap \'New\' to create one.'),
       );
     }
 
@@ -559,7 +811,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             child: AnimatedContainer(
               duration: AppDurations.fast,
               decoration: BoxDecoration(
-                // FIX: .withOpacity → .withValues
                 color: isSelected
                     ? catColor.withValues(alpha: 0.15)
                     : Theme.of(context).colorScheme.surfaceContainerLow,
@@ -576,7 +827,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      // FIX: .withOpacity → .withValues
                       color: catColor.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
@@ -659,7 +909,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 }
               });
             },
-            // FIX: .withOpacity → .withValues
             selectedColor: accountColor.withValues(alpha: 0.15),
             side: BorderSide(
               color: isSelected
@@ -695,7 +944,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               ),
               decoration: BoxDecoration(
                 border: Border.all(
-                  // FIX: .withOpacity → .withValues
                   color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
                 borderRadius: Radii.borderMd,
@@ -730,7 +978,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             ),
             decoration: BoxDecoration(
               border: Border.all(
-                // FIX: .withOpacity → .withValues
                 color: theme.colorScheme.outline.withValues(alpha: 0.3),
               ),
               borderRadius: Radii.borderMd,
@@ -744,9 +991,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 ),
                 const SizedBox(width: Spacing.sm),
                 Text(
-                  // FIX: was hardcoded DateTime(2026,…); use epoch base instead.
                   timeFormat.format(
-                    DateTime(0, 1, 1, _selectedTime.hour, _selectedTime.minute),
+                    DateTime(0, 1, 1, _selectedTime.hour,
+                        _selectedTime.minute),
                   ),
                   style: theme.textTheme.bodyMedium,
                 ),
@@ -803,14 +1050,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 label: Text(tag),
                 onDeleted: () => setState(() => _tags.remove(tag)),
                 deleteIcon: const Icon(Icons.close, size: 16),
-                shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
+                shape:
+                    RoundedRectangleBorder(borderRadius: Radii.borderFull),
               );
             }),
             ActionChip(
               avatar: const Icon(Icons.add, size: 16),
               label: const Text('Add Tag'),
               onPressed: () => _showAddTagDialog(theme),
-              shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
+              shape:
+                  RoundedRectangleBorder(borderRadius: Radii.borderFull),
             ),
           ],
         ),
@@ -898,14 +1147,17 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
                       child: ChoiceChip(
-                        label: Text(freq, style: const TextStyle(fontSize: 12)),
+                        label: Text(freq,
+                            style: const TextStyle(fontSize: 12)),
                         selected: isSelected,
                         onSelected: (sel) {
                           if (sel) {
-                            setState(() => _recurringFrequency = freq);
+                            setState(
+                                () => _recurringFrequency = freq);
                           }
                         },
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 2),
                         shape: RoundedRectangleBorder(
                           borderRadius: Radii.borderFull,
                         ),
@@ -1006,7 +1258,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       txn.type = _type;
       txn.category = _type == 2 ? 'Transfer' : _selectedCategory!.name;
       txn.accountId = _selectedAccount!.id.toString();
-      txn.toAccountId = _type == 2 ? _selectedToAccount?.id.toString() : null;
+      txn.toAccountId =
+          _type == 2 ? _selectedToAccount?.id.toString() : null;
       txn.date = dateTime;
       txn.note = _noteController.text.trim().isEmpty
           ? null
@@ -1049,8 +1302,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       ),
     );
   }
-
-  // ── Helper: Account icon mapping ──
 
   FaIconData _accountIcon(String iconName) {
     switch (iconName) {
@@ -1128,7 +1379,6 @@ class _AmountDisplayButton extends StatelessWidget {
           horizontal: Spacing.md,
         ),
         decoration: BoxDecoration(
-          // FIX: .withOpacity → .withValues
           color: _amountColor.withValues(alpha: 0.08),
           borderRadius: Radii.borderLg,
           border: Border.all(color: _amountColor.withValues(alpha: 0.2)),
@@ -1178,8 +1428,8 @@ class _AmountDisplayButton extends StatelessWidget {
 
 // ── Internal Providers ──────────────────────────────────────────────────────
 
-/// Categories filtered by the current transaction type.
-final _categoriesForTypeProvider = FutureProvider.family<List<CategoryModel>, int>((
+final _categoriesForTypeProvider =
+    FutureProvider.family<List<CategoryModel>, int>((
   ref,
   type,
 ) async {
@@ -1187,8 +1437,8 @@ final _categoriesForTypeProvider = FutureProvider.family<List<CategoryModel>, in
   return repo.getByType(type);
 });
 
-/// All active (non-archived) accounts.
-final _activeAccountsProvider = FutureProvider<List<AccountModel>>((ref) async {
+final _activeAccountsProvider =
+    FutureProvider<List<AccountModel>>((ref) async {
   final repo = ref.watch(accountRepositoryProvider);
   return repo.getActive();
 });

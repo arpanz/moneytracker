@@ -57,10 +57,14 @@ class LockNotifier extends StateNotifier<LockState> {
     state = state.copyWith(isAuthenticating: true, clearError: true);
 
     try {
+      // FIX: biometricOnly is no longer a named param in local_auth >= 2.x.
+      // Use AuthenticationOptions instead.
       final success = await _auth.authenticate(
         localizedReason: 'Authenticate to access Cheddar',
-        biometricOnly: false,
-        persistAcrossBackgrounding: true,
+        options: const AuthenticationOptions(
+          biometricOnly: false,
+          stickyAuth: true,
+        ),
       );
 
       if (success) {
