@@ -1,4 +1,4 @@
-import 'package:cheddar/domain/models/transaction_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -34,10 +34,8 @@ import '../../ui/features/notifications/screens/pending_transactions_screen.dart
 import '../../ui/core/shell/app_shell.dart';
 import 'route_names.dart';
 
-/// FIX: Track whether the user has authenticated through the lock screen
-/// in the current app session. This is reset on cold start.
-/// Using a simple global flag since GoRouter redirect doesn't support async
-/// and we need a synchronous check.
+/// Track whether the user has authenticated through the lock screen
+/// in the current app session. Reset on cold start.
 bool _isSessionAuthenticated = false;
 
 /// Called by LockScreen after successful authentication.
@@ -50,7 +48,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: '/',
-    debugLogDiagnostics: false,
+    // FIX: show diagnostics in debug builds only.
+    debugLogDiagnostics: kDebugMode,
 
     redirect: (context, state) {
       final onboardingComplete =
@@ -143,10 +142,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // ── Detail / Modal Routes ──
 
-      // FIX #6: addTransaction now reads an optional int `extra` as the
-      // initial transaction type (0=income, 1=expense, 2=transfer).
-      // Home screen quick-action chips pass the correct type so the form
-      // pre-selects the right tab instead of always defaulting to Expense.
       GoRoute(
         path: '/transaction/add',
         name: RouteNames.addTransaction,
@@ -161,9 +156,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/transaction/:id',
         name: RouteNames.transactionDetail,
-        builder: (context, state) => TransactionDetailScreen(
-          transactionId: int.parse(state.pathParameters['id']!),
-        ),
+        builder: (context, state) {
+          // FIX: guard int.parse with tryParse to avoid crash on bad deep-links.
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) return const _NotFoundScreen();
+          return TransactionDetailScreen(transactionId: id);
+        },
       ),
       GoRoute(
         path: '/budget/add',
@@ -189,8 +187,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/goal/:id',
         name: RouteNames.goalDetail,
+<<<<<<< HEAD
         builder: (context, state) =>
             GoalDetailScreen(goalId: int.parse(state.pathParameters['id']!)),
+=======
+        builder: (context, state) {
+          // FIX: guard int.parse with tryParse.
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) return const _NotFoundScreen();
+          return GoalDetailScreen(goalId: id);
+        },
+>>>>>>> 77a295523bdc733138be3d49dfcad13168b226cd
       ),
       GoRoute(
         path: '/subscriptions',
@@ -225,9 +232,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/account/:id',
         name: RouteNames.accountDetail,
-        builder: (context, state) => AccountDetailScreen(
-          accountId: int.parse(state.pathParameters['id']!),
-        ),
+        builder: (context, state) {
+          // FIX: guard int.parse with tryParse.
+          final id = int.tryParse(state.pathParameters['id'] ?? '');
+          if (id == null) return const _NotFoundScreen();
+          return AccountDetailScreen(accountId: id);
+        },
       ),
       GoRoute(
         path: '/settings',
@@ -270,4 +280,19 @@ Widget _fadeTransition(
   Widget child,
 ) {
   return FadeTransition(opacity: animation, child: child);
+}
+
+/// FIX: Safe fallback screen shown when a path parameter fails to parse.
+class _NotFoundScreen extends StatelessWidget {
+  const _NotFoundScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Not Found')),
+      body: const Center(
+        child: Text('The requested item could not be found.'),
+      ),
+    );
+  }
 }

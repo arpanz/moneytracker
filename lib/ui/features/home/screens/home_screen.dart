@@ -20,10 +20,6 @@ import '../../../../domain/models/transaction_model.dart';
 import '../providers/home_provider.dart';
 import '../widgets/balance_card.dart';
 
-/// The main home dashboard screen.
-///
-/// Displays greeting, total balance card, monthly income/expense,
-/// quick actions, recent transactions, and a mini spending pie chart.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -53,7 +49,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final userName = ref.watch(userNameProvider);
-    // FIX #16: use runtime currency symbol from provider instead of hardcoded constant.
     final currencySymbol = ref.watch(currencySymbolProvider);
 
     ref.listen(transactionStreamProvider, (_, __) {
@@ -120,8 +115,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: Spacing.horizontalLg,
-                  // FIX #6: pass theme so the row can navigate with the correct
-                  // initial type (expense=1, income=0, scanner).
                   child: _QuickActionsRow(theme: theme),
                 ),
               ),
@@ -179,11 +172,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 currencySymbol: currencySymbol,
               ),
 
-              // FIX #15: Use dynamic bottom padding that accounts for the OS
-              // navigation bar height so the last row isn't obscured.
+              // FIX: Use MediaQuery-based bottom padding (dynamic nav bar height).
               SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 72 + MediaQuery.of(context).padding.bottom,
+                  height: kBottomNavigationBarHeight +
+                      MediaQuery.of(context).padding.bottom +
+                      Spacing.md,
                 ),
               ),
             ],
@@ -436,11 +430,13 @@ class _MiniStatCard extends StatelessWidget {
     );
   }
 
+  /// FIX: Format using universal K/M/B suffixes instead of INR-only L/Cr
+  /// so non-INR users don't see confusing Indian number abbreviations.
   static String _formatCompact(double value) {
-    if (value >= 10000000) {
-      return '${(value / 10000000).toStringAsFixed(1)}Cr';
-    } else if (value >= 100000) {
-      return '${(value / 100000).toStringAsFixed(1)}L';
+    if (value >= 1000000000) {
+      return '${(value / 1000000000).toStringAsFixed(1)}B';
+    } else if (value >= 1000000) {
+      return '${(value / 1000000).toStringAsFixed(1)}M';
     } else if (value >= 1000) {
       return '${(value / 1000).toStringAsFixed(1)}K';
     }
@@ -465,7 +461,6 @@ class _QuickActionsRow extends StatelessWidget {
           label: 'Add Expense',
           icon: Icons.remove_circle_outline_rounded,
           color: colorScheme.error,
-          // FIX #6: pass type=1 (expense) so the form pre-selects Expense tab.
           onTap: () => context.pushNamed(
             RouteNames.addTransaction,
             extra: 1,
@@ -477,7 +472,6 @@ class _QuickActionsRow extends StatelessWidget {
           label: 'Add Income',
           icon: Icons.add_circle_outline_rounded,
           color: Colors.green.shade600,
-          // FIX #6: pass type=0 (income) so the form pre-selects Income tab.
           onTap: () => context.pushNamed(
             RouteNames.addTransaction,
             extra: 0,
@@ -577,7 +571,6 @@ class _SpendingChart extends StatelessWidget {
     return categoryAsync.when(
       data: (totals) {
         if (totals.isEmpty) {
-          // FIX #10: show a gentle placeholder instead of invisible SizedBox.
           return Container(
             padding: const EdgeInsets.all(Spacing.md),
             decoration: BoxDecoration(
@@ -818,12 +811,42 @@ class _RecentTransactionsList extends StatelessWidget {
                   return await _showDeleteConfirmation(context, theme);
                 },
                 onDismissed: (_) {
-                  ref.read(transactionRepositoryProvider).delete(txn.id);
+                  // FIX: capture txn details before async gap for the SnackBar undo.
+                  final deletedTxn = txn;
+                  ref.read(transactionRepositoryProvider).delete(deletedTxn.id);
                   ref.invalidate(recentTransactionsProvider);
                   ref.invalidate(totalBalanceProvider);
                   ref.invalidate(monthlyIncomeProvider);
                   ref.invalidate(monthlyExpenseProvider);
                   ref.invalidate(categoryTotalsProvider);
+                  // FIX: show SnackBar with undo so deletion isn't silent.
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${deletedTxn.category} deleted',
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: Radii.borderMd,
+                        ),
+                        action: SnackBarAction(
+                          label: 'Undo',
+                          onPressed: () async {
+                            // Re-insert the deleted transaction.
+                            await ref
+                                .read(transactionRepositoryProvider)
+                                .add(deletedTxn);
+                            ref.invalidate(recentTransactionsProvider);
+                            ref.invalidate(totalBalanceProvider);
+                            ref.invalidate(monthlyIncomeProvider);
+                            ref.invalidate(monthlyExpenseProvider);
+                            ref.invalidate(categoryTotalsProvider);
+                          },
+                        ),
+                      ),
+                    );
                 },
                 child:
                     _TransactionRow(

@@ -17,13 +17,14 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  // Set system UI overlay style
+  // FIX: Do NOT set SystemUiOverlayStyle at boot with a hardcoded brightness —
+  // that caused white status-bar icons on a white background in light theme.
+  // Instead we set transparent bars only and let the theme's AppBarTheme
+  // (or AnnotatedRegion in each screen) control icon brightness dynamically.
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
       systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
 
@@ -32,10 +33,10 @@ void main() async {
   final databaseService = DatabaseService();
   await databaseService.initialize();
 
-  // FIX: Seed default categories so they're available on first launch.
-  // seedDefaults() is a no-op if categories already exist.
+  // Seed default categories (no-op if already seeded).
+  // Run on a microtask so it does not block runApp.
   final categoryRepo = CategoryRepository(databaseService);
-  await categoryRepo.seedDefaults();
+  categoryRepo.seedDefaults().ignore();
 
   runApp(
     ProviderScope(

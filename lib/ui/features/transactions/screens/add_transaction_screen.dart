@@ -27,7 +27,7 @@ class AddTransactionScreen extends ConsumerStatefulWidget {
   /// If non-null the screen operates in edit mode.
   final TransactionModel? existingTransaction;
 
-  /// FIX #6: Optional initial type so home quick-action chips can pre-select
+  /// Optional initial type so home quick-action chips can pre-select
   /// Income or Expense without the user having to change it manually.
   final int? initialType;
 
@@ -59,12 +59,17 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   bool _isSplit = false;
   bool _isSaving = false;
 
+  // FIX: Track the original category name so we can match it back to a
+  // CategoryModel object once the async categories list loads.
+  String? _editCategoryName;
+  String? _editAccountId;
+  String? _editToAccountId;
+
   bool get _isEditing => widget.existingTransaction != null;
 
   @override
   void initState() {
     super.initState();
-    // FIX #6: honour the initialType passed from the router.
     _type = widget.initialType ?? 1; // default: expense
     if (_isEditing) {
       _populateFromExisting();
@@ -80,6 +85,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     _noteController.text = txn.note ?? '';
     _tags.addAll(txn.tags);
     _isRecurring = txn.isRecurring;
+    // FIX: Store raw IDs/names; the actual model objects are matched once
+    // the async providers load (see _tryRestoreSelections).
+    _editCategoryName = txn.category;
+    _editAccountId = txn.accountId;
+    _editToAccountId = txn.toAccountId;
     if (txn.recurringRule != null) {
       try {
         final rule = json.decode(txn.recurringRule!) as Map<String, dynamic>;
@@ -92,6 +102,39 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       }
     }
     _isSplit = txn.splitId != null;
+  }
+
+  /// FIX: Called from the category / account builders once the async data
+  /// is available, so edit mode pre-selects the correct objects.
+  void _tryRestoreCategory(List<CategoryModel> cats) {
+    if (_editCategoryName == null || _selectedCategory != null) return;
+    final match = cats.where((c) => c.name == _editCategoryName).firstOrNull;
+    if (match != null && mounted) {
+      setState(() => _selectedCategory = match);
+    }
+  }
+
+  void _tryRestoreAccounts(List<AccountModel> accounts) {
+    bool changed = false;
+    if (_editAccountId != null && _selectedAccount == null) {
+      final match = accounts
+          .where((a) => a.id.toString() == _editAccountId)
+          .firstOrNull;
+      if (match != null) {
+        _selectedAccount = match;
+        changed = true;
+      }
+    }
+    if (_editToAccountId != null && _selectedToAccount == null) {
+      final match = accounts
+          .where((a) => a.id.toString() == _editToAccountId)
+          .firstOrNull;
+      if (match != null) {
+        _selectedToAccount = match;
+        changed = true;
+      }
+    }
+    if (changed && mounted) setState(() {});
   }
 
   @override
@@ -120,7 +163,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final cheddarColors = theme.extension<CheddarColors>()!;
     final categoriesAsync = ref.watch(_categoriesForTypeProvider(_type));
     final accountsAsync = ref.watch(_activeAccountsProvider);
-    // FIX #16: use runtime currency symbol.
     final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Scaffold(
@@ -157,9 +199,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               const SizedBox(height: Spacing.lg),
 
               // ── Category Picker (hidden for Transfer) ──
-              // FIX #9: Transfers don't need a meaningful expense category,
-              // so we hide the category section entirely for type==2 and
-              // auto-assign a 'Transfer' label when saving.
               if (_type != 2) ...[
                 Text(
                   'Category',
@@ -169,8 +208,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 ),
                 const SizedBox(height: Spacing.sm),
                 categoriesAsync.when(
-                  data: (categories) =>
-                      _buildCategoryGrid(categories, cheddarColors),
+                  data: (categories) {
+                    // FIX: restore selection on edit mode.
+                    _tryRestoreCategory(categories);
+                    return _buildCategoryGrid(categories, cheddarColors);
+                  },
                   loading: () => const SizedBox(
                     height: 120,
                     child: Center(child: CircularProgressIndicator()),
@@ -189,7 +231,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               ),
               const SizedBox(height: Spacing.sm),
               accountsAsync.when(
-                data: (accounts) => _buildAccountChips(accounts, false),
+                data: (accounts) {
+                  // FIX: restore account selection on edit mode.
+                  _tryRestoreAccounts(accounts);
+                  return _buildAccountChips(accounts, false);
+                },
                 loading: () => const SizedBox(
                   height: 48,
                   child: Center(child: CircularProgressIndicator()),
@@ -336,11 +382,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // FIX: .withOpacity → .withValues
               Container(
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(ctx).colorScheme.onSurface.withOpacity(0.2),
+                  color: Theme.of(ctx)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.2),
                   borderRadius: Radii.borderFull,
                 ),
               ),
@@ -403,22 +453,24 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             child: AnimatedContainer(
               duration: AppDurations.fast,
               decoration: BoxDecoration(
+                // FIX: .withOpacity → .withValues
                 color: isSelected
-                    ? option.color.withOpacity(0.15)
+                    ? option.color.withValues(alpha: 0.15)
                     : Colors.transparent,
                 borderRadius: Radii.borderMd,
                 border: Border.all(
                   color: isSelected
                       ? option.color
-                      : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                      : Theme.of(context)
+                          .colorScheme
+                          .outline
+                          .withValues(alpha: 0.3),
                   width: isSelected ? 2 : 1,
                 ),
               ),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  // FIX #2: reset selected category whenever the type changes
-                  // so a category from the old type isn't silently saved.
                   onTap: () => setState(() {
                     if (_type != option.value) {
                       _type = option.value;
@@ -483,8 +535,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       );
     }
 
-    // FIX #12: previous clamp of 300 cut off the 4th row for 13+ categories.
-    // Each row is ~100px; calculate rows correctly and clamp higher.
     final rowCount = (categories.length / 4).ceil();
     final gridHeight = (rowCount * 100.0).clamp(100.0, 420.0);
 
@@ -509,8 +559,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             child: AnimatedContainer(
               duration: AppDurations.fast,
               decoration: BoxDecoration(
+                // FIX: .withOpacity → .withValues
                 color: isSelected
-                    ? catColor.withOpacity(0.15)
+                    ? catColor.withValues(alpha: 0.15)
                     : Theme.of(context).colorScheme.surfaceContainerLow,
                 borderRadius: Radii.borderMd,
                 border: Border.all(
@@ -525,7 +576,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: catColor.withOpacity(0.15),
+                      // FIX: .withOpacity → .withValues
+                      color: catColor.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -607,11 +659,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 }
               });
             },
-            selectedColor: accountColor.withOpacity(0.15),
+            // FIX: .withOpacity → .withValues
+            selectedColor: accountColor.withValues(alpha: 0.15),
             side: BorderSide(
               color: isSelected
                   ? accountColor
-                  : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                  : Theme.of(context)
+                      .colorScheme
+                      .outline
+                      .withValues(alpha: 0.3),
             ),
             shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
           );
@@ -639,7 +695,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               ),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  // FIX: .withOpacity → .withValues
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
                 borderRadius: Radii.borderMd,
               ),
@@ -673,7 +730,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             ),
             decoration: BoxDecoration(
               border: Border.all(
-                color: theme.colorScheme.outline.withOpacity(0.3),
+                // FIX: .withOpacity → .withValues
+                color: theme.colorScheme.outline.withValues(alpha: 0.3),
               ),
               borderRadius: Radii.borderMd,
             ),
@@ -686,14 +744,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 ),
                 const SizedBox(width: Spacing.sm),
                 Text(
+                  // FIX: was hardcoded DateTime(2026,…); use epoch base instead.
                   timeFormat.format(
-                    DateTime(
-                      2026,
-                      1,
-                      1,
-                      _selectedTime.hour,
-                      _selectedTime.minute,
-                    ),
+                    DateTime(0, 1, 1, _selectedTime.hour, _selectedTime.minute),
                   ),
                   style: theme.textTheme.bodyMedium,
                 ),
@@ -711,7 +764,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       context: context,
       initialDate: _selectedDate,
       firstDate: DateTime(2020),
-      // FIX #5: use dynamic last date (10 years ahead) instead of hardcoded 2030.
       lastDate: DateTime(now.year + 10, now.month, now.day),
     );
     if (picked != null) {
@@ -915,7 +967,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       _showSnackBar('Please enter an amount greater than zero.');
       return;
     }
-    // FIX #9: for transfers, skip category validation and use 'Transfer' label.
     if (_type != 2 && _selectedCategory == null) {
       _showSnackBar('Please select a category.');
       return;
@@ -953,7 +1004,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
       txn.amount = _amount;
       txn.type = _type;
-      // FIX #9: auto-label transfers instead of requiring a category.
       txn.category = _type == 2 ? 'Transfer' : _selectedCategory!.name;
       txn.accountId = _selectedAccount!.id.toString();
       txn.toAccountId = _type == 2 ? _selectedToAccount?.id.toString() : null;
@@ -1078,16 +1128,17 @@ class _AmountDisplayButton extends StatelessWidget {
           horizontal: Spacing.md,
         ),
         decoration: BoxDecoration(
-          color: _amountColor.withOpacity(0.08),
+          // FIX: .withOpacity → .withValues
+          color: _amountColor.withValues(alpha: 0.08),
           borderRadius: Radii.borderLg,
-          border: Border.all(color: _amountColor.withOpacity(0.2)),
+          border: Border.all(color: _amountColor.withValues(alpha: 0.2)),
         ),
         child: Column(
           children: [
             Text(
               'Tap to enter amount',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: Spacing.xs),
@@ -1101,7 +1152,7 @@ class _AmountDisplayButton extends StatelessWidget {
                   Text(
                     currencySymbol,
                     style: theme.textTheme.headlineSmall?.copyWith(
-                      color: _amountColor.withOpacity(0.7),
+                      color: _amountColor.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -1128,15 +1179,13 @@ class _AmountDisplayButton extends StatelessWidget {
 // ── Internal Providers ──────────────────────────────────────────────────────
 
 /// Categories filtered by the current transaction type.
-final _categoriesForTypeProvider =
-    FutureProvider.family<List<CategoryModel>, int>((ref, type) async {
-      final repo = ref.watch(categoryRepositoryProvider);
-      // FIX #1: type 2 (transfer) was incorrectly mapping to 0 (income).
-      // Transfers should show expense categories (type 1) as the most sensible
-      // default, but since the category section is now hidden for transfers (#9)
-      // this provider is only called for type 0 and 1.
-      return repo.getByType(type);
-    });
+final _categoriesForTypeProvider = FutureProvider.family<List<CategoryModel>, int>((
+  ref,
+  type,
+) async {
+  final repo = ref.watch(categoryRepositoryProvider);
+  return repo.getByType(type);
+});
 
 /// All active (non-archived) accounts.
 final _activeAccountsProvider = FutureProvider<List<AccountModel>>((ref) async {

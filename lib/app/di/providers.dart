@@ -53,16 +53,19 @@ final splitRepositoryProvider = Provider<SplitRepository>((ref) {
 
 // ── Currency ──────────────────────────────────────────────────────────────────
 
-/// Returns the currency symbol that matches the user's chosen currency code
-/// stored in SharedPreferences. Falls back to 'Rs.' for INR.
-///
-/// FIX #16: AppConstants.currencySymbol was a hardcoded compile-time constant
-/// that never reflected the user's onboarding currency selection. This provider
-/// reads the pref at runtime so the symbol updates correctly for INR/USD/EUR/GBP.
-final currencySymbolProvider = Provider<String>((ref) {
+/// FIX: Expose the raw currency code as a StateProvider so Settings can push
+/// a new value and all currencySymbolProvider watchers rebuild immediately
+/// without a cold restart.
+final currencyCodeProvider = StateProvider<String>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
-  final code = prefs.getString(AppConstants.prefCurrency) ??
+  return prefs.getString(AppConstants.prefCurrency) ??
       AppConstants.defaultCurrency;
+});
+
+/// Returns the currency symbol that matches the user's chosen currency code.
+/// Watches [currencyCodeProvider] so it rebuilds whenever the code changes.
+final currencySymbolProvider = Provider<String>((ref) {
+  final code = ref.watch(currencyCodeProvider);
   switch (code) {
     case 'USD':
       return r'$';
