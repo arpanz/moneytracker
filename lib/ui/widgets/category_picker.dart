@@ -571,22 +571,19 @@ class _CategoryPickerRowState extends ConsumerState<CategoryPickerRow> {
                 height: 46,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      categoryColor.withValues(alpha: 0.18),
-                      categoryColor.withValues(alpha: 0.08),
-                    ],
-                  ),
+                  color: theme.colorScheme.surface,
                   border: Border.all(
-                    color: categoryColor.withValues(alpha: 0.16),
+                    color: isSelected
+                        ? categoryColor.withValues(alpha: 0.4)
+                        : theme.colorScheme.outlineVariant.withValues(
+                            alpha: 0.6,
+                          ),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: categoryColor.withValues(alpha: 0.12),
-                      blurRadius: 14,
-                      offset: const Offset(0, 6),
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),

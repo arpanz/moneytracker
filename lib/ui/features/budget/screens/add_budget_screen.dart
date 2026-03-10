@@ -570,6 +570,21 @@ class _CategoryPickerStepState extends ConsumerState<_CategoryPickerStep> {
                             children: [
                               SvgPicture.asset(cat.icon, width: 28, height: 28),
                               const SizedBox(height: Spacing.xs),
+                              Container(
+                                width: 18,
+                                height: 3,
+                                margin: const EdgeInsets.only(
+                                  bottom: Spacing.xs,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isAlreadyBudgeted
+                                      ? theme.colorScheme.onSurface.withValues(
+                                          alpha: 0.18,
+                                        )
+                                      : color.withValues(alpha: 0.55),
+                                  borderRadius: Radii.borderFull,
+                                ),
+                              ),
                               Text(
                                 cat.name,
                                 style: theme.textTheme.bodySmall?.copyWith(

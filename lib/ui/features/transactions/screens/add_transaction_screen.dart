@@ -589,9 +589,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         'Expense',
         1,
         cheddarColors.expense,
+        FontAwesomeIcons.arrowUp,
+      ),
+      _TypeOption(
+        'Income',
+        0,
+        cheddarColors.income,
         FontAwesomeIcons.arrowDown,
       ),
-      _TypeOption('Income', 0, cheddarColors.income, FontAwesomeIcons.arrowUp),
       _TypeOption(
         'Transfer',
         2,

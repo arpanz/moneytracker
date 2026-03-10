@@ -31,7 +31,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _loadPreferences() async {
     final prefs = ref.read(sharedPreferencesProvider);
     setState(() {
-      _biometricEnabled = prefs.getBool('biometric_enabled') ?? false;
+      _biometricEnabled =
+          prefs.getBool(AppConstants.prefAppLockEnabled) ?? false;
       _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
       _currency =
           prefs.getString(AppConstants.prefCurrency) ??
@@ -122,7 +123,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             value: _biometricEnabled,
             onChanged: (v) async {
               final prefs = ref.read(sharedPreferencesProvider);
-              await prefs.setBool('biometric_enabled', v);
+              await prefs.setBool(AppConstants.prefAppLockEnabled, v);
               setState(() => _biometricEnabled = v);
             },
           ),
