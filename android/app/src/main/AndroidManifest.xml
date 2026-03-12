@@ -5,13 +5,7 @@
     <!-- Push notifications (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Notification listener: required for payment notification reading.
-         The actual permission grant happens via system settings
-         (ACTION_NOTIFICATION_LISTENER_SETTINGS). -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
-    <!-- SMS permissions: needed to capture bank debit/credit SMS alerts
-         that come through the system SMS app rather than the bank's own app. -->
+    <!-- SMS permissions: needed to capture bank debit/credit SMS alerts -->
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
 
@@ -39,13 +33,11 @@
             </intent-filter>
         </activity>
 
-        <!-- Notification Listener Service declaration.
-             Without this entry the OS never delivers notifications to the app
-             even after the user grants permission in system settings. -->
+        <!-- Correct class name as per notification_listener_service package docs -->
         <service
-            android:name="com.witali.notification_listener_service.NotificationListener"
+            android:name="notification.listener.service.NotificationListener"
             android:label="@string/app_name"
-            android:exported="false"
+            android:exported="true"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
