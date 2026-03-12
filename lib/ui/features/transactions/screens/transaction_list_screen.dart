@@ -170,10 +170,8 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
               return SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    // Compute the flat index across groups + headers
                     int runningIndex = 0;
                     for (final group in groups) {
-                      // Header
                       if (index == runningIndex) {
                         return _DateSectionHeader(
                           date: group.date,
@@ -183,7 +181,6 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
                       }
                       runningIndex++;
 
-                      // Items in this group
                       final itemIndex = index - runningIndex;
                       if (itemIndex < group.transactions.length) {
                         final txn = group.transactions[itemIndex];
@@ -483,9 +480,19 @@ class _TransactionTile extends StatelessWidget {
         cheddarColors.transfer;
   }
 
+  // FIX [Bug 3]: Always return a valid path; unknown categories → categoryOther.
   String get _categoryIconPath {
-    final slug = transaction.category.toLowerCase();
-    return 'assets/svg/categories/$slug.svg';
+    final slug = transaction.category.toLowerCase().trim();
+    const knownSlugs = {
+      'food', 'transport', 'shopping', 'bills', 'entertainment',
+      'health', 'education', 'travel', 'gifts', 'salary',
+      'freelance', 'investments', 'rent', 'groceries', 'pets',
+      'subscriptions', 'other',
+    };
+    if (knownSlugs.contains(slug)) {
+      return 'assets/svg/categories/$slug.svg';
+    }
+    return AssetPaths.categoryOther;
   }
 
   @override
@@ -518,7 +525,7 @@ class _TransactionTile extends StatelessWidget {
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.endToStart) {
           onDelete();
-          return false; // We handle deletion via dialog
+          return false;
         } else {
           onEdit();
           return false;
@@ -652,7 +659,6 @@ class _ShimmerTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Circle avatar
           _ShimmerBox(
             width: 40,
             height: 40,
@@ -661,7 +667,6 @@ class _ShimmerTile extends StatelessWidget {
             highlightColor: highlightColor,
           ),
           const SizedBox(width: Spacing.md),
-          // Text lines
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -682,7 +687,6 @@ class _ShimmerTile extends StatelessWidget {
               ],
             ),
           ),
-          // Amount
           _ShimmerBox(
             width: 64,
             height: 16,

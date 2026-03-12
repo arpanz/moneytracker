@@ -18,6 +18,7 @@ import '../../../../config/theme/theme_extensions.dart';
 import '../../../../config/theme/theme_provider.dart';
 import '../../../../config/theme/vibe_themes.dart';
 import '../../../../domain/models/transaction_model.dart';
+import '../../../features/notifications/providers/notification_provider.dart';
 import '../providers/home_provider.dart';
 import '../widgets/balance_card.dart';
 
@@ -52,6 +53,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userName = ref.watch(userNameProvider);
     final currencySymbol = ref.watch(currencySymbolProvider);
     final showValues = ref.watch(showValuesProvider);
+    // FIX [Bug 1]: Watch pending count so badge stays live.
+    final pendingCount = ref.watch(pendingTransactionsProvider).length;
 
     ref.listen(transactionStreamProvider, (_, __) {
       ref.invalidate(totalBalanceProvider);
@@ -86,6 +89,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     userName: userName,
                     theme: theme,
                     showValues: showValues,
+                    pendingCount: pendingCount,
                     onToggleVisibility: () async {
                       final nextValue = !ref.read(showValuesProvider);
                       ref.read(showValuesProvider.notifier).state = nextValue;
@@ -95,6 +99,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         nextValue,
                       );
                     },
+                    onPendingTap: () =>
+                        context.pushNamed(RouteNames.pendingTransactions),
                   ),
                 ),
               ),
@@ -191,7 +197,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 showValues: showValues,
               ),
 
-              // FIX: Use MediaQuery-based bottom padding (dynamic nav bar height).
               SliverToBoxAdapter(
                 child: SizedBox(
                   height:
@@ -215,14 +220,18 @@ class _GreetingHeader extends StatelessWidget {
   final String userName;
   final ThemeData theme;
   final bool showValues;
+  final int pendingCount;
   final VoidCallback onToggleVisibility;
+  final VoidCallback onPendingTap;
 
   const _GreetingHeader({
     required this.greeting,
     required this.userName,
     required this.theme,
     required this.showValues,
+    required this.pendingCount,
     required this.onToggleVisibility,
+    required this.onPendingTap,
   });
 
   @override
@@ -252,6 +261,43 @@ class _GreetingHeader extends StatelessWidget {
                         curve: Curves.easeOut,
                       ),
             ),
+            // FIX [Bug 1]: Notification bell — visible only when pending > 0.
+            if (pendingCount > 0)
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconButton(
+                    onPressed: onPendingTap,
+                    tooltip: '$pendingCount pending transaction'
+                        '${pendingCount == 1 ? '' : 's'}',
+                    icon: const Icon(Icons.notifications_rounded),
+                    color: theme.colorScheme.primary,
+                  ),
+                  Positioned(
+                    right: 6,
+                    top: 6,
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.error,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints:
+                          const BoxConstraints(minWidth: 16, minHeight: 16),
+                      child: Text(
+                        '$pendingCount',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onError,
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          height: 1,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             IconButton(
               onPressed: onToggleVisibility,
               tooltip: showValues ? 'Hide values' : 'Show values',
@@ -497,8 +543,6 @@ class _MiniStatCard extends StatelessWidget {
     );
   }
 
-  /// FIX: Format using universal K/M/B suffixes instead of INR-only L/Cr
-  /// so non-INR users don't see confusing Indian number abbreviations.
   static String _formatCompact(double value) {
     if (value >= 1000000000) {
       return '${(value / 1000000000).toStringAsFixed(1)}B';
@@ -881,7 +925,6 @@ class _RecentTransactionsList extends StatelessWidget {
                   return await _showDeleteConfirmation(context, theme);
                 },
                 onDismissed: (_) {
-                  // FIX: capture txn details before async gap for the SnackBar undo.
                   final deletedTxn = txn;
                   ref.read(transactionRepositoryProvider).delete(deletedTxn.id);
                   ref.invalidate(recentTransactionsProvider);
@@ -889,7 +932,6 @@ class _RecentTransactionsList extends StatelessWidget {
                   ref.invalidate(monthlyIncomeProvider);
                   ref.invalidate(monthlyExpenseProvider);
                   ref.invalidate(categoryTotalsProvider);
-                  // FIX: show SnackBar with undo so deletion isn't silent.
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
@@ -902,7 +944,6 @@ class _RecentTransactionsList extends StatelessWidget {
                         action: SnackBarAction(
                           label: 'Undo',
                           onPressed: () async {
-                            // Re-insert the deleted transaction.
                             await ref
                                 .read(transactionRepositoryProvider)
                                 .add(deletedTxn);
@@ -1023,6 +1064,7 @@ class _TransactionRow extends StatelessWidget {
         : '-';
     final dateStr = DateFormat('MMM d').format(transaction.date);
 
+    // FIX [Bug 3]: fall back to categoryOther SVG for unknown categories.
     final categoryIcon = _categoryToAssetPath(transaction.category);
 
     return InkWell(
@@ -1055,13 +1097,8 @@ class _TransactionRow extends StatelessWidget {
                 ],
               ),
               padding: const EdgeInsets.all(8),
-              child: categoryIcon != null
-                  ? SvgPicture.asset(categoryIcon, width: 26, height: 26)
-                  : Icon(
-                      Icons.receipt_long_rounded,
-                      size: 22,
-                      color: amountColor,
-                    ),
+              // FIX [Bug 3]: always render SvgPicture — never fall back to Icon.
+              child: SvgPicture.asset(categoryIcon, width: 26, height: 26),
             ),
 
             const SizedBox(width: Spacing.md),
@@ -1111,7 +1148,8 @@ class _TransactionRow extends StatelessWidget {
     );
   }
 
-  static String? _categoryToAssetPath(String category) {
+  // FIX [Bug 3]: Always return a valid SVG path; unknown → categoryOther.
+  static String _categoryToAssetPath(String category) {
     final normalized = category.toLowerCase().trim();
     const map = {
       'food': AssetPaths.categoryFood,
@@ -1130,8 +1168,9 @@ class _TransactionRow extends StatelessWidget {
       'groceries': AssetPaths.categoryGroceries,
       'pets': AssetPaths.categoryPets,
       'subscriptions': AssetPaths.categorySubscriptions,
+      'transfer': AssetPaths.categoryOther,
     };
-    return map[normalized];
+    return map[normalized] ?? AssetPaths.categoryOther;
   }
 }
 

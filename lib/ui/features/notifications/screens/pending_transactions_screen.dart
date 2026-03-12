@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/di/providers.dart';
 import '../../../../config/constants/app_constants.dart';
 import '../../../../config/constants/asset_paths.dart';
 import '../../../../config/router/route_names.dart';
@@ -29,7 +30,6 @@ class PendingTransactionsScreen extends ConsumerWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // FIX: Flexible prevents the text from overflowing the Row
             Flexible(
               child: const Text(
                 'Pending Transactions',
@@ -170,22 +170,27 @@ class PendingTransactionsScreen extends ConsumerWidget {
     );
   }
 
-  void _saveTransaction(
+  // FIX [Bug 2]: Resolve the first active account so accountId is never ''.
+  // An empty accountId causes addTransactionProvider to skip the balance delta.
+  Future<void> _saveTransaction(
     BuildContext context,
     WidgetRef ref,
     PendingTransaction tx,
-  ) {
+  ) async {
     ref.read(pendingTransactionsProvider.notifier).markSaved(tx.id);
 
-    // FIX: initialise ALL late fields on TransactionModel so GoRouter never
-    // hands the add screen a half-constructed object regardless of whether
-    // the extra survives serialisation or not.
+    // Resolve the default account (same auto-select logic as AddTransactionScreen).
+    final accRepo = ref.read(accountRepositoryProvider);
+    final accounts = await accRepo.getActive();
+    final defaultAccount = accounts.isNotEmpty ? accounts.first : null;
+
     final transaction = TransactionModel()
       ..amount = tx.amount
       ..type = tx.isDebit ? 1 : 0
-      // Use merchant as a category hint; user can change it on the next screen.
+      // Use merchant as category hint; user can change on next screen.
       ..category = tx.merchant ?? tx.appName
-      ..accountId = ''
+      // FIX: set accountId so balance is updated when the user taps Save.
+      ..accountId = defaultAccount?.id.toString() ?? ''
       ..toAccountId = null
       ..note = tx.merchant ?? tx.appName
       ..date = tx.timestamp
@@ -194,7 +199,9 @@ class PendingTransactionsScreen extends ConsumerWidget {
       ..recurringRule = null
       ..createdAt = DateTime.now();
 
-    context.pushNamed(RouteNames.addTransaction, extra: transaction);
+    if (context.mounted) {
+      context.pushNamed(RouteNames.addTransaction, extra: transaction);
+    }
   }
 
   void _dismissTransaction(WidgetRef ref, PendingTransaction tx) {
