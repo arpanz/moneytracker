@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:notification_listener_service/notification_event.dart';
 import 'package:notification_listener_service/notification_listener_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,15 +10,16 @@ import '../providers/notification_provider.dart';
 
 class NotificationService {
   static const _pendingKey = 'pending_notification_transactions';
+  // Set to true right after the user grants permission so the next launch
+  // knows to wait for Android to bind the native service before subscribing.
+  static const _firstLaunchAfterGrantKey = 'notif_first_launch_after_grant';
 
   static const supportedPackages = <String>{
-    // UPI apps
     'com.google.android.apps.nbu.paisa.user',
     'com.phonepe.app',
     'net.one97.paytm',
     'in.org.npci.upiapp',
     'com.amazon.mShop.android.shopping',
-    // Banking apps
     'com.csam.icici.bank.imobile',
     'com.sbi.SBIFreedomPlus',
     'com.sbi.lotusintouch',
@@ -33,7 +35,6 @@ class NotificationService {
     'com.pnb.mbanking',
     'com.indusind.mobile',
     'com.yesbank.yesmobile',
-    // System SMS apps
     'com.android.mms',
     'com.google.android.apps.messaging',
     'com.samsung.android.messaging',
@@ -45,15 +46,11 @@ class NotificationService {
   StreamSubscription<ServiceNotificationEvent>? _subscription;
   final List<PendingTransaction> _pending = [];
 
-  // FIX: controller is kept open for the lifetime of the provider.
-  // It is NEVER closed by stop() or initialize() — only by _destroy()
-  // which is called from ref.onDispose when Riverpod tears down the provider.
   final StreamController<List<PendingTransaction>> _pendingController =
       StreamController<List<PendingTransaction>>.broadcast();
 
   Stream<List<PendingTransaction>> get pendingStream =>
       _pendingController.stream;
-
   List<PendingTransaction> get pending => List.unmodifiable(_pending);
 
   NotificationService(this._prefs) {
@@ -68,42 +65,58 @@ class NotificationService {
   Future<bool> requestPermission() =>
       NotificationListenerService.requestPermission();
 
+  void markFirstLaunchAfterGrant() =>
+      _prefs.setBool(_firstLaunchAfterGrantKey, true);
+
+  bool _consumeFirstLaunchAfterGrant() {
+    final val = _prefs.getBool(_firstLaunchAfterGrantKey) ?? false;
+    if (val) _prefs.remove(_firstLaunchAfterGrantKey);
+    return val;
+  }
+
   // ── Lifecycle ──
 
   /// Start (or resume) listening. Safe to call multiple times.
-  Future<bool> initialize() async {
-    // Already subscribed — nothing to do.
+  /// [delayForBind] adds a wait for Android to finish binding the native
+  /// NotificationListenerService after a fresh permission grant.
+  Future<bool> initialize({bool delayForBind = false}) async {
     if (_subscription != null) return true;
 
-    final granted = await isPermissionGranted();
-    if (!granted) return false;
+    try {
+      final granted = await isPermissionGranted();
+      if (!granted) return false;
 
-    _subscription = NotificationListenerService.notificationsStream.listen(
-      _onNotificationReceived,
-      onError: (_) {},
-      cancelOnError: false,
-    );
-    return true;
+      if (delayForBind) {
+        // Give Android time to bind the native service after permission grant.
+        await Future<void>.delayed(const Duration(milliseconds: 800));
+      }
+
+      _subscription = NotificationListenerService.notificationsStream.listen(
+        _onNotificationReceived,
+        onError: (_) {},
+        cancelOnError: false,
+      );
+      return true;
+    } on PlatformException {
+      // Native service not yet bound — will retry on next launch.
+      _subscription = null;
+      return false;
+    } catch (_) {
+      _subscription = null;
+      return false;
+    }
   }
 
-  /// Cancel the stream subscription but keep the controller alive.
-  /// Call this when the user toggles the feature off — the service instance
-  /// stays valid and initialize() can be called again later.
   void stop() {
     _subscription?.cancel();
     _subscription = null;
   }
 
-  /// Full teardown — only called by Riverpod's ref.onDispose.
-  /// After this the instance must not be used again.
-  void _destroy() {
+  void dispose() {
     _subscription?.cancel();
     _subscription = null;
     if (!_pendingController.isClosed) _pendingController.close();
   }
-
-  /// Exposed so the provider can wire it to ref.onDispose.
-  void dispose() => _destroy();
 
   // ── Notification Processing ──
 
@@ -122,11 +135,10 @@ class NotificationService {
     );
     if (transaction == null) return;
 
-    final isDuplicate = _pending.any((p) {
-      return p.amount == transaction.amount &&
-          p.merchant == transaction.merchant &&
-          transaction.timestamp.difference(p.timestamp).inMinutes.abs() < 2;
-    });
+    final isDuplicate = _pending.any((p) =>
+        p.amount == transaction.amount &&
+        p.merchant == transaction.merchant &&
+        transaction.timestamp.difference(p.timestamp).inMinutes.abs() < 2);
     if (isDuplicate) return;
 
     _pending.insert(0, transaction);
@@ -181,4 +193,7 @@ class NotificationService {
     final jsonStr = jsonEncode(_pending.map((t) => t.toJson()).toList());
     _prefs.setString(_pendingKey, jsonStr);
   }
+
+  bool get isFirstLaunchAfterGrant => _prefs.getBool(_firstLaunchAfterGrantKey) ?? false;
+  bool consumeFirstLaunchAfterGrant() => _consumeFirstLaunchAfterGrant();
 }

@@ -117,7 +117,6 @@ class NotificationParser {
     'com.amazon.mShop.android.shopping': 'amazonpay',
   };
 
-  // ── Amount: strict — requires currency symbol OR decimal part ──
   static final _amountStrict = RegExp(
     r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
     r'|'
@@ -127,14 +126,10 @@ class NotificationParser {
     caseSensitive: false,
   );
 
-  // Strip balance part before parsing so Bal: Rs. 3257.9 is never
-  // mistaken for the transaction amount.
   static final _balancePattern = RegExp(
     r'(?:Bal(?:ance)?|Avl\.?\s*Bal)\.?\s*:?\s*(?:Rs\.?|INR|\u20B9)?\s*[\d,]+(?:\.\d{1,2})?',
     caseSensitive: false,
   );
-
-  // ── UPI app patterns ──────────────────────────────────────────────────────
 
   static final _gpayPaid = RegExp(
     r'(?:you\s+)?paid\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s*$)',
@@ -160,15 +155,6 @@ class NotificationParser {
     r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+received\s+from\s+(.+?)(?:\s+on|\s*$)',
     caseSensitive: false,
   );
-
-  // ── Bank SMS: credit patterns ─────────────────────────────────────────────
-  // Covers all common Indian bank formats:
-  //   "A/c XXXX credited with Rs. 1000"       <- the bug format
-  //   "credited by Rs. 1000"
-  //   "Rs. 1000 has been credited"
-  //   "Rs. 1000 credited to A/c"
-  //   "INR 1000 credited"
-  //   "deposited Rs. 1000"
   static final _bankCredited = RegExp(
     r'credited\s+(?:with\s+|by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
     r'|'
@@ -177,14 +163,6 @@ class NotificationParser {
     r'deposited\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)',
     caseSensitive: false,
   );
-
-  // ── Bank SMS: debit patterns ──────────────────────────────────────────────
-  // Covers:
-  //   "A/c XXXX debited with Rs. 500"
-  //   "debited by Rs. 500"
-  //   "Rs. 500 has been debited"
-  //   "Rs. 500 debited from A/c"
-  //   "withdrawn Rs. 500"
   static final _bankDebited = RegExp(
     r'debited\s+(?:with\s+|by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
     r'|'
@@ -193,24 +171,15 @@ class NotificationParser {
     r'withdrawn\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)',
     caseSensitive: false,
   );
-
-  // ── Merchant extraction ───────────────────────────────────────────────────
-  // 1. Standard: "at / to / from / towards MERCHANT on/ref/."
   static final _merchantKeyword = RegExp(
     r"(?:at|to|from|towards)\s+([A-Za-z][\w\s&.'-]{1,40}?)(?:\s+on|\s+ref|\s+txn|\s+via|\s*\.|\s*$)",
     caseSensitive: false,
   );
-  // 2. Trailing sender: "... - JPBL" or "... -HDFCBK" at end of string
-  static final _merchantSender = RegExp(
-    r'-\s*([A-Z][A-Z0-9]{1,15})\s*$',
-  );
-  // 3. Info field: "Info: MERCHANT"
+  static final _merchantSender = RegExp(r'-\s*([A-Z][A-Z0-9]{1,15})\s*$');
   static final _merchantInfo = RegExp(
     r'Info:\s*([A-Za-z][\w\s&.-]{1,40}?)(?:\s*\.|\s*$)',
     caseSensitive: false,
   );
-
-  // ── Entry point ───────────────────────────────────────────────────────────
 
   static PendingTransaction? parseNotification(
     String packageName,
@@ -220,7 +189,6 @@ class NotificationParser {
     final rawFull = '$title $text'.trim();
     if (rawFull.isEmpty) return null;
 
-    // Strip balance segment so it can't pollute amount extraction
     final fullText = rawFull.replaceAll(_balancePattern, '').trim();
 
     final appName = _appNames[packageName] ?? packageName;
@@ -230,7 +198,6 @@ class NotificationParser {
     String? merchant;
     bool? isDebit;
 
-    // UPI apps first
     if (packageName == 'com.google.android.apps.nbu.paisa.user') {
       final r = _tryGpayPatterns(fullText);
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
@@ -242,13 +209,11 @@ class NotificationParser {
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     }
 
-    // Bank SMS fallback (also handles generic bank apps)
     if (amount == null) {
       final r = _tryBankPatterns(fullText);
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     }
 
-    // Last resort: strict amount pattern with no directional context
     if (amount == null) {
       final match = _amountStrict.firstMatch(fullText);
       if (match != null) {
@@ -259,13 +224,12 @@ class NotificationParser {
 
     if (amount == null || amount <= 0) return null;
 
-    // Merchant: try keyword → sender suffix → info field
     if (merchant == null) {
       final m1 = _merchantKeyword.firstMatch(fullText);
       if (m1 != null) {
         merchant = m1.group(1)?.trim();
       } else {
-        final m2 = _merchantSender.firstMatch(rawFull); // use raw — sender is at end
+        final m2 = _merchantSender.firstMatch(rawFull);
         if (m2 != null) {
           merchant = m2.group(1)?.trim();
         } else {
@@ -289,8 +253,6 @@ class NotificationParser {
       rawText: rawFull,
     );
   }
-
-  // ── UPI helpers ───────────────────────────────────────────────────────────
 
   static _ParseResult? _tryGpayPatterns(String text) {
     final paid = _gpayPaid.firstMatch(text);
@@ -334,10 +296,7 @@ class NotificationParser {
     return null;
   }
 
-  // ── Bank SMS helper ───────────────────────────────────────────────────────
-
   static _ParseResult? _tryBankPatterns(String text) {
-    // Check credit first
     final credit = _bankCredited.firstMatch(text);
     if (credit != null) {
       final raw = credit.group(1) ?? credit.group(2) ?? credit.group(3);
@@ -349,7 +308,6 @@ class NotificationParser {
         }
       }
     }
-    // Then debit
     final debit = _bankDebited.firstMatch(text);
     if (debit != null) {
       final raw = debit.group(1) ?? debit.group(2) ?? debit.group(3);
@@ -414,6 +372,9 @@ final pendingTransactionsProvider = StateNotifierProvider<
   return PendingTransactionNotifier(service);
 });
 
+/// Called on every app launch by NotificationBootstrap.
+/// If this was the first launch after permission was just granted,
+/// delays the subscription to let Android bind the native service.
 Future<void> initializeIfEnabled(WidgetRef ref) async {
   final prefs = ref.read(sharedPreferencesProvider);
   final wasEnabled =
@@ -421,10 +382,23 @@ Future<void> initializeIfEnabled(WidgetRef ref) async {
   if (!wasEnabled) return;
 
   final service = ref.read(notificationServiceProvider);
-  final started = await service.initialize();
-  if (started) {
-    ref.read(isListeningProvider.notifier).state = true;
-  } else {
+
+  // Consume the flag — if true this is the launch right after grant
+  final isFirstAfterGrant = service.consumeFirstLaunchAfterGrant();
+
+  try {
+    final started = await service.initialize(
+      delayForBind: isFirstAfterGrant,
+    );
+    if (started) {
+      ref.read(isListeningProvider.notifier).state = true;
+    } else {
+      // Permission revoked or service not ready — reset cleanly
+      await prefs.setBool(AppConstants.prefNotificationListener, false);
+      ref.read(isListeningProvider.notifier).state = false;
+    }
+  } catch (_) {
+    // Safety net: any unexpected error resets state so crash loop can't happen
     await prefs.setBool(AppConstants.prefNotificationListener, false);
     ref.read(isListeningProvider.notifier).state = false;
   }
@@ -432,18 +406,26 @@ Future<void> initializeIfEnabled(WidgetRef ref) async {
 
 Future<bool> startListening(WidgetRef ref) async {
   final service = ref.read(notificationServiceProvider);
-  final granted = await service.isPermissionGranted();
-  if (!granted) {
-    final result = await service.requestPermission();
-    if (!result) return false;
+
+  try {
+    final granted = await service.isPermissionGranted();
+    if (!granted) {
+      final result = await service.requestPermission();
+      if (!result) return false;
+      // Mark that the NEXT launch is the first after a fresh grant
+      service.markFirstLaunchAfterGrant();
+    }
+
+    final started = await service.initialize(delayForBind: !granted);
+    if (started) {
+      final prefs = ref.read(sharedPreferencesProvider);
+      await prefs.setBool(AppConstants.prefNotificationListener, true);
+      ref.read(isListeningProvider.notifier).state = true;
+    }
+    return started;
+  } catch (_) {
+    return false;
   }
-  final started = await service.initialize();
-  if (started) {
-    final prefs = ref.read(sharedPreferencesProvider);
-    await prefs.setBool(AppConstants.prefNotificationListener, true);
-    ref.read(isListeningProvider.notifier).state = true;
-  }
-  return started;
 }
 
 void stopListening(WidgetRef ref) {
