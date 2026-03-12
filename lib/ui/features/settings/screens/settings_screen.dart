@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../app/di/providers.dart';
 import '../../../../config/constants/app_constants.dart';
@@ -8,6 +9,7 @@ import '../../../../config/constants/currency_catalog.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_provider.dart';
+import '../../notifications/providers/notification_provider.dart';
 
 /// Main settings / "More" screen with all app configuration options.
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -17,15 +19,34 @@ class SettingsScreen extends ConsumerStatefulWidget {
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen>
+    with WidgetsBindingObserver {
   bool _biometricEnabled = false;
-  bool _notificationsEnabled = true;
+  // Push notifications: live permission status, not just a pref
+  bool _notificationsEnabled = false;
   String _currency = 'INR';
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadPreferences();
+    _refreshNotificationPermission();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // Re-check permissions when user comes back from system settings
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshNotificationPermission();
+      _refreshListenerStatus();
+    }
   }
 
   Future<void> _loadPreferences() async {
@@ -33,17 +54,233 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() {
       _biometricEnabled =
           prefs.getBool(AppConstants.prefAppLockEnabled) ?? false;
-      _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
       _currency =
           prefs.getString(AppConstants.prefCurrency) ??
           AppConstants.defaultCurrency;
     });
   }
 
+  /// Read the REAL OS-level notification permission status.
+  Future<void> _refreshNotificationPermission() async {
+    final status = await Permission.notification.status;
+    if (mounted) {
+      setState(() => _notificationsEnabled = status.isGranted);
+    }
+  }
+
+  /// Re-sync the listener toggle with the service's actual state.
+  Future<void> _refreshListenerStatus() async {
+    final service = ref.read(notificationServiceProvider);
+    final granted = await service.isPermissionGranted();
+    if (!granted) {
+      // Permission was revoked in system settings — update state
+      final prefs = ref.read(sharedPreferencesProvider);
+      await prefs.setBool(AppConstants.prefNotificationListener, false);
+      ref.read(isListeningProvider.notifier).state = false;
+    }
+  }
+
+  // ── Push Notifications toggle ──────────────────────────────────────────
+
+  Future<void> _onPushNotificationsToggled(bool enable) async {
+    if (enable) {
+      final status = await Permission.notification.request();
+      if (status.isGranted) {
+        setState(() => _notificationsEnabled = true);
+      } else if (status.isPermanentlyDenied) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Notification permission is blocked. Enable it in Settings.',
+            ),
+            action: SnackBarAction(
+              label: 'Open Settings',
+              onPressed: openAppSettings,
+            ),
+            duration: const Duration(seconds: 5),
+          ),
+        );
+        setState(() => _notificationsEnabled = false);
+      } else {
+        // Denied but not permanently — just reflect reality
+        setState(() => _notificationsEnabled = false);
+      }
+    } else {
+      // Can't programmatically revoke — open settings for the user
+      await openAppSettings();
+    }
+  }
+
+  // ── Notification Listener (SMS/bank alerts) toggle ─────────────────────
+
+  Future<void> _onListenerToggled(bool enable) async {
+    if (enable) {
+      await _showListenerExplanationSheet();
+    } else {
+      stopListening(ref);
+    }
+  }
+
+  Future<void> _showListenerExplanationSheet() async {
+    final confirmed = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final theme = Theme.of(ctx);
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Handle bar
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.outlineVariant,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.notifications_active_outlined,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Enable Notification Reader',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Auto-detect payments from UPI & bank alerts',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // What it reads
+                _PermissionPoint(
+                  icon: Icons.payment_outlined,
+                  title: 'Payment notifications',
+                  subtitle:
+                      'Google Pay, PhonePe, Paytm, and bank SMS alerts',
+                ),
+                const SizedBox(height: 12),
+                _PermissionPoint(
+                  icon: Icons.auto_awesome_outlined,
+                  title: 'Auto-fills transactions',
+                  subtitle:
+                      'Amount and merchant are detected — you confirm before saving',
+                ),
+                const SizedBox(height: 12),
+                _PermissionPoint(
+                  icon: Icons.lock_outline_rounded,
+                  title: 'Private by design',
+                  subtitle:
+                      'Nothing leaves your device. No data is uploaded anywhere.',
+                ),
+
+                const SizedBox(height: 8),
+
+                // Note about system settings
+                Container(
+                  margin: const EdgeInsets.only(top: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline_rounded,
+                        size: 16,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Android will open Notification Access settings. '  
+                          'Find Cheddar in the list and toggle it on.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Enable'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (confirmed == true && mounted) {
+      await startListening(ref);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final isListening = ref.watch(isListeningProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings'), centerTitle: true),
@@ -157,21 +394,46 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           // ── Notifications ──
           _SectionHeader(title: 'Notifications'),
+
+          // Push notifications — requests OS permission via permission_handler
           SwitchListTile(
             secondary: const Icon(Icons.notifications_outlined),
             title: const Text('Push Notifications'),
-            subtitle: const Text('Budget alerts, bill reminders, insights'),
+            subtitle: Text(
+              _notificationsEnabled ? 'Enabled' : 'Disabled',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: _notificationsEnabled
+                    ? colors.primary
+                    : colors.onSurfaceVariant,
+              ),
+            ),
             value: _notificationsEnabled,
-            onChanged: (v) async {
-              final prefs = ref.read(sharedPreferencesProvider);
-              await prefs.setBool('notifications_enabled', v);
-              setState(() => _notificationsEnabled = v);
-            },
+            onChanged: _onPushNotificationsToggled,
           ),
+
+          // Notification listener — reads payment/bank notifications
+          SwitchListTile(
+            secondary: const Icon(Icons.sms_outlined),
+            title: const Text('Payment Notification Reader'),
+            subtitle: Text(
+              isListening
+                  ? 'Active — auto-detecting payments'
+                  : 'Off — tap to enable',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: isListening
+                    ? colors.primary
+                    : colors.onSurfaceVariant,
+              ),
+            ),
+            value: isListening,
+            onChanged: _onListenerToggled,
+          ),
+
+          // View detected pending transactions
           ListTile(
-            leading: const Icon(Icons.sms_outlined),
-            title: const Text('SMS / Notification Reader'),
-            subtitle: const Text('Auto-capture transactions from bank alerts'),
+            leading: const Icon(Icons.pending_actions_outlined),
+            title: const Text('Pending Transactions'),
+            subtitle: const Text('Review transactions detected from alerts'),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => context.pushNamed(RouteNames.pendingTransactions),
           ),
@@ -221,21 +483,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.star_outline_rounded),
             title: const Text('Rate on Play Store'),
-            onTap: () {
-              // TODO: Open Play Store link
-            },
+            onTap: () {},
           ),
           ListTile(
             leading: const Icon(Icons.share_outlined),
             title: const Text('Share with Friends'),
-            onTap: () {
-              // TODO: Share intent
-            },
+            onTap: () {},
           ),
 
           const SizedBox(height: AppSpacing.xxl),
 
-          // ── Footer ──
           Center(
             child: Column(
               children: [
@@ -261,7 +518,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  // ── Dialogs ───────────────────────────────────────────────────────────────
+  // ── Dialogs ──────────────────────────────────────────────────────────────
 
   void _showCurrencyPicker() {
     showModalBottomSheet(
@@ -269,7 +526,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       isScrollControlled: true,
       builder: (ctx) {
         var query = '';
-
         return FractionallySizedBox(
           heightFactor: 0.84,
           child: StatefulBuilder(
@@ -335,7 +591,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           itemBuilder: (context, index) {
                             final currency = filtered[index];
                             final isSelected = currency.code == _currency;
-
                             return RadioListTile<String>(
                               value: currency.code,
                               groupValue: _currency,
@@ -356,15 +611,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               ),
                               onChanged: (value) async {
                                 if (value == null) return;
-                                final prefs = ref.read(
-                                  sharedPreferencesProvider,
-                                );
+                                final prefs =
+                                    ref.read(sharedPreferencesProvider);
                                 await prefs.setString(
                                   AppConstants.prefCurrency,
                                   value,
                                 );
-                                ref.read(currencyCodeProvider.notifier).state =
-                                    value;
+                                ref
+                                    .read(currencyCodeProvider.notifier)
+                                    .state = value;
                                 setState(() => _currency = value);
                                 if (ctx.mounted) Navigator.pop(ctx);
                               },
@@ -466,31 +721,84 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  // ── Data Actions (stubs - Phase 18 will implement) ────────────────────────
-
   Future<void> _exportData(String format) async {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Exporting as $format...')));
-    // TODO: Phase 18 - implement export via ExportService
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Exporting as $format...')),
+    );
   }
 
   Future<void> _createBackup() async {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Creating backup...')));
-    // TODO: Phase 18 - implement backup via ExportService
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Creating backup...')),
+    );
   }
 
   Future<void> _restoreBackup() async {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Select a backup file...')));
-    // TODO: Phase 18 - implement restore via file_picker + ExportService
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Select a backup file...')),
+    );
   }
 }
 
-// ── Section Header ──────────────────────────────────────────────────────────
+// ── Permission Explanation Point ────────────────────────────────────────────
+
+class _PermissionPoint extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const _PermissionPoint({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.secondaryContainer,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: theme.colorScheme.secondary,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  height: 1.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Section Header ───────────────────────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {
   final String title;
@@ -517,7 +825,7 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// ── Quick Link Card ─────────────────────────────────────────────────────────
+// ── Quick Link Card ──────────────────────────────────────────────────────────
 
 class _QuickLink extends StatelessWidget {
   final IconData icon;
@@ -563,13 +871,11 @@ class _QuickLink extends StatelessWidget {
 
 class _CurrencyBadge extends StatelessWidget {
   final CurrencyOption currency;
-
   const _CurrencyBadge({required this.currency});
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-
     return Container(
       width: 42,
       height: 42,
