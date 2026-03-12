@@ -53,7 +53,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userName = ref.watch(userNameProvider);
     final currencySymbol = ref.watch(currencySymbolProvider);
     final showValues = ref.watch(showValuesProvider);
-    // FIX [Bug 1]: Watch pending count so badge stays live.
     final pendingCount = ref.watch(pendingTransactionsProvider).length;
 
     ref.listen(transactionStreamProvider, (_, __) {
@@ -261,7 +260,6 @@ class _GreetingHeader extends StatelessWidget {
                         curve: Curves.easeOut,
                       ),
             ),
-            // FIX [Bug 1]: Notification bell — visible only when pending > 0.
             if (pendingCount > 0)
               Stack(
                 clipBehavior: Clip.none,
@@ -850,8 +848,14 @@ class _SpendingChart extends StatelessWidget {
 }
 
 // ── Recent Transactions List (Sliver) ────────────────────────────────────────
+//
+// MUST be a StatefulWidget so we can track _dismissedIds synchronously.
+// Flutter requires the Dismissible to be removed from the tree in the very
+// next frame after onDismissed fires. Riverpod's async invalidate+refetch
+// takes longer, so we keep a local Set<int> that filters items out
+// immediately, satisfying Flutter while Riverpod catches up in parallel.
 
-class _RecentTransactionsList extends StatelessWidget {
+class _RecentTransactionsList extends StatefulWidget {
   final WidgetRef ref;
   final ThemeData theme;
   final String currencySymbol;
@@ -865,12 +869,28 @@ class _RecentTransactionsList extends StatelessWidget {
   });
 
   @override
+  State<_RecentTransactionsList> createState() =>
+      _RecentTransactionsListState();
+}
+
+class _RecentTransactionsListState extends State<_RecentTransactionsList> {
+  // IDs removed optimistically so the Dismissible is gone before Riverpod
+  // delivers the updated list.
+  final Set<int> _dismissedIds = {};
+
+  @override
   Widget build(BuildContext context) {
-    final txnAsync = ref.watch(recentTransactionsProvider);
-    final cheddarColors = theme.extension<CheddarColors>();
+    final txnAsync = widget.ref.watch(recentTransactionsProvider);
+    final cheddarColors = widget.theme.extension<CheddarColors>();
 
     return txnAsync.when(
-      data: (transactions) {
+      data: (allTransactions) {
+        // Filter out locally-dismissed items immediately.
+        final transactions = allTransactions
+            .where((t) => !_dismissedIds.contains(t.id))
+            .take(5)
+            .toList();
+
         if (transactions.isEmpty) {
           return SliverToBoxAdapter(
             child: Padding(
@@ -881,17 +901,16 @@ class _RecentTransactionsList extends StatelessWidget {
                   const SizedBox(height: Spacing.md),
                   Text(
                     'No transactions yet',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                    style: widget.theme.textTheme.bodyMedium?.copyWith(
+                      color: widget.theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: Spacing.sm),
                   Text(
                     'Tap "Add Expense" to get started',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant.withValues(
-                        alpha: 0.7,
-                      ),
+                    style: widget.theme.textTheme.bodySmall?.copyWith(
+                      color: widget.theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -903,7 +922,7 @@ class _RecentTransactionsList extends StatelessWidget {
         return SliverPadding(
           padding: Spacing.horizontalLg,
           sliver: SliverList.builder(
-            itemCount: math.min(transactions.length, 5),
+            itemCount: transactions.length,
             itemBuilder: (context, index) {
               final txn = transactions[index];
               return Dismissible(
@@ -913,7 +932,7 @@ class _RecentTransactionsList extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   padding: const EdgeInsets.only(right: Spacing.lg),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.error,
+                    color: widget.theme.colorScheme.error,
                     borderRadius: Radii.borderMd,
                   ),
                   child: const Icon(
@@ -922,16 +941,27 @@ class _RecentTransactionsList extends StatelessWidget {
                   ),
                 ),
                 confirmDismiss: (_) async {
-                  return await _showDeleteConfirmation(context, theme);
+                  return await _showDeleteConfirmation(
+                    context,
+                    widget.theme,
+                  );
                 },
                 onDismissed: (_) {
+                  // 1. Remove from local set SYNCHRONOUSLY so Flutter sees
+                  //    it gone on the very next frame — no assertion error.
+                  setState(() => _dismissedIds.add(txn.id));
+
+                  // 2. Persist the delete and refresh providers in parallel.
                   final deletedTxn = txn;
-                  ref.read(transactionRepositoryProvider).delete(deletedTxn.id);
-                  ref.invalidate(recentTransactionsProvider);
-                  ref.invalidate(totalBalanceProvider);
-                  ref.invalidate(monthlyIncomeProvider);
-                  ref.invalidate(monthlyExpenseProvider);
-                  ref.invalidate(categoryTotalsProvider);
+                  widget.ref
+                      .read(transactionRepositoryProvider)
+                      .delete(deletedTxn.id);
+                  widget.ref.invalidate(recentTransactionsProvider);
+                  widget.ref.invalidate(totalBalanceProvider);
+                  widget.ref.invalidate(monthlyIncomeProvider);
+                  widget.ref.invalidate(monthlyExpenseProvider);
+                  widget.ref.invalidate(categoryTotalsProvider);
+
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
@@ -944,14 +974,20 @@ class _RecentTransactionsList extends StatelessWidget {
                         action: SnackBarAction(
                           label: 'Undo',
                           onPressed: () async {
-                            await ref
+                            await widget.ref
                                 .read(transactionRepositoryProvider)
                                 .add(deletedTxn);
-                            ref.invalidate(recentTransactionsProvider);
-                            ref.invalidate(totalBalanceProvider);
-                            ref.invalidate(monthlyIncomeProvider);
-                            ref.invalidate(monthlyExpenseProvider);
-                            ref.invalidate(categoryTotalsProvider);
+                            // Remove from dismissed set so it reappears.
+                            if (mounted) {
+                              setState(
+                                () => _dismissedIds.remove(deletedTxn.id),
+                              );
+                            }
+                            widget.ref.invalidate(recentTransactionsProvider);
+                            widget.ref.invalidate(totalBalanceProvider);
+                            widget.ref.invalidate(monthlyIncomeProvider);
+                            widget.ref.invalidate(monthlyExpenseProvider);
+                            widget.ref.invalidate(categoryTotalsProvider);
                           },
                         ),
                       ),
@@ -960,10 +996,10 @@ class _RecentTransactionsList extends StatelessWidget {
                 child:
                     _TransactionRow(
                           transaction: txn,
-                          theme: theme,
+                          theme: widget.theme,
                           cheddarColors: cheddarColors,
-                          currencySymbol: currencySymbol,
-                          showValues: showValues,
+                          currencySymbol: widget.currencySymbol,
+                          showValues: widget.showValues,
                           onTap: () {
                             context.pushNamed(
                               RouteNames.transactionDetail,
@@ -1064,7 +1100,6 @@ class _TransactionRow extends StatelessWidget {
         : '-';
     final dateStr = DateFormat('MMM d').format(transaction.date);
 
-    // FIX [Bug 3]: fall back to categoryOther SVG for unknown categories.
     final categoryIcon = _categoryToAssetPath(transaction.category);
 
     return InkWell(
@@ -1097,7 +1132,6 @@ class _TransactionRow extends StatelessWidget {
                 ],
               ),
               padding: const EdgeInsets.all(8),
-              // FIX [Bug 3]: always render SvgPicture — never fall back to Icon.
               child: SvgPicture.asset(categoryIcon, width: 26, height: 26),
             ),
 
@@ -1148,7 +1182,6 @@ class _TransactionRow extends StatelessWidget {
     );
   }
 
-  // FIX [Bug 3]: Always return a valid SVG path; unknown → categoryOther.
   static String _categoryToAssetPath(String category) {
     final normalized = category.toLowerCase().trim();
     const map = {
