@@ -179,7 +179,6 @@ final addTransactionProvider =
   ref.invalidate(allTransactionsProvider);
   ref.invalidate(filteredTransactionsProvider);
   ref.invalidate(groupedTransactionsProvider);
-  // FIX: invalidate home providers so home screen syncs immediately.
   ref.invalidate(recentTransactionsProvider);
   ref.invalidate(totalBalanceProvider);
   ref.invalidate(monthlyIncomeProvider);
@@ -197,8 +196,6 @@ final updateTransactionProvider =
   ref.invalidate(filteredTransactionsProvider);
   ref.invalidate(groupedTransactionsProvider);
   ref.invalidate(transactionByIdProvider(transaction.id));
-  // FIX: also invalidate home screen providers so recent transactions
-  // and balance reflect edits immediately without needing a manual refresh.
   ref.invalidate(recentTransactionsProvider);
   ref.invalidate(totalBalanceProvider);
   ref.invalidate(monthlyIncomeProvider);
@@ -206,15 +203,57 @@ final updateTransactionProvider =
   ref.invalidate(categoryTotalsProvider);
 });
 
-/// Deletes a transaction by id and invalidates caches.
+/// Deletes a transaction by id, reverses its effect on account balance(s),
+/// and invalidates caches.
+///
+/// FIX: Previously only deleted the DB row without touching account balances,
+/// leaving the account total permanently wrong after any deletion.
 final deleteTransactionProvider =
     FutureProvider.family<void, int>((ref, id) async {
-  final repo = ref.read(transactionRepositoryProvider);
-  await repo.delete(id);
+  final txnRepo = ref.read(transactionRepositoryProvider);
+  final accRepo = ref.read(accountRepositoryProvider);
+
+  // Fetch the transaction BEFORE deleting so we can reverse its balance impact.
+  final txn = await txnRepo.getById(id);
+
+  await txnRepo.delete(id);
+
+  if (txn != null) {
+    final srcId = int.tryParse(txn.accountId);
+    if (srcId != null) {
+      final src = await accRepo.getById(srcId);
+      if (src != null) {
+        // Reverse the original delta:
+        //   income  (+amount) → subtract amount
+        //   expense (-amount) → add amount back
+        //   transfer src (-amount) → add amount back
+        final double reverseDelta;
+        switch (txn.type) {
+          case 0:
+            reverseDelta = -txn.amount;
+            break;
+          default:
+            reverseDelta = txn.amount;
+        }
+        await accRepo.updateBalance(srcId, src.balance + reverseDelta);
+      }
+    }
+
+    // For transfers, also reverse the destination account.
+    if (txn.type == 2 && txn.toAccountId != null) {
+      final dstId = int.tryParse(txn.toAccountId!);
+      if (dstId != null) {
+        final dst = await accRepo.getById(dstId);
+        if (dst != null) {
+          await accRepo.updateBalance(dstId, dst.balance - txn.amount);
+        }
+      }
+    }
+  }
+
   ref.invalidate(allTransactionsProvider);
   ref.invalidate(filteredTransactionsProvider);
   ref.invalidate(groupedTransactionsProvider);
-  // FIX: invalidate home providers on delete too.
   ref.invalidate(recentTransactionsProvider);
   ref.invalidate(totalBalanceProvider);
   ref.invalidate(monthlyIncomeProvider);
