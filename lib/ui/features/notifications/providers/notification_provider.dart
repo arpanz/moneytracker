@@ -6,7 +6,7 @@ import '../../../../app/di/providers.dart';
 import '../../../../config/constants/app_constants.dart';
 import '../services/notification_service.dart';
 
-// ── Data Models ──
+// ── Data Models ──────────────────────────────────────────────────────────────
 
 class PendingTransaction {
   final String id;
@@ -76,7 +76,7 @@ class PendingTransaction {
   }
 }
 
-// ── Notification Parser ──
+// ── Notification Parser ──────────────────────────────────────────────────────
 
 class NotificationParser {
   const NotificationParser._();
@@ -117,7 +117,8 @@ class NotificationParser {
     'com.amazon.mShop.android.shopping': 'amazonpay',
   };
 
-  static final _amountPatternStrict = RegExp(
+  // ── Amount: strict — requires currency symbol OR decimal part ──
+  static final _amountStrict = RegExp(
     r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
     r'|'
     r'([\d,]+\.\d{1,2})\s*(?:Rs\.?|INR|\u20B9)?'
@@ -125,6 +126,15 @@ class NotificationParser {
     r'\b([\d,]+\.\d{2})\b',
     caseSensitive: false,
   );
+
+  // Strip balance part before parsing so Bal: Rs. 3257.9 is never
+  // mistaken for the transaction amount.
+  static final _balancePattern = RegExp(
+    r'(?:Bal(?:ance)?|Avl\.?\s*Bal)\.?\s*:?\s*(?:Rs\.?|INR|\u20B9)?\s*[\d,]+(?:\.\d{1,2})?',
+    caseSensitive: false,
+  );
+
+  // ── UPI app patterns ──────────────────────────────────────────────────────
 
   static final _gpayPaid = RegExp(
     r'(?:you\s+)?paid\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s*$)',
@@ -150,30 +160,68 @@ class NotificationParser {
     r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+received\s+from\s+(.+?)(?:\s+on|\s*$)',
     caseSensitive: false,
   );
-  static final _bankDebited = RegExp(
-    r'(?:debited\s+(?:by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?))'
-    r'|'
-    r'(?:(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+(?:has\s+been\s+)?debited)',
-    caseSensitive: false,
-  );
+
+  // ── Bank SMS: credit patterns ─────────────────────────────────────────────
+  // Covers all common Indian bank formats:
+  //   "A/c XXXX credited with Rs. 1000"       <- the bug format
+  //   "credited by Rs. 1000"
+  //   "Rs. 1000 has been credited"
+  //   "Rs. 1000 credited to A/c"
+  //   "INR 1000 credited"
+  //   "deposited Rs. 1000"
   static final _bankCredited = RegExp(
-    r'(?:credited\s+(?:by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?))'
+    r'credited\s+(?:with\s+|by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
     r'|'
-    r'(?:(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+(?:has\s+been\s+)?credited)',
+    r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+(?:has\s+been\s+)?credited'
+    r'|'
+    r'deposited\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)',
     caseSensitive: false,
   );
-  static final _merchantPattern = RegExp(
-    r"(?:at|to|from|towards)\s+([A-Za-z][\w\s&.'-]{1,40}?)(?:\s+on|\s+ref|\s+txn|\s*\.|\s*$)",
+
+  // ── Bank SMS: debit patterns ──────────────────────────────────────────────
+  // Covers:
+  //   "A/c XXXX debited with Rs. 500"
+  //   "debited by Rs. 500"
+  //   "Rs. 500 has been debited"
+  //   "Rs. 500 debited from A/c"
+  //   "withdrawn Rs. 500"
+  static final _bankDebited = RegExp(
+    r'debited\s+(?:with\s+|by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
+    r'|'
+    r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+(?:has\s+been\s+)?debited'
+    r'|'
+    r'withdrawn\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)',
     caseSensitive: false,
   );
+
+  // ── Merchant extraction ───────────────────────────────────────────────────
+  // 1. Standard: "at / to / from / towards MERCHANT on/ref/."
+  static final _merchantKeyword = RegExp(
+    r"(?:at|to|from|towards)\s+([A-Za-z][\w\s&.'-]{1,40}?)(?:\s+on|\s+ref|\s+txn|\s+via|\s*\.|\s*$)",
+    caseSensitive: false,
+  );
+  // 2. Trailing sender: "... - JPBL" or "... -HDFCBK" at end of string
+  static final _merchantSender = RegExp(
+    r'-\s*([A-Z][A-Z0-9]{1,15})\s*$',
+  );
+  // 3. Info field: "Info: MERCHANT"
+  static final _merchantInfo = RegExp(
+    r'Info:\s*([A-Za-z][\w\s&.-]{1,40}?)(?:\s*\.|\s*$)',
+    caseSensitive: false,
+  );
+
+  // ── Entry point ───────────────────────────────────────────────────────────
 
   static PendingTransaction? parseNotification(
     String packageName,
     String title,
     String text,
   ) {
-    final fullText = '$title $text'.trim();
-    if (fullText.isEmpty) return null;
+    final rawFull = '$title $text'.trim();
+    if (rawFull.isEmpty) return null;
+
+    // Strip balance segment so it can't pollute amount extraction
+    final fullText = rawFull.replaceAll(_balancePattern, '').trim();
 
     final appName = _appNames[packageName] ?? packageName;
     final appIcon = _appIcons[packageName];
@@ -182,6 +230,7 @@ class NotificationParser {
     String? merchant;
     bool? isDebit;
 
+    // UPI apps first
     if (packageName == 'com.google.android.apps.nbu.paisa.user') {
       final r = _tryGpayPatterns(fullText);
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
@@ -193,13 +242,15 @@ class NotificationParser {
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     }
 
+    // Bank SMS fallback (also handles generic bank apps)
     if (amount == null) {
       final r = _tryBankPatterns(fullText);
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     }
 
+    // Last resort: strict amount pattern with no directional context
     if (amount == null) {
-      final match = _amountPatternStrict.firstMatch(fullText);
+      final match = _amountStrict.firstMatch(fullText);
       if (match != null) {
         final raw = match.group(1) ?? match.group(2) ?? match.group(3);
         if (raw != null) amount = double.tryParse(raw.replaceAll(',', ''));
@@ -208,9 +259,20 @@ class NotificationParser {
 
     if (amount == null || amount <= 0) return null;
 
+    // Merchant: try keyword → sender suffix → info field
     if (merchant == null) {
-      final mMatch = _merchantPattern.firstMatch(fullText);
-      if (mMatch != null) merchant = mMatch.group(1)?.trim();
+      final m1 = _merchantKeyword.firstMatch(fullText);
+      if (m1 != null) {
+        merchant = m1.group(1)?.trim();
+      } else {
+        final m2 = _merchantSender.firstMatch(rawFull); // use raw — sender is at end
+        if (m2 != null) {
+          merchant = m2.group(1)?.trim();
+        } else {
+          final m3 = _merchantInfo.firstMatch(fullText);
+          if (m3 != null) merchant = m3.group(1)?.trim();
+        }
+      }
     }
 
     isDebit ??= true;
@@ -224,9 +286,11 @@ class NotificationParser {
       merchant: merchant,
       timestamp: DateTime.now(),
       isDebit: isDebit,
-      rawText: fullText,
+      rawText: rawFull,
     );
   }
+
+  // ── UPI helpers ───────────────────────────────────────────────────────────
 
   static _ParseResult? _tryGpayPatterns(String text) {
     final paid = _gpayPaid.firstMatch(text);
@@ -270,26 +334,30 @@ class NotificationParser {
     return null;
   }
 
+  // ── Bank SMS helper ───────────────────────────────────────────────────────
+
   static _ParseResult? _tryBankPatterns(String text) {
-    final debit = _bankDebited.firstMatch(text);
-    if (debit != null) {
-      final raw = debit.group(1) ?? debit.group(2);
+    // Check credit first
+    final credit = _bankCredited.firstMatch(text);
+    if (credit != null) {
+      final raw = credit.group(1) ?? credit.group(2) ?? credit.group(3);
       if (raw != null) {
         final a = double.tryParse(raw.replaceAll(',', ''));
         if (a != null) {
-          final m = _merchantPattern.firstMatch(text);
-          return _ParseResult(amount: a, merchant: m?.group(1)?.trim(), isDebit: true);
+          final m = _merchantKeyword.firstMatch(text);
+          return _ParseResult(amount: a, merchant: m?.group(1)?.trim(), isDebit: false);
         }
       }
     }
-    final credit = _bankCredited.firstMatch(text);
-    if (credit != null) {
-      final raw = credit.group(1) ?? credit.group(2);
+    // Then debit
+    final debit = _bankDebited.firstMatch(text);
+    if (debit != null) {
+      final raw = debit.group(1) ?? debit.group(2) ?? debit.group(3);
       if (raw != null) {
         final a = double.tryParse(raw.replaceAll(',', ''));
         if (a != null) {
-          final m = _merchantPattern.firstMatch(text);
-          return _ParseResult(amount: a, merchant: m?.group(1)?.trim(), isDebit: false);
+          final m = _merchantKeyword.firstMatch(text);
+          return _ParseResult(amount: a, merchant: m?.group(1)?.trim(), isDebit: true);
         }
       }
     }
@@ -304,7 +372,7 @@ class _ParseResult {
   const _ParseResult({required this.amount, this.merchant, required this.isDebit});
 }
 
-// ── State Notifier ──
+// ── State Notifier ────────────────────────────────────────────────────────────
 
 class PendingTransactionNotifier
     extends StateNotifier<List<PendingTransaction>> {
@@ -326,12 +394,11 @@ class PendingTransactionNotifier
   }
 }
 
-// ── Providers ──
+// ── Providers ─────────────────────────────────────────────────────────────────
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
   final service = NotificationService(prefs);
-  // _destroy() (full teardown) only runs when Riverpod removes the provider
   ref.onDispose(service.dispose);
   return service;
 });
@@ -379,11 +446,9 @@ Future<bool> startListening(WidgetRef ref) async {
   return started;
 }
 
-/// FIX: call service.stop() (subscription cancel only), NOT service.dispose()
-/// (which closed the StreamController and caused the next-launch crash).
 void stopListening(WidgetRef ref) {
   final service = ref.read(notificationServiceProvider);
-  service.stop(); // cancels subscription, keeps controller alive
+  service.stop();
   final prefs = ref.read(sharedPreferencesProvider);
   prefs.setBool(AppConstants.prefNotificationListener, false);
   ref.read(isListeningProvider.notifier).state = false;
