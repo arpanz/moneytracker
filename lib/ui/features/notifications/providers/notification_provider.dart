@@ -117,6 +117,7 @@ class NotificationParser {
     'com.amazon.mShop.android.shopping': 'amazonpay',
   };
 
+  // ── Amount ──
   static final _amountStrict = RegExp(
     r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
     r'|'
@@ -131,38 +132,73 @@ class NotificationParser {
     caseSensitive: false,
   );
 
+  // ── UPI / Payment app patterns ──────────────────────────────────────────
+
+  // GPay: "You paid ₹500 to Swiggy on..."
   static final _gpayPaid = RegExp(
     r'(?:you\s+)?paid\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s*$)',
     caseSensitive: false,
   );
+  // GPay: "Received ₹500 from Rahul on..."
   static final _gpayReceived = RegExp(
     r'received\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+from\s+(.+?)(?:\s+on|\s*$)',
     caseSensitive: false,
   );
+
+  // PhonePe: "paid ₹500 to NAME on/via"
   static final _phonepePaid = RegExp(
     r'paid\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s+via|\s*$)',
     caseSensitive: false,
   );
+  // PhonePe: "received ₹500 from NAME on/via"
   static final _phonepeReceived = RegExp(
     r'received\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+from\s+(.+?)(?:\s+on|\s+via|\s*$)',
     caseSensitive: false,
   );
+
+  // Paytm title: "Received ₹1000 from NAME"  ← the bug format
+  static final _paytmReceivedTitle = RegExp(
+    r'received\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+from\s+(.+?)(?:\s+on|\s*$)',
+    caseSensitive: false,
+  );
+  // Paytm body: "₹1000 received from NAME"
+  static final _paytmReceivedBody = RegExp(
+    r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+received\s+from\s+(.+?)(?:\s+on|\s*$)',
+    caseSensitive: false,
+  );
+  // Paytm paid: "paid ₹500 to NAME"
   static final _paytmPaid = RegExp(
     r'paid\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s*$)',
     caseSensitive: false,
   );
-  static final _paytmReceived = RegExp(
-    r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+received\s+from\s+(.+?)(?:\s+on|\s*$)',
+
+  // Generic fallbacks — work across any UPI app
+  static final _genericReceived = RegExp(
+    r'received\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)(?:\s+from\s+([\w\s]+?))?(?:\s+on|\s*$)',
     caseSensitive: false,
   );
+  static final _genericPaid = RegExp(
+    r'(?:paid|sent)\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)(?:\s+to\s+([\w\s]+?))?(?:\s+on|\s*$)',
+    caseSensitive: false,
+  );
+
+  // ── Bank SMS patterns ────────────────────────────────────────────────────
+
+  // group(1): "credited with/by ₹X"
+  // group(2): "₹X credited"
+  // group(3): "deposited in your ... ₹X" (requires amount after deposited keyword phrase)
+  // group(4): "₹X deposited"
   static final _bankCredited = RegExp(
     r'credited\s+(?:with\s+|by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
     r'|'
     r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+(?:has\s+been\s+)?credited'
     r'|'
-    r'deposited\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)',
+    r'deposited\s+(?:in\s+your\s+)?(?:[\w\s]+?\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
+    r'|'
+    r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+deposited',
     caseSensitive: false,
   );
+
   static final _bankDebited = RegExp(
     r'debited\s+(?:with\s+|by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
     r'|'
@@ -171,15 +207,28 @@ class NotificationParser {
     r'withdrawn\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)',
     caseSensitive: false,
   );
+
+  // ── Merchant patterns ────────────────────────────────────────────────────
+
+  // "at/to/from/towards MERCHANT on/ref/."
   static final _merchantKeyword = RegExp(
     r"(?:at|to|from|towards)\s+([A-Za-z][\w\s&.'-]{1,40}?)(?:\s+on|\s+ref|\s+txn|\s+via|\s*\.|\s*$)",
     caseSensitive: false,
   );
+  // Title-level "from NAME" — e.g. "Received ₹1000 from Ashutoshkumar"
+  static final _merchantFrom = RegExp(
+    r'from\s+([A-Za-z][\w\s]{1,30}?)(?:\s+on|\s*$)',
+    caseSensitive: false,
+  );
+  // Trailing sender code: "... - JPBL"
   static final _merchantSender = RegExp(r'-\s*([A-Z][A-Z0-9]{1,15})\s*$');
+  // Info field: "Info: NAME"
   static final _merchantInfo = RegExp(
     r'Info:\s*([A-Za-z][\w\s&.-]{1,40}?)(?:\s*\.|\s*$)',
     caseSensitive: false,
   );
+
+  // ── Entry point ──────────────────────────────────────────────────────────
 
   static PendingTransaction? parseNotification(
     String packageName,
@@ -189,6 +238,7 @@ class NotificationParser {
     final rawFull = '$title $text'.trim();
     if (rawFull.isEmpty) return null;
 
+    // Strip balance segment so it can't pollute amount extraction
     final fullText = rawFull.replaceAll(_balancePattern, '').trim();
 
     final appName = _appNames[packageName] ?? packageName;
@@ -198,6 +248,7 @@ class NotificationParser {
     String? merchant;
     bool? isDebit;
 
+    // 1. App-specific patterns
     if (packageName == 'com.google.android.apps.nbu.paisa.user') {
       final r = _tryGpayPatterns(fullText);
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
@@ -209,11 +260,19 @@ class NotificationParser {
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     }
 
+    // 2. Bank SMS patterns (also catches UPI bank-style notifs like "Deposited in your account")
     if (amount == null) {
       final r = _tryBankPatterns(fullText);
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     }
 
+    // 3. Generic UPI fallback
+    if (amount == null) {
+      final r = _tryGenericUpiPatterns(fullText);
+      if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
+    }
+
+    // 4. Last resort: grab any currency amount
     if (amount == null) {
       final match = _amountStrict.firstMatch(fullText);
       if (match != null) {
@@ -224,17 +283,24 @@ class NotificationParser {
 
     if (amount == null || amount <= 0) return null;
 
+    // Merchant extraction: keyword → title "from NAME" → trailing sender → Info:
     if (merchant == null) {
       final m1 = _merchantKeyword.firstMatch(fullText);
       if (m1 != null) {
         merchant = m1.group(1)?.trim();
       } else {
-        final m2 = _merchantSender.firstMatch(rawFull);
+        // Check title specifically for "from NAME" (e.g. Paytm "Received ₹X from NAME")
+        final m2 = _merchantFrom.firstMatch(title);
         if (m2 != null) {
           merchant = m2.group(1)?.trim();
         } else {
-          final m3 = _merchantInfo.firstMatch(fullText);
-          if (m3 != null) merchant = m3.group(1)?.trim();
+          final m3 = _merchantSender.firstMatch(rawFull);
+          if (m3 != null) {
+            merchant = m3.group(1)?.trim();
+          } else {
+            final m4 = _merchantInfo.firstMatch(fullText);
+            if (m4 != null) merchant = m4.group(1)?.trim();
+          }
         }
       }
     }
@@ -254,6 +320,7 @@ class NotificationParser {
     );
   }
 
+  // ── GPay ──
   static _ParseResult? _tryGpayPatterns(String text) {
     final paid = _gpayPaid.firstMatch(text);
     if (paid != null) {
@@ -268,6 +335,7 @@ class NotificationParser {
     return null;
   }
 
+  // ── PhonePe ──
   static _ParseResult? _tryPhonepePatterns(String text) {
     final paid = _phonepePaid.firstMatch(text);
     if (paid != null) {
@@ -282,24 +350,50 @@ class NotificationParser {
     return null;
   }
 
+  // ── Paytm ──
   static _ParseResult? _tryPaytmPatterns(String text) {
+    // Title format FIRST: "Received ₹1000 from NAME"
+    final recvTitle = _paytmReceivedTitle.firstMatch(text);
+    if (recvTitle != null) {
+      final a = double.tryParse(recvTitle.group(1)!.replaceAll(',', ''));
+      if (a != null) return _ParseResult(amount: a, merchant: recvTitle.group(2)?.trim(), isDebit: false);
+    }
+    // Body format: "₹1000 received from NAME"
+    final recvBody = _paytmReceivedBody.firstMatch(text);
+    if (recvBody != null) {
+      final a = double.tryParse(recvBody.group(1)!.replaceAll(',', ''));
+      if (a != null) return _ParseResult(amount: a, merchant: recvBody.group(2)?.trim(), isDebit: false);
+    }
+    // Paid: "paid ₹500 to NAME"
     final paid = _paytmPaid.firstMatch(text);
     if (paid != null) {
       final a = double.tryParse(paid.group(1)!.replaceAll(',', ''));
       if (a != null) return _ParseResult(amount: a, merchant: paid.group(2)?.trim(), isDebit: true);
     }
-    final recv = _paytmReceived.firstMatch(text);
+    return null;
+  }
+
+  // ── Generic UPI ──
+  static _ParseResult? _tryGenericUpiPatterns(String text) {
+    final recv = _genericReceived.firstMatch(text);
     if (recv != null) {
       final a = double.tryParse(recv.group(1)!.replaceAll(',', ''));
       if (a != null) return _ParseResult(amount: a, merchant: recv.group(2)?.trim(), isDebit: false);
     }
+    final paid = _genericPaid.firstMatch(text);
+    if (paid != null) {
+      final a = double.tryParse(paid.group(1)!.replaceAll(',', ''));
+      if (a != null) return _ParseResult(amount: a, merchant: paid.group(2)?.trim(), isDebit: true);
+    }
     return null;
   }
 
+  // ── Bank SMS ──
   static _ParseResult? _tryBankPatterns(String text) {
     final credit = _bankCredited.firstMatch(text);
     if (credit != null) {
-      final raw = credit.group(1) ?? credit.group(2) ?? credit.group(3);
+      // 4 capture groups: check all
+      final raw = credit.group(1) ?? credit.group(2) ?? credit.group(3) ?? credit.group(4);
       if (raw != null) {
         final a = double.tryParse(raw.replaceAll(',', ''));
         if (a != null) {
@@ -372,9 +466,6 @@ final pendingTransactionsProvider = StateNotifierProvider<
   return PendingTransactionNotifier(service);
 });
 
-/// Called on every app launch by NotificationBootstrap.
-/// If this was the first launch after permission was just granted,
-/// delays the subscription to let Android bind the native service.
 Future<void> initializeIfEnabled(WidgetRef ref) async {
   final prefs = ref.read(sharedPreferencesProvider);
   final wasEnabled =
@@ -382,23 +473,17 @@ Future<void> initializeIfEnabled(WidgetRef ref) async {
   if (!wasEnabled) return;
 
   final service = ref.read(notificationServiceProvider);
-
-  // Consume the flag — if true this is the launch right after grant
   final isFirstAfterGrant = service.consumeFirstLaunchAfterGrant();
 
   try {
-    final started = await service.initialize(
-      delayForBind: isFirstAfterGrant,
-    );
+    final started = await service.initialize(delayForBind: isFirstAfterGrant);
     if (started) {
       ref.read(isListeningProvider.notifier).state = true;
     } else {
-      // Permission revoked or service not ready — reset cleanly
       await prefs.setBool(AppConstants.prefNotificationListener, false);
       ref.read(isListeningProvider.notifier).state = false;
     }
   } catch (_) {
-    // Safety net: any unexpected error resets state so crash loop can't happen
     await prefs.setBool(AppConstants.prefNotificationListener, false);
     ref.read(isListeningProvider.notifier).state = false;
   }
@@ -406,16 +491,13 @@ Future<void> initializeIfEnabled(WidgetRef ref) async {
 
 Future<bool> startListening(WidgetRef ref) async {
   final service = ref.read(notificationServiceProvider);
-
   try {
     final granted = await service.isPermissionGranted();
     if (!granted) {
       final result = await service.requestPermission();
       if (!result) return false;
-      // Mark that the NEXT launch is the first after a fresh grant
       service.markFirstLaunchAfterGrant();
     }
-
     final started = await service.initialize(delayForBind: !granted);
     if (started) {
       final prefs = ref.read(sharedPreferencesProvider);
