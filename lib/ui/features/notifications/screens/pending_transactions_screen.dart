@@ -29,7 +29,13 @@ class PendingTransactionsScreen extends ConsumerWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Pending Transactions'),
+            // FIX: Flexible prevents the text from overflowing the Row
+            Flexible(
+              child: const Text(
+                'Pending Transactions',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             if (pending.isNotEmpty) ...[
               const SizedBox(width: Spacing.sm),
               Container(
@@ -70,16 +76,13 @@ class PendingTransactionsScreen extends ConsumerWidget {
           ? _buildEmptyState(context, theme)
           : RefreshIndicator(
               onRefresh: () async {
-                // Re-read from service (triggers stream update)
                 ref.invalidate(pendingTransactionsProvider);
               },
               child: ListView.builder(
                 padding: Spacing.paddingMd,
-                itemCount: pending.length + 1, // +1 for info card
+                itemCount: pending.length + 1,
                 itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return _buildInfoCard(theme);
-                  }
+                  if (index == 0) return _buildInfoCard(theme);
                   final tx = pending[index - 1];
                   return _PendingTransactionCard(
                         transaction: tx,
@@ -172,17 +175,23 @@ class PendingTransactionsScreen extends ConsumerWidget {
     WidgetRef ref,
     PendingTransaction tx,
   ) {
-    // Mark as saved in the provider
     ref.read(pendingTransactionsProvider.notifier).markSaved(tx.id);
 
-    // Create a pre-filled transaction and navigate to add screen
+    // FIX: initialise ALL late fields on TransactionModel so GoRouter never
+    // hands the add screen a half-constructed object regardless of whether
+    // the extra survives serialisation or not.
     final transaction = TransactionModel()
       ..amount = tx.amount
-      ..type = tx.isDebit
-          ? 1
-          : 0 // 1 = expense, 0 = income
+      ..type = tx.isDebit ? 1 : 0
+      // Use merchant as a category hint; user can change it on the next screen.
+      ..category = tx.merchant ?? tx.appName
+      ..accountId = ''
+      ..toAccountId = null
       ..note = tx.merchant ?? tx.appName
       ..date = tx.timestamp
+      ..tags = []
+      ..isRecurring = false
+      ..recurringRule = null
       ..createdAt = DateTime.now();
 
     context.pushNamed(RouteNames.addTransaction, extra: transaction);
@@ -237,7 +246,6 @@ class _PendingTransactionCard extends StatelessWidget {
     required this.onDismiss,
   });
 
-  /// Map app icon identifiers to FontAwesome icons.
   static const _appIconMap = <String, FaIconData>{
     'gpay': FontAwesomeIcons.googlePay,
     'phonepe': FontAwesomeIcons.mobile,
@@ -250,7 +258,6 @@ class _PendingTransactionCard extends StatelessWidget {
         _appIconMap.containsKey(transaction.appIcon)) {
       return _appIconMap[transaction.appIcon]!;
     }
-    // Default icon for bank apps
     return FontAwesomeIcons.buildingColumns;
   }
 
@@ -266,9 +273,7 @@ class _PendingTransactionCard extends StatelessWidget {
 
     final amountPrefix = isDebit ? '-' : '+';
     final formattedAmount = _formatAmount(transaction.amount);
-    final formattedDate = DateFormat(
-      'dd MMM, hh:mm a',
-    ).format(transaction.timestamp);
+    final formattedDate = DateFormat('dd MMM, hh:mm a').format(transaction.timestamp);
 
     return Dismissible(
       key: ValueKey(transaction.id),
@@ -294,17 +299,13 @@ class _PendingTransactionCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header row: app icon/name + amount
               Row(
                 children: [
-                  // App icon
                   Container(
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer.withOpacity(
-                        0.5,
-                      ),
+                      color: theme.colorScheme.primaryContainer.withOpacity(0.5),
                       borderRadius: Radii.borderSm,
                     ),
                     child: Center(
@@ -316,8 +317,6 @@ class _PendingTransactionCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: Spacing.sm),
-
-                  // App name and merchant
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,8 +340,6 @@ class _PendingTransactionCard extends StatelessWidget {
                       ],
                     ),
                   ),
-
-                  // Amount
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -376,10 +373,7 @@ class _PendingTransactionCard extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: Spacing.sm),
-
-              // Date & time
               Row(
                 children: [
                   FaIcon(
@@ -396,10 +390,7 @@ class _PendingTransactionCard extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: Spacing.md),
-
-              // Action buttons
               Row(
                 children: [
                   Expanded(
@@ -408,14 +399,11 @@ class _PendingTransactionCard extends StatelessWidget {
                       icon: const FaIcon(FontAwesomeIcons.xmark, size: 14),
                       label: const Text('Dismiss'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: theme.colorScheme.onSurface
-                            .withOpacity(0.6),
+                        foregroundColor: theme.colorScheme.onSurface.withOpacity(0.6),
                         side: BorderSide(
                           color: theme.colorScheme.outline.withOpacity(0.3),
                         ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: Spacing.sm,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
                       ),
                     ),
                   ),
@@ -426,9 +414,7 @@ class _PendingTransactionCard extends StatelessWidget {
                       icon: const FaIcon(FontAwesomeIcons.floppyDisk, size: 14),
                       label: const Text('Save'),
                       style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: Spacing.sm,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
                       ),
                     ),
                   ),
@@ -441,20 +427,14 @@ class _PendingTransactionCard extends StatelessWidget {
     );
   }
 
-  /// Format amount with Indian-style comma grouping.
   String _formatAmount(double amount) {
-    if (amount >= 10000000) {
-      return '${(amount / 10000000).toStringAsFixed(2)} Cr';
-    }
-    if (amount >= 100000) {
-      return '${(amount / 100000).toStringAsFixed(2)} L';
-    }
+    if (amount >= 10000000) return '${(amount / 10000000).toStringAsFixed(2)} Cr';
+    if (amount >= 100000) return '${(amount / 100000).toStringAsFixed(2)} L';
 
     final wholePart = amount.truncate();
     final decimalPart = ((amount - wholePart) * 100).round();
     final wholeStr = wholePart.toString();
 
-    // Indian comma format: last 3 digits, then groups of 2
     if (wholeStr.length <= 3) {
       return decimalPart > 0
           ? '$wholeStr.${decimalPart.toString().padLeft(2, '0')}'
@@ -465,18 +445,12 @@ class _PendingTransactionCard extends StatelessWidget {
     final remaining = wholeStr.substring(0, wholeStr.length - 3);
     final buffer = StringBuffer();
     for (var i = 0; i < remaining.length; i++) {
-      if (i > 0 && (remaining.length - i) % 2 == 0) {
-        buffer.write(',');
-      }
+      if (i > 0 && (remaining.length - i) % 2 == 0) buffer.write(',');
       buffer.write(remaining[i]);
     }
     buffer.write(',');
     buffer.write(lastThree);
-
-    if (decimalPart > 0) {
-      buffer.write('.${decimalPart.toString().padLeft(2, '0')}');
-    }
-
+    if (decimalPart > 0) buffer.write('.${decimalPart.toString().padLeft(2, '0')}');
     return buffer.toString();
   }
 }
