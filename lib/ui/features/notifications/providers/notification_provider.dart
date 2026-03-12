@@ -117,31 +117,14 @@ class NotificationParser {
     'com.amazon.mShop.android.shopping': 'amazonpay',
   };
 
-  // ── Amount patterns ──
-  // FIX: tightened so bare integers only match when adjacent to a currency
-  // symbol or have a decimal part — prevents quantities, barcodes, years from
-  // being picked up as amounts.
   static final _amountPatternStrict = RegExp(
-    // currency-symbol then number (with or without decimals)
     r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
     r'|'
-    // number then currency symbol
     r'([\d,]+\.\d{1,2})\s*(?:Rs\.?|INR|\u20B9)?'
     r'|'
-    // number with decimal followed by nothing (bare price like 249.00)
     r'\b([\d,]+\.\d{2})\b',
     caseSensitive: false,
   );
-
-  // Kept for generic amount extraction only when strict fails
-  static final _amountPatternLoose = RegExp(
-    r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
-    r'|'
-    r'([\d,]+(?:\.\d{1,2})?)\s*(?:Rs\.?|INR|\u20B9)',
-    caseSensitive: false,
-  );
-
-  // ── UPI app-specific patterns ──
 
   static final _gpayPaid = RegExp(
     r'(?:you\s+)?paid\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s*$)',
@@ -167,9 +150,6 @@ class NotificationParser {
     r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+received\s+from\s+(.+?)(?:\s+on|\s*$)',
     caseSensitive: false,
   );
-
-  // ── Bank SMS patterns ──
-
   static final _bankDebited = RegExp(
     r'(?:debited\s+(?:by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?))'
     r'|'
@@ -218,7 +198,6 @@ class NotificationParser {
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     }
 
-    // Last resort: strict amount pattern (avoids false positives)
     if (amount == null) {
       final match = _amountPatternStrict.firstMatch(fullText);
       if (match != null) {
@@ -352,6 +331,7 @@ class PendingTransactionNotifier
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
   final service = NotificationService(prefs);
+  // _destroy() (full teardown) only runs when Riverpod removes the provider
   ref.onDispose(service.dispose);
   return service;
 });
@@ -367,9 +347,6 @@ final pendingTransactionsProvider = StateNotifierProvider<
   return PendingTransactionNotifier(service);
 });
 
-/// FIX: called on app start to auto-resume listening if it was previously
-/// enabled. This is the key function that was missing — the service was never
-/// restarted after an app restart even though the pref said enabled=true.
 Future<void> initializeIfEnabled(WidgetRef ref) async {
   final prefs = ref.read(sharedPreferencesProvider);
   final wasEnabled =
@@ -381,7 +358,6 @@ Future<void> initializeIfEnabled(WidgetRef ref) async {
   if (started) {
     ref.read(isListeningProvider.notifier).state = true;
   } else {
-    // Permission was revoked — update pref to reflect reality.
     await prefs.setBool(AppConstants.prefNotificationListener, false);
     ref.read(isListeningProvider.notifier).state = false;
   }
@@ -403,9 +379,11 @@ Future<bool> startListening(WidgetRef ref) async {
   return started;
 }
 
+/// FIX: call service.stop() (subscription cancel only), NOT service.dispose()
+/// (which closed the StreamController and caused the next-launch crash).
 void stopListening(WidgetRef ref) {
   final service = ref.read(notificationServiceProvider);
-  service.dispose();
+  service.stop(); // cancels subscription, keeps controller alive
   final prefs = ref.read(sharedPreferencesProvider);
   prefs.setBool(AppConstants.prefNotificationListener, false);
   ref.read(isListeningProvider.notifier).state = false;
