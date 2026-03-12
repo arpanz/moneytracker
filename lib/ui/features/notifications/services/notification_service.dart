@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as dev;
 
 import 'package:flutter/services.dart';
 import 'package:notification_listener_service/notification_event.dart';
@@ -10,8 +11,6 @@ import '../providers/notification_provider.dart';
 
 class NotificationService {
   static const _pendingKey = 'pending_notification_transactions';
-  // Set to true right after the user grants permission so the next launch
-  // knows to wait for Android to bind the native service before subscribing.
   static const _firstLaunchAfterGrantKey = 'notif_first_launch_after_grant';
 
   static const supportedPackages = <String>{
@@ -57,8 +56,6 @@ class NotificationService {
     _loadPending();
   }
 
-  // ── Permission ──
-
   Future<bool> isPermissionGranted() =>
       NotificationListenerService.isPermissionGranted();
 
@@ -74,34 +71,27 @@ class NotificationService {
     return val;
   }
 
-  // ── Lifecycle ──
-
-  /// Start (or resume) listening. Safe to call multiple times.
-  /// [delayForBind] adds a wait for Android to finish binding the native
-  /// NotificationListenerService after a fresh permission grant.
   Future<bool> initialize({bool delayForBind = false}) async {
     if (_subscription != null) return true;
-
     try {
       final granted = await isPermissionGranted();
       if (!granted) return false;
-
       if (delayForBind) {
-        // Give Android time to bind the native service after permission grant.
         await Future<void>.delayed(const Duration(milliseconds: 800));
       }
-
       _subscription = NotificationListenerService.notificationsStream.listen(
         _onNotificationReceived,
-        onError: (_) {},
+        onError: (e) => dev.log('[NotifService] stream error: $e', name: 'Cheddar'),
         cancelOnError: false,
       );
+      dev.log('[NotifService] listener subscribed', name: 'Cheddar');
       return true;
-    } on PlatformException {
-      // Native service not yet bound — will retry on next launch.
+    } on PlatformException catch (e) {
+      dev.log('[NotifService] PlatformException on init: $e', name: 'Cheddar');
       _subscription = null;
       return false;
-    } catch (_) {
+    } catch (e) {
+      dev.log('[NotifService] unexpected error on init: $e', name: 'Cheddar');
       _subscription = null;
       return false;
     }
@@ -110,6 +100,7 @@ class NotificationService {
   void stop() {
     _subscription?.cancel();
     _subscription = null;
+    dev.log('[NotifService] listener stopped', name: 'Cheddar');
   }
 
   void dispose() {
@@ -118,28 +109,46 @@ class NotificationService {
     if (!_pendingController.isClosed) _pendingController.close();
   }
 
-  // ── Notification Processing ──
-
   void _onNotificationReceived(ServiceNotificationEvent event) {
-    final packageName = event.packageName;
-    if (packageName == null) return;
-    if (!supportedPackages.contains(packageName)) return;
-
+    final pkg = event.packageName ?? 'unknown';
     final title = event.title ?? '';
     final text = event.content ?? '';
 
-    final transaction = NotificationParser.parseNotification(
-      packageName,
-      title,
-      text,
+    // DEBUG: log every single notification so we can see what's arriving
+    dev.log(
+      '[NotifService] PKG=$pkg | TITLE=$title | TEXT=$text',
+      name: 'Cheddar',
     );
-    if (transaction == null) return;
+
+    if (!supportedPackages.contains(pkg)) {
+      // Not a supported app — logged above, skip processing
+      return;
+    }
+
+    final transaction = NotificationParser.parseNotification(pkg, title, text);
+
+    if (transaction == null) {
+      dev.log(
+        '[NotifService] PARSE FAILED for supported pkg=$pkg | "$title" | "$text"',
+        name: 'Cheddar',
+      );
+      return;
+    }
 
     final isDuplicate = _pending.any((p) =>
         p.amount == transaction.amount &&
         p.merchant == transaction.merchant &&
         transaction.timestamp.difference(p.timestamp).inMinutes.abs() < 2);
-    if (isDuplicate) return;
+    if (isDuplicate) {
+      dev.log('[NotifService] duplicate skipped: ${transaction.amount}', name: 'Cheddar');
+      return;
+    }
+
+    dev.log(
+      '[NotifService] SAVED: ${transaction.isDebit ? 'DEBIT' : 'CREDIT'} '
+      '${transaction.amount} from ${transaction.merchant ?? 'unknown'}',
+      name: 'Cheddar',
+    );
 
     _pending.insert(0, transaction);
     _persistPending();
@@ -147,8 +156,6 @@ class NotificationService {
       _pendingController.add(List.unmodifiable(_pending));
     }
   }
-
-  // ── CRUD ──
 
   void dismiss(String id) {
     _pending.removeWhere((t) => t.id == id);
@@ -167,8 +174,6 @@ class NotificationService {
   }
 
   void markSaved(String id) => dismiss(id);
-
-  // ── Persistence ──
 
   void _loadPending() {
     final jsonStr = _prefs.getString(_pendingKey);
@@ -194,6 +199,7 @@ class NotificationService {
     _prefs.setString(_pendingKey, jsonStr);
   }
 
-  bool get isFirstLaunchAfterGrant => _prefs.getBool(_firstLaunchAfterGrantKey) ?? false;
+  bool get isFirstLaunchAfterGrant =>
+      _prefs.getBool(_firstLaunchAfterGrantKey) ?? false;
   bool consumeFirstLaunchAfterGrant() => _consumeFirstLaunchAfterGrant();
 }
