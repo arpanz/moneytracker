@@ -14,23 +14,44 @@ class NotificationService {
   static const _pendingKey = 'pending_notification_transactions';
 
   /// Supported payment / banking app package names.
+  ///
+  /// FIX: corrected wrong package IDs for HDFC, Canara, SBI.
+  /// Added real package names verified against Play Store listings.
+  /// Also added system SMS apps so bank debit/credit SMS alerts are captured
+  /// (banks typically send alerts via SMS, not their own app notifications).
   static const supportedPackages = <String>{
-    // UPI apps
+    // ── UPI apps ──
     'com.google.android.apps.nbu.paisa.user', // Google Pay
-    'com.phonepe.app', // PhonePe
-    'net.one97.paytm', // Paytm
-    'in.org.npci.upiapp', // BHIM
-    // Banking apps
-    'com.csam.icici.bank.imobile', // ICICI iMobile
-    'com.sbi.SBIFreedomPlus', // SBI YONO
-    'com.axis.mobile', // Axis Mobile
-    'com.bankofbaroda.mconnect', // BOB
-    'com.msf.kbank.mobile', // Kotak
-    'com.unionbankofindia.unionbank', // Union Bank
-    'com.infrasofttech.indianbank', // Indian Bank
-    'com.canaaboretum', // Canara Bank
-    'com.lcode.hdfc', // HDFC
-    'com.snapwork.hdfc', // HDFC PayZapp
+    'com.phonepe.app',                         // PhonePe
+    'net.one97.paytm',                         // Paytm
+    'in.org.npci.upiapp',                      // BHIM
+    'com.amazon.mShop.android.shopping',       // Amazon Pay
+
+    // ── Banking apps (verified package IDs) ──
+    'com.csam.icici.bank.imobile',             // ICICI iMobile Pay
+    'com.sbi.SBIFreedomPlus',                  // SBI YONO (old)
+    'com.sbi.lotusintouch',                    // SBI YONO (new)
+    'com.axis.mobile',                         // Axis Mobile
+    'com.bankofbaroda.mconnect',               // Bank of Baroda
+    'com.msf.kbank.mobile',                    // Kotak Bank
+    'com.unionbankofindia.unionbank',          // Union Bank
+    'com.infrasofttech.indianbank',            // Indian Bank
+    'com.canarabank.mobility',                 // Canara Bank (FIX: was wrong)
+    'com.hdfc.hdfcbankmobilebanking',          // HDFC Bank (FIX: was wrong)
+    'com.snapwork.hdfc',                       // HDFC PayZapp
+    'com.idbi.mPassbook',                      // IDBI Bank
+    'com.pnb.mbanking',                        // PNB mBanking
+    'com.indusind.mobile',                     // IndusInd Bank
+    'com.yesbank.yesmobile',                   // Yes Bank
+
+    // ── System SMS apps ──
+    // Bank debit/credit alerts come via SMS, not the bank's own app,
+    // so we need to intercept messages from the default SMS handler.
+    'com.android.mms',                         // Stock Android SMS
+    'com.google.android.apps.messaging',       // Google Messages
+    'com.samsung.android.messaging',           // Samsung Messages
+    'com.miui.sms',                            // Xiaomi / MIUI SMS
+    'com.oneplus.mms',                         // OnePlus Messages
   };
 
   final SharedPreferences _prefs;
@@ -39,11 +60,9 @@ class NotificationService {
   final _pendingController =
       StreamController<List<PendingTransaction>>.broadcast();
 
-  /// Stream of pending transactions for UI consumption.
   Stream<List<PendingTransaction>> get pendingStream =>
       _pendingController.stream;
 
-  /// Current pending list snapshot.
   List<PendingTransaction> get pending => List.unmodifiable(_pending);
 
   NotificationService(this._prefs) {
@@ -52,12 +71,10 @@ class NotificationService {
 
   // ── Permission ──
 
-  /// Check if the notification listener permission has been granted.
   Future<bool> isPermissionGranted() async {
     return NotificationListenerService.isPermissionGranted();
   }
 
-  /// Open the system settings page to grant notification listener permission.
   Future<bool> requestPermission() async {
     return NotificationListenerService.requestPermission();
   }
@@ -66,11 +83,16 @@ class NotificationService {
 
   /// Start listening for notifications. Returns `true` if the service started.
   Future<bool> initialize() async {
+    // If already subscribed, don't double-subscribe.
+    if (_subscription != null) return true;
+
     final granted = await isPermissionGranted();
     if (!granted) return false;
 
     _subscription = NotificationListenerService.notificationsStream.listen(
       _onNotificationReceived,
+      onError: (_) {},     // swallow stream errors so the app doesn't crash
+      cancelOnError: false,
     );
     return true;
   }
@@ -79,7 +101,7 @@ class NotificationService {
   void dispose() {
     _subscription?.cancel();
     _subscription = null;
-    _pendingController.close();
+    if (!_pendingController.isClosed) _pendingController.close();
   }
 
   // ── Notification Processing ──
@@ -87,32 +109,24 @@ class NotificationService {
   void _onNotificationReceived(ServiceNotificationEvent event) {
     final packageName = event.packageName;
     if (packageName == null) return;
-
-    // Only process notifications from supported apps
     if (!supportedPackages.contains(packageName)) return;
 
     final title = event.title ?? '';
     final text = event.content ?? '';
-
-    // Combine title and text for parsing
-    final fullText = '$title\n$text';
 
     final transaction = NotificationParser.parseNotification(
       packageName,
       title,
       text,
     );
-
     if (transaction == null) return;
 
-    // Avoid duplicates: check if we already have a pending transaction
-    // with the same amount and merchant within the last 2 minutes
+    // Deduplicate: same amount + merchant within 2 minutes
     final isDuplicate = _pending.any((p) {
       return p.amount == transaction.amount &&
           p.merchant == transaction.merchant &&
           transaction.timestamp.difference(p.timestamp).inMinutes.abs() < 2;
     });
-
     if (isDuplicate) return;
 
     _pending.insert(0, transaction);
@@ -120,33 +134,27 @@ class NotificationService {
     _pendingController.add(List.unmodifiable(_pending));
   }
 
-  // ── CRUD for pending list ──
+  // ── CRUD ──
 
-  /// Dismiss a single pending transaction by id.
   void dismiss(String id) {
     _pending.removeWhere((t) => t.id == id);
     _persistPending();
     _pendingController.add(List.unmodifiable(_pending));
   }
 
-  /// Dismiss all pending transactions.
   void dismissAll() {
     _pending.clear();
     _persistPending();
     _pendingController.add(List.unmodifiable(_pending));
   }
 
-  /// Mark a pending transaction as saved (removes it from pending).
-  void markSaved(String id) {
-    dismiss(id);
-  }
+  void markSaved(String id) => dismiss(id);
 
   // ── Persistence ──
 
   void _loadPending() {
     final jsonStr = _prefs.getString(_pendingKey);
     if (jsonStr == null || jsonStr.isEmpty) return;
-
     try {
       final list = jsonDecode(jsonStr) as List<dynamic>;
       _pending.addAll(
@@ -157,7 +165,6 @@ class NotificationService {
       );
       _pendingController.add(List.unmodifiable(_pending));
     } on FormatException {
-      // Corrupted data -- start fresh
       _prefs.remove(_pendingKey);
     }
   }

@@ -8,7 +8,6 @@ import '../services/notification_service.dart';
 
 // ── Data Models ──
 
-/// A transaction detected from a payment notification, pending user review.
 class PendingTransaction {
   final String id;
   final String appName;
@@ -79,105 +78,115 @@ class PendingTransaction {
 
 // ── Notification Parser ──
 
-/// Stateless parser that extracts payment information from notification text
-/// across common Indian UPI and banking apps.
 class NotificationParser {
   const NotificationParser._();
 
-  /// Friendly app name mapping from package names.
   static const _appNames = <String, String>{
     'com.google.android.apps.nbu.paisa.user': 'Google Pay',
     'com.phonepe.app': 'PhonePe',
     'net.one97.paytm': 'Paytm',
     'in.org.npci.upiapp': 'BHIM',
+    'com.amazon.mShop.android.shopping': 'Amazon Pay',
     'com.csam.icici.bank.imobile': 'ICICI Bank',
     'com.sbi.SBIFreedomPlus': 'SBI YONO',
+    'com.sbi.lotusintouch': 'SBI YONO',
     'com.axis.mobile': 'Axis Bank',
     'com.bankofbaroda.mconnect': 'Bank of Baroda',
     'com.msf.kbank.mobile': 'Kotak Bank',
     'com.unionbankofindia.unionbank': 'Union Bank',
     'com.infrasofttech.indianbank': 'Indian Bank',
-    'com.canaaboretum': 'Canara Bank',
-    'com.lcode.hdfc': 'HDFC Bank',
+    'com.canarabank.mobility': 'Canara Bank',
+    'com.hdfc.hdfcbankmobilebanking': 'HDFC Bank',
     'com.snapwork.hdfc': 'HDFC PayZapp',
+    'com.idbi.mPassbook': 'IDBI Bank',
+    'com.pnb.mbanking': 'PNB',
+    'com.indusind.mobile': 'IndusInd Bank',
+    'com.yesbank.yesmobile': 'Yes Bank',
+    'com.android.mms': 'SMS',
+    'com.google.android.apps.messaging': 'SMS',
+    'com.samsung.android.messaging': 'SMS',
+    'com.miui.sms': 'SMS',
+    'com.oneplus.mms': 'SMS',
   };
 
-  /// App icon identifiers (for mapping to local assets or icon fonts).
   static const _appIcons = <String, String>{
     'com.google.android.apps.nbu.paisa.user': 'gpay',
     'com.phonepe.app': 'phonepe',
     'net.one97.paytm': 'paytm',
     'in.org.npci.upiapp': 'bhim',
+    'com.amazon.mShop.android.shopping': 'amazonpay',
   };
 
   // ── Amount patterns ──
-
-  /// Matches Rs./INR followed by amount, or amount followed by Rs./INR
-  static final _amountPattern = RegExp(
-    r'(?:Rs\.?|INR|Rupees)\s*([\d,]+(?:\.\d{1,2})?)'
+  // FIX: tightened so bare integers only match when adjacent to a currency
+  // symbol or have a decimal part — prevents quantities, barcodes, years from
+  // being picked up as amounts.
+  static final _amountPatternStrict = RegExp(
+    // currency-symbol then number (with or without decimals)
+    r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
     r'|'
-    r'([\d,]+(?:\.\d{1,2})?)\s*(?:Rs\.?|INR|Rupees)',
+    // number then currency symbol
+    r'([\d,]+\.\d{1,2})\s*(?:Rs\.?|INR|\u20B9)?'
+    r'|'
+    // number with decimal followed by nothing (bare price like 249.00)
+    r'\b([\d,]+\.\d{2})\b',
     caseSensitive: false,
   );
 
-  // ── UPI app patterns ──
+  // Kept for generic amount extraction only when strict fails
+  static final _amountPatternLoose = RegExp(
+    r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
+    r'|'
+    r'([\d,]+(?:\.\d{1,2})?)\s*(?:Rs\.?|INR|\u20B9)',
+    caseSensitive: false,
+  );
 
-  /// Google Pay: "You paid Rs.X to Y" / "Received Rs.X from Y"
+  // ── UPI app-specific patterns ──
+
   static final _gpayPaid = RegExp(
-    r'(?:you\s+)?paid\s+(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s*$)',
+    r'(?:you\s+)?paid\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s*$)',
     caseSensitive: false,
   );
   static final _gpayReceived = RegExp(
-    r'received\s+(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?)\s+from\s+(.+?)(?:\s+on|\s*$)',
+    r'received\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+from\s+(.+?)(?:\s+on|\s*$)',
     caseSensitive: false,
   );
-
-  /// PhonePe: "Paid Rs.X to Y" / "Received Rs.X from Y"
   static final _phonepePaid = RegExp(
-    r'paid\s+(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s+via|\s*$)',
+    r'paid\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s+via|\s*$)',
     caseSensitive: false,
   );
   static final _phonepeReceived = RegExp(
-    r'received\s+(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?)\s+from\s+(.+?)(?:\s+on|\s+via|\s*$)',
+    r'received\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+from\s+(.+?)(?:\s+on|\s+via|\s*$)',
     caseSensitive: false,
   );
-
-  /// Paytm: "Paid Rs.X to Y" / "Rs.X received from Y"
   static final _paytmPaid = RegExp(
-    r'paid\s+(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s*$)',
+    r'paid\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+(.+?)(?:\s+on|\s*$)',
     caseSensitive: false,
   );
   static final _paytmReceived = RegExp(
-    r'(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?)\s+received\s+from\s+(.+?)(?:\s+on|\s*$)',
+    r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+received\s+from\s+(.+?)(?:\s+on|\s*$)',
     caseSensitive: false,
   );
 
-  // ── Bank SMS / notification patterns ──
+  // ── Bank SMS patterns ──
 
-  /// "debited by Rs.X" / "Rs.X debited"
   static final _bankDebited = RegExp(
-    r'(?:debited\s+(?:by\s+)?(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?))'
+    r'(?:debited\s+(?:by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?))'
     r'|'
-    r'(?:(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?)\s+(?:has\s+been\s+)?debited)',
+    r'(?:(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+(?:has\s+been\s+)?debited)',
     caseSensitive: false,
   );
-
-  /// "credited by Rs.X" / "Rs.X credited"
   static final _bankCredited = RegExp(
-    r'(?:credited\s+(?:by\s+)?(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?))'
+    r'(?:credited\s+(?:by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?))'
     r'|'
-    r'(?:(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?)\s+(?:has\s+been\s+)?credited)',
+    r'(?:(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+(?:has\s+been\s+)?credited)',
     caseSensitive: false,
   );
-
-  /// Extract merchant from bank notifications: "at Y" / "to Y" / "from Y"
   static final _merchantPattern = RegExp(
     r"(?:at|to|from|towards)\s+([A-Za-z][\w\s&.'-]{1,40}?)(?:\s+on|\s+ref|\s+txn|\s*\.|\s*$)",
     caseSensitive: false,
   );
 
-  /// Attempt to parse a notification into a [PendingTransaction].
-  /// Returns `null` if the notification is not a payment notification.
   static PendingTransaction? parseNotification(
     String packageName,
     String title,
@@ -193,67 +202,41 @@ class NotificationParser {
     String? merchant;
     bool? isDebit;
 
-    // Try UPI app-specific patterns first
     if (packageName == 'com.google.android.apps.nbu.paisa.user') {
-      final result = _tryGpayPatterns(fullText);
-      if (result != null) {
-        amount = result.amount;
-        merchant = result.merchant;
-        isDebit = result.isDebit;
-      }
+      final r = _tryGpayPatterns(fullText);
+      if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     } else if (packageName == 'com.phonepe.app') {
-      final result = _tryPhonepePatterns(fullText);
-      if (result != null) {
-        amount = result.amount;
-        merchant = result.merchant;
-        isDebit = result.isDebit;
-      }
+      final r = _tryPhonepePatterns(fullText);
+      if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     } else if (packageName == 'net.one97.paytm') {
-      final result = _tryPaytmPatterns(fullText);
-      if (result != null) {
-        amount = result.amount;
-        merchant = result.merchant;
-        isDebit = result.isDebit;
-      }
+      final r = _tryPaytmPatterns(fullText);
+      if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     }
 
-    // Fall back to generic bank patterns
     if (amount == null) {
-      final result = _tryBankPatterns(fullText);
-      if (result != null) {
-        amount = result.amount;
-        merchant = result.merchant;
-        isDebit = result.isDebit;
-      }
+      final r = _tryBankPatterns(fullText);
+      if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     }
 
-    // Last resort: just try to extract an amount
+    // Last resort: strict amount pattern (avoids false positives)
     if (amount == null) {
-      final amountMatch = _amountPattern.firstMatch(fullText);
-      if (amountMatch != null) {
-        final raw = amountMatch.group(1) ?? amountMatch.group(2);
-        if (raw != null) {
-          amount = double.tryParse(raw.replaceAll(',', ''));
-        }
+      final match = _amountPatternStrict.firstMatch(fullText);
+      if (match != null) {
+        final raw = match.group(1) ?? match.group(2) ?? match.group(3);
+        if (raw != null) amount = double.tryParse(raw.replaceAll(',', ''));
       }
     }
 
-    // If we still have no amount, this isn't a payment notification
     if (amount == null || amount <= 0) return null;
 
-    // Try to extract merchant if not found yet
     if (merchant == null) {
       final mMatch = _merchantPattern.firstMatch(fullText);
-      if (mMatch != null) {
-        merchant = mMatch.group(1)?.trim();
-      }
+      if (mMatch != null) merchant = mMatch.group(1)?.trim();
     }
 
-    // Default to debit if direction unknown
     isDebit ??= true;
 
     final id = '${DateTime.now().millisecondsSinceEpoch}_${amount.hashCode}';
-
     return PendingTransaction(
       id: id,
       appName: appName,
@@ -269,17 +252,13 @@ class NotificationParser {
   static _ParseResult? _tryGpayPatterns(String text) {
     final paid = _gpayPaid.firstMatch(text);
     if (paid != null) {
-      final amount = double.tryParse(paid.group(1)!.replaceAll(',', ''));
-      if (amount != null) {
-        return _ParseResult(amount: amount, merchant: paid.group(2)?.trim(), isDebit: true);
-      }
+      final a = double.tryParse(paid.group(1)!.replaceAll(',', ''));
+      if (a != null) return _ParseResult(amount: a, merchant: paid.group(2)?.trim(), isDebit: true);
     }
-    final received = _gpayReceived.firstMatch(text);
-    if (received != null) {
-      final amount = double.tryParse(received.group(1)!.replaceAll(',', ''));
-      if (amount != null) {
-        return _ParseResult(amount: amount, merchant: received.group(2)?.trim(), isDebit: false);
-      }
+    final recv = _gpayReceived.firstMatch(text);
+    if (recv != null) {
+      final a = double.tryParse(recv.group(1)!.replaceAll(',', ''));
+      if (a != null) return _ParseResult(amount: a, merchant: recv.group(2)?.trim(), isDebit: false);
     }
     return null;
   }
@@ -287,17 +266,13 @@ class NotificationParser {
   static _ParseResult? _tryPhonepePatterns(String text) {
     final paid = _phonepePaid.firstMatch(text);
     if (paid != null) {
-      final amount = double.tryParse(paid.group(1)!.replaceAll(',', ''));
-      if (amount != null) {
-        return _ParseResult(amount: amount, merchant: paid.group(2)?.trim(), isDebit: true);
-      }
+      final a = double.tryParse(paid.group(1)!.replaceAll(',', ''));
+      if (a != null) return _ParseResult(amount: a, merchant: paid.group(2)?.trim(), isDebit: true);
     }
-    final received = _phonepeReceived.firstMatch(text);
-    if (received != null) {
-      final amount = double.tryParse(received.group(1)!.replaceAll(',', ''));
-      if (amount != null) {
-        return _ParseResult(amount: amount, merchant: received.group(2)?.trim(), isDebit: false);
-      }
+    final recv = _phonepeReceived.firstMatch(text);
+    if (recv != null) {
+      final a = double.tryParse(recv.group(1)!.replaceAll(',', ''));
+      if (a != null) return _ParseResult(amount: a, merchant: recv.group(2)?.trim(), isDebit: false);
     }
     return null;
   }
@@ -305,51 +280,37 @@ class NotificationParser {
   static _ParseResult? _tryPaytmPatterns(String text) {
     final paid = _paytmPaid.firstMatch(text);
     if (paid != null) {
-      final amount = double.tryParse(paid.group(1)!.replaceAll(',', ''));
-      if (amount != null) {
-        return _ParseResult(amount: amount, merchant: paid.group(2)?.trim(), isDebit: true);
-      }
+      final a = double.tryParse(paid.group(1)!.replaceAll(',', ''));
+      if (a != null) return _ParseResult(amount: a, merchant: paid.group(2)?.trim(), isDebit: true);
     }
-    final received = _paytmReceived.firstMatch(text);
-    if (received != null) {
-      final amount = double.tryParse(received.group(1)!.replaceAll(',', ''));
-      if (amount != null) {
-        return _ParseResult(amount: amount, merchant: received.group(2)?.trim(), isDebit: false);
-      }
+    final recv = _paytmReceived.firstMatch(text);
+    if (recv != null) {
+      final a = double.tryParse(recv.group(1)!.replaceAll(',', ''));
+      if (a != null) return _ParseResult(amount: a, merchant: recv.group(2)?.trim(), isDebit: false);
     }
     return null;
   }
 
   static _ParseResult? _tryBankPatterns(String text) {
-    // Check debit
     final debit = _bankDebited.firstMatch(text);
     if (debit != null) {
       final raw = debit.group(1) ?? debit.group(2);
       if (raw != null) {
-        final amount = double.tryParse(raw.replaceAll(',', ''));
-        if (amount != null) {
-          final mMatch = _merchantPattern.firstMatch(text);
-          return _ParseResult(
-            amount: amount,
-            merchant: mMatch?.group(1)?.trim(),
-            isDebit: true,
-          );
+        final a = double.tryParse(raw.replaceAll(',', ''));
+        if (a != null) {
+          final m = _merchantPattern.firstMatch(text);
+          return _ParseResult(amount: a, merchant: m?.group(1)?.trim(), isDebit: true);
         }
       }
     }
-    // Check credit
     final credit = _bankCredited.firstMatch(text);
     if (credit != null) {
       final raw = credit.group(1) ?? credit.group(2);
       if (raw != null) {
-        final amount = double.tryParse(raw.replaceAll(',', ''));
-        if (amount != null) {
-          final mMatch = _merchantPattern.firstMatch(text);
-          return _ParseResult(
-            amount: amount,
-            merchant: mMatch?.group(1)?.trim(),
-            isDebit: false,
-          );
+        final a = double.tryParse(raw.replaceAll(',', ''));
+        if (a != null) {
+          final m = _merchantPattern.firstMatch(text);
+          return _ParseResult(amount: a, merchant: m?.group(1)?.trim(), isDebit: false);
         }
       }
     }
@@ -357,44 +318,27 @@ class NotificationParser {
   }
 }
 
-/// Internal parse result holder.
 class _ParseResult {
   final double amount;
   final String? merchant;
   final bool isDebit;
-
-  const _ParseResult({
-    required this.amount,
-    this.merchant,
-    required this.isDebit,
-  });
+  const _ParseResult({required this.amount, this.merchant, required this.isDebit});
 }
 
 // ── State Notifier ──
 
-class PendingTransactionNotifier extends StateNotifier<List<PendingTransaction>> {
+class PendingTransactionNotifier
+    extends StateNotifier<List<PendingTransaction>> {
   final NotificationService _service;
-
   StreamSubscription<List<PendingTransaction>>? _subscription;
 
-  PendingTransactionNotifier(this._service)
-      : super(_service.pending) {
-    _subscription = _service.pendingStream.listen((list) {
-      state = list;
-    });
+  PendingTransactionNotifier(this._service) : super(_service.pending) {
+    _subscription = _service.pendingStream.listen((list) => state = list);
   }
 
-  void dismiss(String id) {
-    _service.dismiss(id);
-  }
-
-  void dismissAll() {
-    _service.dismissAll();
-  }
-
-  void markSaved(String id) {
-    _service.markSaved(id);
-  }
+  void dismiss(String id) => _service.dismiss(id);
+  void dismissAll() => _service.dismissAll();
+  void markSaved(String id) => _service.markSaved(id);
 
   @override
   void dispose() {
@@ -405,7 +349,6 @@ class PendingTransactionNotifier extends StateNotifier<List<PendingTransaction>>
 
 // ── Providers ──
 
-/// Provides the [NotificationService] singleton, backed by SharedPreferences.
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
   final service = NotificationService(prefs);
@@ -413,30 +356,44 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
   return service;
 });
 
-/// Whether the notification listener is actively running.
 final isListeningProvider = StateProvider<bool>((ref) {
-  // Read persisted preference
   final prefs = ref.watch(sharedPreferencesProvider);
   return prefs.getBool(AppConstants.prefNotificationListener) ?? false;
 });
 
-/// Manages the list of pending transactions detected from notifications.
 final pendingTransactionsProvider = StateNotifierProvider<
     PendingTransactionNotifier, List<PendingTransaction>>((ref) {
   final service = ref.watch(notificationServiceProvider);
   return PendingTransactionNotifier(service);
 });
 
-/// Start listening for payment notifications.
+/// FIX: called on app start to auto-resume listening if it was previously
+/// enabled. This is the key function that was missing — the service was never
+/// restarted after an app restart even though the pref said enabled=true.
+Future<void> initializeIfEnabled(WidgetRef ref) async {
+  final prefs = ref.read(sharedPreferencesProvider);
+  final wasEnabled =
+      prefs.getBool(AppConstants.prefNotificationListener) ?? false;
+  if (!wasEnabled) return;
+
+  final service = ref.read(notificationServiceProvider);
+  final started = await service.initialize();
+  if (started) {
+    ref.read(isListeningProvider.notifier).state = true;
+  } else {
+    // Permission was revoked — update pref to reflect reality.
+    await prefs.setBool(AppConstants.prefNotificationListener, false);
+    ref.read(isListeningProvider.notifier).state = false;
+  }
+}
+
 Future<bool> startListening(WidgetRef ref) async {
   final service = ref.read(notificationServiceProvider);
   final granted = await service.isPermissionGranted();
-
   if (!granted) {
     final result = await service.requestPermission();
     if (!result) return false;
   }
-
   final started = await service.initialize();
   if (started) {
     final prefs = ref.read(sharedPreferencesProvider);
@@ -446,7 +403,6 @@ Future<bool> startListening(WidgetRef ref) async {
   return started;
 }
 
-/// Stop listening for payment notifications.
 void stopListening(WidgetRef ref) {
   final service = ref.read(notificationServiceProvider);
   service.dispose();
