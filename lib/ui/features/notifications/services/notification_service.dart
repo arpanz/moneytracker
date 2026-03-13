@@ -13,12 +13,26 @@ class NotificationService {
   static const _pendingKey = 'pending_notification_transactions';
   static const _firstLaunchAfterGrantKey = 'notif_first_launch_after_grant';
 
+  /// All packages whose notifications are scanned for transaction data.
+  ///
+  /// UPI / payment apps:
+  ///   GPay, PhonePe, Paytm, BHIM, Amazon Pay
+  /// Bank apps (major Indian banks):
+  ///   ICICI, SBI YONO (two variants), Axis, BoB, Kotak, Union, Indian,
+  ///   Canara, HDFC (two variants), IDBI, PNB, IndusInd, Yes Bank
+  /// SMS / messaging apps (covers stock Android + major OEM skins):
+  ///   AOSP MMS, Google Messages, Samsung Messages, MIUI Messages,
+  ///   MIUI v2 Messages, OnePlus/OxygenOS MMS, ColorOS MMS,
+  ///   Motorola Messages, Vivo Messages, Asus Messages,
+  ///   Realme Messages, Transsion (Tecno/Infinix) Messages
   static const supportedPackages = <String>{
+    // ── UPI / payment ──────────────────────────────────────────────────────
     'com.google.android.apps.nbu.paisa.user',
     'com.phonepe.app',
     'net.one97.paytm',
     'in.org.npci.upiapp',
     'com.amazon.mShop.android.shopping',
+    // ── Bank apps ──────────────────────────────────────────────────────────
     'com.csam.icici.bank.imobile',
     'com.sbi.SBIFreedomPlus',
     'com.sbi.lotusintouch',
@@ -34,11 +48,19 @@ class NotificationService {
     'com.pnb.mbanking',
     'com.indusind.mobile',
     'com.yesbank.yesmobile',
-    'com.android.mms',
-    'com.google.android.apps.messaging',
-    'com.samsung.android.messaging',
-    'com.miui.sms',
-    'com.oneplus.mms',
+    // ── SMS / messaging ────────────────────────────────────────────────────
+    'com.android.mms',                    // AOSP
+    'com.google.android.apps.messaging',  // Google Messages
+    'com.samsung.android.messaging',      // Samsung
+    'com.miui.sms',                       // MIUI (older)
+    'com.miui.messaging',                 // MIUI (newer)
+    'com.oneplus.mms',                    // OxygenOS
+    'com.coloros.mms',                    // ColorOS (OnePlus/Oppo)
+    'com.messaging.android',              // Motorola
+    'com.vivo.mms',                       // Vivo
+    'com.asus.mms',                       // Asus
+    'com.realme.mms',                     // Realme
+    'com.transsion.message',              // Tecno / Infinix
   };
 
   final SharedPreferences _prefs;

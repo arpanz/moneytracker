@@ -6,7 +6,7 @@ import '../../../../app/di/providers.dart';
 import '../../../../config/constants/app_constants.dart';
 import '../services/notification_service.dart';
 
-// ── Data Models ──────────────────────────────────────────────────────────────
+// ── Data Models ─────────────────────────────────────────────────────────────
 
 class PendingTransaction {
   final String id;
@@ -76,7 +76,7 @@ class PendingTransaction {
   }
 }
 
-// ── Notification Parser ──────────────────────────────────────────────────────
+// ── Notification Parser ────────────────────────────────────────────────────────
 
 class NotificationParser {
   const NotificationParser._();
@@ -106,7 +106,14 @@ class NotificationParser {
     'com.google.android.apps.messaging': 'SMS',
     'com.samsung.android.messaging': 'SMS',
     'com.miui.sms': 'SMS',
+    'com.miui.messaging': 'SMS',
     'com.oneplus.mms': 'SMS',
+    'com.coloros.mms': 'SMS',
+    'com.messaging.android': 'SMS',
+    'com.vivo.mms': 'SMS',
+    'com.asus.mms': 'SMS',
+    'com.realme.mms': 'SMS',
+    'com.transsion.message': 'SMS',
   };
 
   static const _appIcons = <String, String>{
@@ -132,7 +139,7 @@ class NotificationParser {
     caseSensitive: false,
   );
 
-  // ── UPI / Payment app patterns ──────────────────────────────────────────
+  // ── UPI / Payment app patterns ────────────────────────────────────────────────
 
   // GPay: "You paid ₹500 to Swiggy on..."
   static final _gpayPaid = RegExp(
@@ -156,7 +163,7 @@ class NotificationParser {
     caseSensitive: false,
   );
 
-  // Paytm title: "Received ₹1000 from NAME"  ← the bug format
+  // Paytm title: "Received ₹1000 from NAME"
   static final _paytmReceivedTitle = RegExp(
     r'received\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+from\s+(.+?)(?:\s+on|\s*$)',
     caseSensitive: false,
@@ -172,22 +179,71 @@ class NotificationParser {
     caseSensitive: false,
   );
 
-  // Generic fallbacks — work across any UPI app
+  // ── BHIM UPI patterns ────────────────────────────────────────────────────────────
+  //
+  // BHIM notification formats observed:
+  //
+  // Debit:
+  //   Title: "₹500 Paid"  OR  "Transaction Successful"
+  //   Body:  "Transaction successful. Paid ₹500 to Swiggy using BHIM UPI."
+  //          "You paid ₹500 to merchant@upi using BHIM"
+  //
+  // Credit:
+  //   Title: "Money Received"  OR  "₹1,000 Received"
+  //   Body:  "₹1,000 received from Rahul Kumar via BHIM UPI. Ref No: 123456789"
+  //          "Received ₹1,000 from rahul@upi"
+
+  // Paid ₹X to NAME [using/via BHIM ...]
+  static final _bhimPaid = RegExp(
+    r'paid\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+([\w\s@.&-]{1,50}?)'
+    r'(?:\s+using|\s+via|\s+through|\s+on|\s+ref|\s*\.\s*|\s*$)',
+    caseSensitive: false,
+  );
+  // You paid ₹X to NAME
+  static final _bhimYouPaid = RegExp(
+    r'you\s+paid\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+to\s+([\w\s@.&-]{1,50}?)'
+    r'(?:\s+using|\s+via|\s+through|\s+on|\s+ref|\s*\.\s*|\s*$)',
+    caseSensitive: false,
+  );
+  // ₹X received from NAME [via/using BHIM ...]
+  static final _bhimReceived = RegExp(
+    r'(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+received\s+from\s+([\w\s@.&-]{1,50}?)'
+    r'(?:\s+via|\s+using|\s+through|\s+on|\s+ref|\s*\.\s*|\s*$)',
+    caseSensitive: false,
+  );
+  // received ₹X from NAME
+  static final _bhimReceivedAlt = RegExp(
+    r'received\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+from\s+([\w\s@.&-]{1,50}?)'
+    r'(?:\s+via|\s+using|\s+through|\s+on|\s+ref|\s*\.\s*|\s*$)',
+    caseSensitive: false,
+  );
+  // Title-only amount: "₹500 Paid" or "₹1,000 Received"
+  static final _bhimTitleAmount = RegExp(
+    r'^(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)\s+(paid|received)$',
+    caseSensitive: false,
+  );
+
+  // ── Generic fallbacks ─────────────────────────────────────────────────────────────
+  //
+  // FIX: Added 'using', 'via', 'upi', 'ref' as terminators so BHIM/Amazon
+  // notifications don't accidentally consume the app-name suffix as the
+  // merchant name or swallow extra text into the amount group.
+
   static final _genericReceived = RegExp(
-    r'received\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)(?:\s+from\s+([\w\s]+?))?(?:\s+on|\s*$)',
+    r'received\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
+    r'(?:\s+from\s+([\w\s]+?))?'
+    r'(?:\s+on|\s+via|\s+using|\s+upi|\s+ref|\s*$)',
     caseSensitive: false,
   );
   static final _genericPaid = RegExp(
-    r'(?:paid|sent)\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)(?:\s+to\s+([\w\s]+?))?(?:\s+on|\s*$)',
+    r'(?:paid|sent)\s+(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
+    r'(?:\s+to\s+([\w\s]+?))?'
+    r'(?:\s+on|\s+via|\s+using|\s+upi|\s+ref|\s*$)',
     caseSensitive: false,
   );
 
-  // ── Bank SMS patterns ────────────────────────────────────────────────────
+  // ── Bank SMS patterns ────────────────────────────────────────────────────────────────
 
-  // group(1): "credited with/by ₹X"
-  // group(2): "₹X credited"
-  // group(3): "deposited in your ... ₹X" (requires amount after deposited keyword phrase)
-  // group(4): "₹X deposited"
   static final _bankCredited = RegExp(
     r'credited\s+(?:with\s+|by\s+)?(?:Rs\.?|INR|\u20B9)\s*([\d,]+(?:\.\d{1,2})?)'
     r'|'
@@ -208,27 +264,23 @@ class NotificationParser {
     caseSensitive: false,
   );
 
-  // ── Merchant patterns ────────────────────────────────────────────────────
+  // ── Merchant patterns ──────────────────────────────────────────────────────────────
 
-  // "at/to/from/towards MERCHANT on/ref/."
   static final _merchantKeyword = RegExp(
-    r"(?:at|to|from|towards)\s+([A-Za-z][\w\s&.'-]{1,40}?)(?:\s+on|\s+ref|\s+txn|\s+via|\s*\.|\s*$)",
+    r"(?:at|to|from|towards)\s+([A-Za-z][\w\s&.'-]{1,40}?)(?:\s+on|\s+ref|\s+txn|\s+via|\s+using|\s*\.|\s*$)",
     caseSensitive: false,
   );
-  // Title-level "from NAME" — e.g. "Received ₹1000 from Ashutoshkumar"
   static final _merchantFrom = RegExp(
-    r'from\s+([A-Za-z][\w\s]{1,30}?)(?:\s+on|\s*$)',
+    r'from\s+([A-Za-z][\w\s]{1,30}?)(?:\s+on|\s+via|\s+using|\s*$)',
     caseSensitive: false,
   );
-  // Trailing sender code: "... - JPBL"
   static final _merchantSender = RegExp(r'-\s*([A-Z][A-Z0-9]{1,15})\s*$');
-  // Info field: "Info: NAME"
   static final _merchantInfo = RegExp(
     r'Info:\s*([A-Za-z][\w\s&.-]{1,40}?)(?:\s*\.|\s*$)',
     caseSensitive: false,
   );
 
-  // ── Entry point ──────────────────────────────────────────────────────────
+  // ── Entry point ──────────────────────────────────────────────────────────────
 
   static PendingTransaction? parseNotification(
     String packageName,
@@ -258,15 +310,18 @@ class NotificationParser {
     } else if (packageName == 'net.one97.paytm') {
       final r = _tryPaytmPatterns(fullText);
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
+    } else if (packageName == 'in.org.npci.upiapp') {
+      final r = _tryBhimPatterns(title, fullText);
+      if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     }
 
-    // 2. Bank SMS patterns (also catches UPI bank-style notifs like "Deposited in your account")
+    // 2. Bank SMS patterns
     if (amount == null) {
       final r = _tryBankPatterns(fullText);
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
     }
 
-    // 3. Generic UPI fallback
+    // 3. Generic UPI fallback (covers Amazon Pay, lesser-known UPI apps, SMS)
     if (amount == null) {
       final r = _tryGenericUpiPatterns(fullText);
       if (r != null) { amount = r.amount; merchant = r.merchant; isDebit = r.isDebit; }
@@ -289,7 +344,6 @@ class NotificationParser {
       if (m1 != null) {
         merchant = m1.group(1)?.trim();
       } else {
-        // Check title specifically for "from NAME" (e.g. Paytm "Received ₹X from NAME")
         final m2 = _merchantFrom.firstMatch(title);
         if (m2 != null) {
           merchant = m2.group(1)?.trim();
@@ -352,23 +406,64 @@ class NotificationParser {
 
   // ── Paytm ──
   static _ParseResult? _tryPaytmPatterns(String text) {
-    // Title format FIRST: "Received ₹1000 from NAME"
     final recvTitle = _paytmReceivedTitle.firstMatch(text);
     if (recvTitle != null) {
       final a = double.tryParse(recvTitle.group(1)!.replaceAll(',', ''));
       if (a != null) return _ParseResult(amount: a, merchant: recvTitle.group(2)?.trim(), isDebit: false);
     }
-    // Body format: "₹1000 received from NAME"
     final recvBody = _paytmReceivedBody.firstMatch(text);
     if (recvBody != null) {
       final a = double.tryParse(recvBody.group(1)!.replaceAll(',', ''));
       if (a != null) return _ParseResult(amount: a, merchant: recvBody.group(2)?.trim(), isDebit: false);
     }
-    // Paid: "paid ₹500 to NAME"
     final paid = _paytmPaid.firstMatch(text);
     if (paid != null) {
       final a = double.tryParse(paid.group(1)!.replaceAll(',', ''));
       if (a != null) return _ParseResult(amount: a, merchant: paid.group(2)?.trim(), isDebit: true);
+    }
+    return null;
+  }
+
+  // ── BHIM UPI ──
+  //
+  // Tries patterns in priority order:
+  //   1. "You paid ₹X to NAME using BHIM"   → debit
+  //   2. "paid ₹X to NAME using BHIM"        → debit
+  //   3. "₹X received from NAME via BHIM"    → credit
+  //   4. "received ₹X from NAME"             → credit
+  //   5. Title "₹X Paid" + body for merchant  → debit  (title-only fallback)
+  //   6. Title "₹X Received"                 → credit (title-only fallback)
+  static _ParseResult? _tryBhimPatterns(String title, String text) {
+    // 1 & 2 — debit with merchant
+    for (final re in [_bhimYouPaid, _bhimPaid]) {
+      final m = re.firstMatch(text);
+      if (m != null) {
+        final a = double.tryParse(m.group(1)!.replaceAll(',', ''));
+        if (a != null) return _ParseResult(amount: a, merchant: m.group(2)?.trim(), isDebit: true);
+      }
+    }
+    // 3 & 4 — credit with merchant
+    for (final re in [_bhimReceived, _bhimReceivedAlt]) {
+      final m = re.firstMatch(text);
+      if (m != null) {
+        final a = double.tryParse(m.group(1)!.replaceAll(',', ''));
+        if (a != null) return _ParseResult(amount: a, merchant: m.group(2)?.trim(), isDebit: false);
+      }
+    }
+    // 5 & 6 — title-only amount (e.g. "₹500 Paid" title, body has merchant)
+    final titleMatch = _bhimTitleAmount.firstMatch(title.trim());
+    if (titleMatch != null) {
+      final a = double.tryParse(titleMatch.group(1)!.replaceAll(',', ''));
+      final verb = titleMatch.group(2)?.toLowerCase();
+      if (a != null && verb != null) {
+        // Try to pull merchant from body text
+        final mBody = _merchantKeyword.firstMatch(text);
+        return _ParseResult(
+          amount: a,
+          merchant: mBody?.group(1)?.trim(),
+          isDebit: verb == 'paid',
+        );
+      }
     }
     return null;
   }
@@ -392,7 +487,6 @@ class NotificationParser {
   static _ParseResult? _tryBankPatterns(String text) {
     final credit = _bankCredited.firstMatch(text);
     if (credit != null) {
-      // 4 capture groups: check all
       final raw = credit.group(1) ?? credit.group(2) ?? credit.group(3) ?? credit.group(4);
       if (raw != null) {
         final a = double.tryParse(raw.replaceAll(',', ''));
@@ -424,7 +518,7 @@ class _ParseResult {
   const _ParseResult({required this.amount, this.merchant, required this.isDebit});
 }
 
-// ── State Notifier ────────────────────────────────────────────────────────────
+// ── State Notifier ────────────────────────────────────────────────────────────────
 
 class PendingTransactionNotifier
     extends StateNotifier<List<PendingTransaction>> {
@@ -446,7 +540,7 @@ class PendingTransactionNotifier
   }
 }
 
-// ── Providers ─────────────────────────────────────────────────────────────────
+// ── Providers ───────────────────────────────────────────────────────────────────
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
