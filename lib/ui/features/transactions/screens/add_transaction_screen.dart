@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/di/providers.dart';
 import '../../../../config/constants/app_constants.dart';
-import '../../../../config/constants/asset_paths.dart';
+import '../../../../config/constants/category_catalog.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_extensions.dart';
@@ -908,7 +908,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     (icon: FontAwesomeIcons.basketShopping, label: 'groceries'),
     (icon: FontAwesomeIcons.paw, label: 'pets'),
     (icon: FontAwesomeIcons.tv, label: 'subscriptions'),
+    (icon: FontAwesomeIcons.shieldHeart, label: 'insurance'),
+    (icon: FontAwesomeIcons.soap, label: 'personal care'),
     (icon: FontAwesomeIcons.bolt, label: 'other'),
+    (icon: FontAwesomeIcons.gasPump, label: 'fuel'),
     (icon: FontAwesomeIcons.droplet, label: 'other'),
     (icon: FontAwesomeIcons.wifi, label: 'other'),
     (icon: FontAwesomeIcons.dumbbell, label: 'other'),
@@ -918,6 +921,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     (icon: FontAwesomeIcons.bookOpen, label: 'education'),
     (icon: FontAwesomeIcons.baby, label: 'health'),
     (icon: FontAwesomeIcons.shirt, label: 'shopping'),
+    (icon: FontAwesomeIcons.house, label: 'home'),
+    (icon: FontAwesomeIcons.fileInvoice, label: 'taxes'),
+    (icon: FontAwesomeIcons.briefcase, label: 'business'),
+    (icon: FontAwesomeIcons.coins, label: 'bonus'),
     (icon: FontAwesomeIcons.toolbox, label: 'other'),
     (icon: FontAwesomeIcons.moneyBill, label: 'salary'),
     (icon: FontAwesomeIcons.circleQuestion, label: 'other'),
@@ -930,25 +937,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     _ => 2,
   };
 
-  String _svgForLabel(String label) => switch (label) {
-    'food' => AssetPaths.categoryFood,
-    'transport' => AssetPaths.categoryTransport,
-    'shopping' => AssetPaths.categoryShopping,
-    'bills' => AssetPaths.categoryBills,
-    'entertainment' => AssetPaths.categoryEntertainment,
-    'health' => AssetPaths.categoryHealth,
-    'education' => AssetPaths.categoryEducation,
-    'travel' => AssetPaths.categoryTravel,
-    'gifts' => AssetPaths.categoryGifts,
-    'salary' => AssetPaths.categorySalary,
-    'freelance' => AssetPaths.categoryFreelance,
-    'investments' => AssetPaths.categoryInvestments,
-    'rent' => AssetPaths.categoryRent,
-    'groceries' => AssetPaths.categoryGroceries,
-    'pets' => AssetPaths.categoryPets,
-    'subscriptions' => AssetPaths.categorySubscriptions,
-    _ => AssetPaths.categoryDefault,
-  };
+  String _svgForLabel(String label) =>
+      CategoryCatalog.assetPathForKeyword(label);
 
   void _showNewCategoryDialog(BuildContext context) {
     final nameCtrl = TextEditingController();

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/di/providers.dart';
 import '../../../../config/constants/asset_paths.dart';
+import '../../../../config/constants/category_catalog.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_extensions.dart';
@@ -522,25 +523,7 @@ class _BudgetCard extends ConsumerWidget {
   // Previously this map used title-case keys but the category string from
   // the DB could be any case depending on how it was seeded / entered.
   String? _getCategoryIconPath(String category) {
-    const map = <String, String>{
-      'food': AssetPaths.categoryFood,
-      'transport': AssetPaths.categoryTransport,
-      'shopping': AssetPaths.categoryShopping,
-      'bills': AssetPaths.categoryBills,
-      'entertainment': AssetPaths.categoryEntertainment,
-      'health': AssetPaths.categoryHealth,
-      'education': AssetPaths.categoryEducation,
-      'travel': AssetPaths.categoryTravel,
-      'gifts': AssetPaths.categoryGifts,
-      'salary': AssetPaths.categorySalary,
-      'freelance': AssetPaths.categoryFreelance,
-      'investments': AssetPaths.categoryInvestments,
-      'rent': AssetPaths.categoryRent,
-      'groceries': AssetPaths.categoryGroceries,
-      'pets': AssetPaths.categoryPets,
-      'subscriptions': AssetPaths.categorySubscriptions,
-    };
-    return map[category.toLowerCase().trim()];
+    return CategoryCatalog.assetPathForName(category);
   }
 }
 

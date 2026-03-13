@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bonusGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5EEAD4"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+  </defs>
+  <rect x="14" y="23" width="36" height="24" rx="6" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="2.5"/>
+  <path d="M23 23C19.7 23 17 20.3 17 17C17 14.2 19.2 12 22 12C26.5 12 28.7 17.2 32 23" fill="#D1FAE5" stroke="#34D399" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M41 23C44.3 23 47 20.3 47 17C47 14.2 44.8 12 42 12C37.5 12 35.3 17.2 32 23" fill="#D1FAE5" stroke="#34D399" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M32 23V47" stroke="url(#bonusGrad)" stroke-width="3"/>
+  <path d="M14 31H50" stroke="#6EE7B7" stroke-width="2.5"/>
+  <circle cx="32" cy="35" r="7" fill="url(#bonusGrad)"/>
+  <path d="M32 31V39" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M28 35H36" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

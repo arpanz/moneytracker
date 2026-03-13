@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import '../../../../app/di/providers.dart';
 import '../../../../config/constants/app_constants.dart';
 import '../../../../config/constants/asset_paths.dart';
+import '../../../../config/constants/category_catalog.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_extensions.dart';
@@ -1467,27 +1468,7 @@ class _TransactionRow extends StatelessWidget {
   }
 
   static String _categoryToAssetPath(String category) {
-    final normalized = category.toLowerCase().trim();
-    const map = {
-      'food': AssetPaths.categoryFood,
-      'transport': AssetPaths.categoryTransport,
-      'shopping': AssetPaths.categoryShopping,
-      'bills': AssetPaths.categoryBills,
-      'entertainment': AssetPaths.categoryEntertainment,
-      'health': AssetPaths.categoryHealth,
-      'education': AssetPaths.categoryEducation,
-      'travel': AssetPaths.categoryTravel,
-      'gifts': AssetPaths.categoryGifts,
-      'salary': AssetPaths.categorySalary,
-      'freelance': AssetPaths.categoryFreelance,
-      'investments': AssetPaths.categoryInvestments,
-      'rent': AssetPaths.categoryRent,
-      'groceries': AssetPaths.categoryGroceries,
-      'pets': AssetPaths.categoryPets,
-      'subscriptions': AssetPaths.categorySubscriptions,
-      'transfer': AssetPaths.categoryOther,
-    };
-    return map[normalized] ?? AssetPaths.categoryOther;
+    return CategoryCatalog.assetPathForName(category);
   }
 }
 

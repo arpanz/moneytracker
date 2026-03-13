@@ -28,6 +28,18 @@ abstract class AssetPaths {
   static const String categoryPets = 'assets/svg/categories/pets.svg';
   static const String categorySubscriptions =
       'assets/svg/categories/subscriptions.svg';
+  static const String categoryInsurance = 'assets/svg/categories/insurance.svg';
+  static const String categoryPersonalCare =
+      'assets/svg/categories/personal_care.svg';
+  static const String categoryUtilities = 'assets/svg/categories/utilities.svg';
+  static const String categoryFuel = 'assets/svg/categories/fuel.svg';
+  static const String categoryHome = 'assets/svg/categories/home.svg';
+  static const String categoryChildcare = 'assets/svg/categories/childcare.svg';
+  static const String categoryTaxes = 'assets/svg/categories/taxes.svg';
+  static const String categoryBonus = 'assets/svg/categories/bonus.svg';
+  static const String categoryBusiness = 'assets/svg/categories/business.svg';
+  static const String categoryRentalIncome =
+      'assets/svg/categories/rental_income.svg';
   static const String categoryOther = 'assets/svg/categories/other.svg';
   static const String categoryDefault = categoryOther;
 

@@ -75,7 +75,6 @@ flutter:
     - assets/svg/
     - assets/svg/onboarding/
     - assets/svg/categories/
-    - assets/svg/personalities/
     - assets/svg/empty_states/
     - assets/svg/misc/
 

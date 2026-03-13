@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../app/di/providers.dart';
-import '../../config/constants/asset_paths.dart';
+import '../../config/constants/category_catalog.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/theme_extensions.dart';
 import '../../domain/models/category_model.dart';
@@ -64,7 +64,10 @@ class _CategoryPickerRowState extends ConsumerState<CategoryPickerRow> {
     (icon: FontAwesomeIcons.basketShopping, label: 'Grocery'),
     (icon: FontAwesomeIcons.paw, label: 'Pets'),
     (icon: FontAwesomeIcons.tv, label: 'Subscriptions'),
+    (icon: FontAwesomeIcons.shieldHeart, label: 'Insurance'),
+    (icon: FontAwesomeIcons.soap, label: 'Personal Care'),
     (icon: FontAwesomeIcons.bolt, label: 'Energy'),
+    (icon: FontAwesomeIcons.gasPump, label: 'Fuel'),
     (icon: FontAwesomeIcons.droplet, label: 'Water'),
     (icon: FontAwesomeIcons.wifi, label: 'Internet'),
     (icon: FontAwesomeIcons.mobileScreen, label: 'Phone'),
@@ -75,6 +78,10 @@ class _CategoryPickerRowState extends ConsumerState<CategoryPickerRow> {
     (icon: FontAwesomeIcons.bookOpen, label: 'Books'),
     (icon: FontAwesomeIcons.baby, label: 'Baby'),
     (icon: FontAwesomeIcons.shirt, label: 'Clothes'),
+    (icon: FontAwesomeIcons.house, label: 'Home'),
+    (icon: FontAwesomeIcons.fileInvoice, label: 'Taxes'),
+    (icon: FontAwesomeIcons.briefcase, label: 'Business'),
+    (icon: FontAwesomeIcons.coins, label: 'Bonus'),
     (icon: FontAwesomeIcons.toolbox, label: 'Repairs'),
     (icon: FontAwesomeIcons.circleQuestion, label: 'Other'),
     (icon: FontAwesomeIcons.moneyBill, label: 'Cash'),
@@ -295,55 +302,7 @@ class _CategoryPickerRowState extends ConsumerState<CategoryPickerRow> {
   }
 
   String _assetPathFor(FaIconData icon) {
-    switch (_iconLabelFor(icon)) {
-      case 'food':
-      case 'coffee':
-        return AssetPaths.categoryFood;
-      case 'car':
-        return AssetPaths.categoryTransport;
-      case 'shopping':
-      case 'clothes':
-        return AssetPaths.categoryShopping;
-      case 'bills':
-      case 'energy':
-      case 'water':
-      case 'internet':
-      case 'phone':
-      case 'repairs':
-        return AssetPaths.categoryBills;
-      case 'entertainment':
-      case 'gaming':
-      case 'music':
-      case 'books':
-        return AssetPaths.categoryEntertainment;
-      case 'health':
-      case 'gym':
-      case 'baby':
-        return AssetPaths.categoryHealth;
-      case 'education':
-        return AssetPaths.categoryEducation;
-      case 'travel':
-        return AssetPaths.categoryTravel;
-      case 'gifts':
-        return AssetPaths.categoryGifts;
-      case 'salary':
-      case 'cash':
-        return AssetPaths.categorySalary;
-      case 'freelance':
-        return AssetPaths.categoryFreelance;
-      case 'invest':
-        return AssetPaths.categoryInvestments;
-      case 'rent':
-        return AssetPaths.categoryRent;
-      case 'grocery':
-        return AssetPaths.categoryGroceries;
-      case 'pets':
-        return AssetPaths.categoryPets;
-      case 'subscriptions':
-        return AssetPaths.categorySubscriptions;
-      default:
-        return AssetPaths.categoryDefault;
-    }
+    return CategoryCatalog.assetPathForKeyword(_iconLabelFor(icon));
   }
 
   CategoryModel? _restoreSelectionIfNeeded(List<CategoryModel> categories) {

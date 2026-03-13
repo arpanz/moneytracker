@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../constants/category_catalog.dart';
+
 /// Custom theme extension for Cheddar-specific colors not covered by
 /// the standard Material [ColorScheme].
 ///
@@ -37,9 +39,7 @@ class CheddarColors extends ThemeExtension<CheddarColors> {
   });
 
   /// Default light mode instance.
-  static CheddarColors light({
-    required LinearGradient cardGradient,
-  }) {
+  static CheddarColors light({required LinearGradient cardGradient}) {
     return CheddarColors(
       income: const Color(0xFF22C55E),
       expense: const Color(0xFFEF4444),
@@ -52,9 +52,7 @@ class CheddarColors extends ThemeExtension<CheddarColors> {
   }
 
   /// Default dark mode instance.
-  static CheddarColors dark({
-    required LinearGradient cardGradient,
-  }) {
+  static CheddarColors dark({required LinearGradient cardGradient}) {
     return CheddarColors(
       income: const Color(0xFF4ADE80),
       expense: const Color(0xFFF87171),
@@ -94,10 +92,18 @@ class CheddarColors extends ThemeExtension<CheddarColors> {
       income: Color.lerp(income, other.income, t)!,
       expense: Color.lerp(expense, other.expense, t)!,
       transfer: Color.lerp(transfer, other.transfer, t)!,
-      categoryColors: _lerpCategoryColors(categoryColors, other.categoryColors, t),
+      categoryColors: _lerpCategoryColors(
+        categoryColors,
+        other.categoryColors,
+        t,
+      ),
       cardGradient: LinearGradient.lerp(cardGradient, other.cardGradient, t)!,
       shimmerBase: Color.lerp(shimmerBase, other.shimmerBase, t)!,
-      shimmerHighlight: Color.lerp(shimmerHighlight, other.shimmerHighlight, t)!,
+      shimmerHighlight: Color.lerp(
+        shimmerHighlight,
+        other.shimmerHighlight,
+        t,
+      )!,
     );
   }
 
@@ -120,21 +126,5 @@ class CheddarColors extends ThemeExtension<CheddarColors> {
 }
 
 // ── Default category color map (16 categories) ──────────────────────────────
-const Map<String, Color> _defaultCategoryColors = {
-  'food': Color(0xFFFF6B6B),
-  'transport': Color(0xFF4ECDC4),
-  'shopping': Color(0xFFFFBE76),
-  'bills': Color(0xFF6C5CE7),
-  'entertainment': Color(0xFFFF9FF3),
-  'health': Color(0xFF55E6C1),
-  'education': Color(0xFF48DBFB),
-  'travel': Color(0xFFFFA502),
-  'gifts': Color(0xFFFF6348),
-  'salary': Color(0xFF2ED573),
-  'freelance': Color(0xFF1DD1A1),
-  'investments': Color(0xFF5352ED),
-  'rent': Color(0xFFFF4757),
-  'groceries': Color(0xFFA3CB38),
-  'pets': Color(0xFFF8A5C2),
-  'subscriptions': Color(0xFF7158E2),
-};
+final Map<String, Color> _defaultCategoryColors =
+    CategoryCatalog.buildColorMap();

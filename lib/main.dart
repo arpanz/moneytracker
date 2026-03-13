@@ -38,7 +38,7 @@ void main() async {
   // The `ref.read` call cannot be used directly in `main` before `ProviderScope` is set up.
   // We will keep the direct instantiation for now, and rename the method.
   final categoryRepo = CategoryRepository(databaseService);
-  categoryRepo.seedDefaultsIfEmpty().ignore();
+  categoryRepo.seedMissingDefaults().ignore();
 
   runApp(
     ProviderScope(
