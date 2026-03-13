@@ -25,8 +25,6 @@ abstract class RouteNames {
   static const settings = 'settings';
   static const themePicker = 'theme-picker';
   static const scanner = 'scanner';
-  static const personality = 'personality';
-  static const weeklyWrap = 'weekly-wrap';
   static const pendingTransactions = 'pending-transactions';
   static const more = 'more';
 }

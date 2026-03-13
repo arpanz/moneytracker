@@ -56,4 +56,5 @@ abstract class AppConstants {
   static const String prefNotificationListener = 'notification_listener';
   static const String prefShowValues = 'show_values';
   static const String prefActiveAccountId = 'active_account_id';
+  static const String prefFloatingNavItems = 'floating_nav_items';
 }

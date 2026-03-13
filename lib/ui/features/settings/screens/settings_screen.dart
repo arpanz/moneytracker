@@ -10,9 +10,9 @@ import '../../../../config/constants/currency_catalog.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_provider.dart';
+import '../../../core/shell/floating_nav_config.dart';
 import '../../notifications/providers/notification_provider.dart';
 
-/// Main settings / "More" screen with all app configuration options.
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -23,7 +23,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen>
     with WidgetsBindingObserver {
   bool _biometricEnabled = false;
-  // Push notifications: live permission status, not just a pref
   bool _notificationsEnabled = false;
   String _currency = 'INR';
 
@@ -41,7 +40,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     super.dispose();
   }
 
-  // Re-check permissions when user comes back from system settings
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -61,7 +59,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     });
   }
 
-  /// Read the REAL OS-level notification permission status.
   Future<void> _refreshNotificationPermission() async {
     final status = await Permission.notification.status;
     if (mounted) {
@@ -69,19 +66,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     }
   }
 
-  /// Re-sync the listener toggle with the service's actual state.
   Future<void> _refreshListenerStatus() async {
     final service = ref.read(notificationServiceProvider);
     final granted = await service.isPermissionGranted();
     if (!granted) {
-      // Permission was revoked in system settings — update state
       final prefs = ref.read(sharedPreferencesProvider);
       await prefs.setBool(AppConstants.prefNotificationListener, false);
       ref.read(isListeningProvider.notifier).state = false;
     }
   }
-
-  // ── Push Notifications toggle ──────────────────────────────────────────
 
   Future<void> _onPushNotificationsToggled(bool enable) async {
     if (enable) {
@@ -104,16 +97,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         );
         setState(() => _notificationsEnabled = false);
       } else {
-        // Denied but not permanently — just reflect reality
         setState(() => _notificationsEnabled = false);
       }
     } else {
-      // Can't programmatically revoke — open settings for the user
       await openAppSettings();
     }
   }
-
-  // ── Notification Listener (SMS/bank alerts) toggle ─────────────────────
 
   Future<void> _onListenerToggled(bool enable) async {
     if (enable) {
@@ -139,7 +128,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Handle bar
                 Center(
                   child: Container(
                     width: 40,
@@ -151,7 +139,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   ),
                 ),
                 const SizedBox(height: 20),
-
                 Row(
                   children: [
                     Container(
@@ -178,7 +165,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             ),
                           ),
                           Text(
-                            'Auto-detect payments from UPI & bank alerts',
+                            'Auto-detect payments from UPI and bank alerts',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -188,40 +175,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
-
-                // What it reads
-                _PermissionPoint(
+                const _PermissionPoint(
                   icon: Icons.payment_outlined,
                   title: 'Payment notifications',
-                  subtitle:
-                      'Google Pay, PhonePe, Paytm, and bank SMS alerts',
+                  subtitle: 'Google Pay, PhonePe, Paytm, and bank SMS alerts',
                 ),
                 const SizedBox(height: 12),
-                _PermissionPoint(
+                const _PermissionPoint(
                   icon: Icons.auto_awesome_outlined,
                   title: 'Auto-fills transactions',
                   subtitle:
-                      'Amount and merchant are detected — you confirm before saving',
+                      'Amount and merchant are detected and you confirm before saving',
                 ),
                 const SizedBox(height: 12),
-                _PermissionPoint(
+                const _PermissionPoint(
                   icon: Icons.lock_outline_rounded,
                   title: 'Private by design',
                   subtitle:
-                      'Nothing leaves your device. No data is uploaded anywhere.',
+                      'Nothing leaves your device and no data is uploaded anywhere.',
                 ),
-
                 const SizedBox(height: 8),
-
-                // Note about system settings
                 Container(
                   margin: const EdgeInsets.only(top: 12),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest
-                        .withValues(alpha: 0.5),
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.5,
+                    ),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -234,8 +215,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Android will open Notification Access settings. '  
-                          'Find Cheddar in the list and toggle it on.',
+                          'Android will open Notification Access settings. Find Cheddar in the list and toggle it on.',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                             height: 1.4,
@@ -245,9 +225,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
                 Row(
                   children: [
                     Expanded(
@@ -277,249 +255,307 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     }
   }
 
+  Future<void> _addFloatingNavItem(String id) async {
+    final current = [...ref.read(floatingNavItemIdsProvider)];
+    if (current.contains(id)) return;
+    if (current.length >= kMaxFloatingNavItems) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Floating nav can show up to 4 items.')),
+      );
+      return;
+    }
+    current.add(id);
+    await persistFloatingNavItemIds(ref, current);
+  }
+
+  Future<void> _removeFloatingNavItem(String id) async {
+    final destination = kFloatingNavDestinations.firstWhere(
+      (item) => item.id == id,
+    );
+    if (!destination.removable) return;
+    final current = [...ref.read(floatingNavItemIdsProvider)]..remove(id);
+    await persistFloatingNavItemIds(ref, current);
+  }
+
+  Future<void> _reorderFloatingNavItems(int oldIndex, int newIndex) async {
+    final current = [...ref.read(floatingNavItemIdsProvider)];
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+    final moved = current.removeAt(oldIndex);
+    current.insert(newIndex, moved);
+    await persistFloatingNavItemIds(ref, current);
+  }
+
+  Future<void> _setCurrency(
+    String value,
+    BuildContext bottomSheetContext,
+  ) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setString(AppConstants.prefCurrency, value);
+    ref.read(currencyCodeProvider.notifier).state = value;
+    setState(() => _currency = value);
+    if (bottomSheetContext.mounted) {
+      Navigator.pop(bottomSheetContext);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final isListening = ref.watch(isListeningProvider);
+    final navItemIds = ref.watch(floatingNavItemIdsProvider);
+    final navItems = resolveFloatingNavItems(navItemIds);
+    final availableNavItems = kFloatingNavDestinations
+        .where((item) => !navItemIds.contains(item.id))
+        .toList(growable: false);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings'), centerTitle: true),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        children: [
-          // ── Quick Links ──
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final itemWidth =
-                    (constraints.maxWidth - (AppSpacing.sm * 3)) / 4;
-                return Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.sm,
-                  children: [
-                    SizedBox(
-                      width: itemWidth,
-                      child: _QuickLink(
-                        icon: Icons.savings_outlined,
-                        label: 'Goals',
-                        color: Colors.amber,
-                        onTap: () => context.pushNamed(RouteNames.goals),
-                      ),
-                    ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _QuickLink(
-                        icon: Icons.subscriptions_outlined,
-                        label: 'Subscriptions',
-                        color: Colors.purple,
-                        onTap: () =>
-                            context.pushNamed(RouteNames.subscriptions),
-                      ),
-                    ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _QuickLink(
-                        icon: Icons.call_split_rounded,
-                        label: 'Splits',
-                        color: Colors.teal,
-                        onTap: () => context.pushNamed(RouteNames.split),
-                      ),
-                    ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _QuickLink(
-                        icon: Icons.currency_exchange_rounded,
-                        label: 'Loans',
-                        color: Colors.indigo,
-                        onTap: () => context.pushNamed(RouteNames.loans),
-                      ),
-                    ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _QuickLink(
-                        icon: Icons.psychology_outlined,
-                        label: 'Personality',
-                        color: Colors.deepOrange,
-                        onTap: () => context.pushNamed(RouteNames.personality),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-
-          const Divider(height: AppSpacing.lg),
-
-          // ── Appearance ──
-          _SectionHeader(title: 'Appearance'),
-          ListTile(
-            leading: const Icon(Icons.palette_outlined),
-            title: const Text('Theme & Vibes'),
-            subtitle: Text(
-              ref.watch(themeProvider).themeName,
-              style: theme.textTheme.bodySmall,
-            ),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () => context.pushNamed(RouteNames.themePicker),
-          ),
-
-          // ── Currency ──
-          _SectionHeader(title: 'General'),
-          ListTile(
-            leading: const Icon(Icons.currency_exchange_rounded),
-            title: const Text('Currency'),
-            subtitle: Text('${currencyOptionFor(_currency).name} ($_currency)'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () => _showCurrencyPicker(),
-          ),
-
-          // ── Security ──
-          _SectionHeader(title: 'Security'),
-          SwitchListTile(
-            secondary: const Icon(Icons.fingerprint_rounded),
-            title: const Text('Biometric Lock'),
-            subtitle: const Text('Require fingerprint or face to open app'),
-            value: _biometricEnabled,
-            onChanged: (v) async {
-              final prefs = ref.read(sharedPreferencesProvider);
-              await prefs.setBool(AppConstants.prefAppLockEnabled, v);
-              setState(() => _biometricEnabled = v);
-            },
-          ),
-
-          // ── Notifications ──
-          _SectionHeader(title: 'Notifications'),
-
-          // Push notifications — requests OS permission via permission_handler
-          SwitchListTile(
-            secondary: const Icon(Icons.notifications_outlined),
-            title: const Text('Push Notifications'),
-            subtitle: Text(
-              _notificationsEnabled ? 'Enabled' : 'Disabled',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: _notificationsEnabled
-                    ? colors.primary
-                    : colors.onSurfaceVariant,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.md,
+          AppSpacing.sm,
+          AppSpacing.md,
+          AppSpacing.xxl,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _HeroCard(
+              title: 'Everything in one place',
+              subtitle:
+                  'Tighter controls, faster shortcuts, and a nav bar you can reorganize.',
+              trailing: Icon(
+                Icons.tune_rounded,
+                size: 28,
+                color: colors.primary,
               ),
             ),
-            value: _notificationsEnabled,
-            onChanged: _onPushNotificationsToggled,
-          ),
-
-          // Notification listener — reads payment/bank notifications
-          SwitchListTile(
-            secondary: const Icon(Icons.sms_outlined),
-            title: const Text('Payment Notification Reader'),
-            subtitle: Text(
-              isListening
-                  ? 'Active — auto-detecting payments'
-                  : 'Off — tap to enable',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: isListening
-                    ? colors.primary
-                    : colors.onSurfaceVariant,
-              ),
+            const SizedBox(height: AppSpacing.lg),
+            const _SectionHeader(
+              title: 'Quick Access',
+              subtitle: 'Frequently used screens in a compact grid.',
             ),
-            value: isListening,
-            onChanged: _onListenerToggled,
-          ),
-
-          // View detected pending transactions
-          ListTile(
-            leading: const Icon(Icons.pending_actions_outlined),
-            title: const Text('Pending Transactions'),
-            subtitle: const Text('Review transactions detected from alerts'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () => context.pushNamed(RouteNames.pendingTransactions),
-          ),
-
-          // ── Accounts ──
-          _SectionHeader(title: 'Accounts'),
-          ListTile(
-            leading: const Icon(Icons.account_balance_wallet_outlined),
-            title: const Text('Manage Accounts'),
-            subtitle: const Text('Bank accounts, wallets, credit cards'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () => context.pushNamed(RouteNames.accounts),
-          ),
-          ListTile(
-            leading: const Icon(Icons.currency_exchange_rounded),
-            title: const Text('Loan Tracker'),
-            subtitle: const Text('Track lendings and borrowings'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () => context.pushNamed(RouteNames.loans),
-          ),
-
-          // ── Data ──
-          _SectionHeader(title: 'Data & Backup'),
-          ListTile(
-            leading: const Icon(Icons.file_download_outlined),
-            title: const Text('Export Transactions'),
-            subtitle: const Text('CSV or PDF format'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () => _showExportDialog(),
-          ),
-          ListTile(
-            leading: const Icon(Icons.backup_outlined),
-            title: const Text('Backup & Restore'),
-            subtitle: const Text('JSON backup of all app data'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () => _showBackupDialog(),
-          ),
-
-          // ── About ──
-          _SectionHeader(title: 'About'),
-          ListTile(
-            leading: const Icon(Icons.info_outline_rounded),
-            title: const Text('About Cheddar'),
-            subtitle: Text('v${AppConstants.appVersion}'),
-            onTap: () => _showAboutDialog(),
-          ),
-          ListTile(
-            leading: const Icon(Icons.star_outline_rounded),
-            title: const Text('Rate on Play Store'),
-            onTap: () {},
-          ),
-          ListTile(
-            leading: const Icon(Icons.share_outlined),
-            title: const Text('Share with Friends'),
-            onTap: () {},
-          ),
-
-          const SizedBox(height: AppSpacing.xxl),
-
-          Center(
-            child: Column(
+            _AdaptiveCardGrid(
               children: [
-                Text(
-                  'Made with cheese in India',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colors.onSurfaceVariant.withValues(alpha: 0.6),
-                  ),
+                _SettingsActionCard(
+                  icon: Icons.savings_outlined,
+                  title: 'Goals',
+                  subtitle: 'Track savings targets',
+                  accent: Colors.amber,
+                  onTap: () => context.pushNamed(RouteNames.goals),
                 ),
-                const SizedBox(height: Spacing.xs),
-                Text(
-                  'Cheddar v${AppConstants.appVersion}',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colors.onSurfaceVariant.withValues(alpha: 0.4),
-                  ),
+                _SettingsActionCard(
+                  icon: Icons.subscriptions_outlined,
+                  title: 'Subscriptions',
+                  subtitle: 'Recurring payments',
+                  accent: Colors.purple,
+                  onTap: () => context.pushNamed(RouteNames.subscriptions),
+                ),
+                _SettingsActionCard(
+                  icon: Icons.call_split_rounded,
+                  title: 'Splits',
+                  subtitle: 'Shared expenses',
+                  accent: Colors.teal,
+                  onTap: () => context.pushNamed(RouteNames.split),
+                ),
+                _SettingsActionCard(
+                  icon: Icons.currency_exchange_rounded,
+                  title: 'Loans',
+                  subtitle: 'Lendings and borrowings',
+                  accent: Colors.indigo,
+                  onTap: () => context.pushNamed(RouteNames.loans),
+                ),
+                _SettingsActionCard(
+                  icon: Icons.account_balance_wallet_outlined,
+                  title: 'Accounts',
+                  subtitle: 'Wallets and banks',
+                  accent: Colors.green,
+                  onTap: () => context.pushNamed(RouteNames.accounts),
+                ),
+                _SettingsActionCard(
+                  icon: Icons.pending_actions_outlined,
+                  title: 'Pending',
+                  subtitle: 'Review detected alerts',
+                  accent: Colors.deepOrange,
+                  onTap: () =>
+                      context.pushNamed(RouteNames.pendingTransactions),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: AppSpacing.xxl),
-        ],
+            const SizedBox(height: AppSpacing.lg),
+            const _SectionHeader(
+              title: 'Preferences',
+              subtitle: 'Core app controls with a cleaner, denser layout.',
+            ),
+            _AdaptiveCardGrid(
+              children: [
+                _SettingsActionCard(
+                  icon: Icons.palette_outlined,
+                  title: 'Theme and vibes',
+                  subtitle: ref.watch(themeProvider).themeName,
+                  accent: colors.primary,
+                  onTap: () => context.pushNamed(RouteNames.themePicker),
+                ),
+                _SettingsActionCard(
+                  icon: Icons.currency_exchange_rounded,
+                  title: 'Currency',
+                  subtitle: '${currencyOptionFor(_currency).name} ($_currency)',
+                  accent: Colors.blue,
+                  onTap: _showCurrencyPicker,
+                ),
+                _SettingsActionCard(
+                  icon: Icons.receipt_long_rounded,
+                  title: 'Activity',
+                  subtitle: 'Browse all transactions',
+                  accent: Colors.cyan,
+                  onTap: () => context.pushNamed(RouteNames.transactions),
+                ),
+                _SettingsActionCard(
+                  icon: Icons.account_balance_rounded,
+                  title: 'Manage accounts',
+                  subtitle: 'Banks, cards, wallets',
+                  accent: Colors.green,
+                  onTap: () => context.pushNamed(RouteNames.accounts),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _FloatingNavEditorCard(
+              items: navItems,
+              availableItems: availableNavItems,
+              onAdd: _addFloatingNavItem,
+              onRemove: _removeFloatingNavItem,
+              onReorder: _reorderFloatingNavItems,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            const _SectionHeader(
+              title: 'Security and Alerts',
+              subtitle: 'Lock access and manage the notification pipeline.',
+            ),
+            _AdaptiveCardGrid(
+              children: [
+                _SettingsToggleCard(
+                  icon: Icons.fingerprint_rounded,
+                  title: 'Biometric lock',
+                  subtitle: 'Require fingerprint or face to open the app.',
+                  accent: Colors.deepPurple,
+                  value: _biometricEnabled,
+                  onChanged: (value) async {
+                    final prefs = ref.read(sharedPreferencesProvider);
+                    await prefs.setBool(AppConstants.prefAppLockEnabled, value);
+                    setState(() => _biometricEnabled = value);
+                  },
+                ),
+                _SettingsToggleCard(
+                  icon: Icons.notifications_outlined,
+                  title: 'Push notifications',
+                  subtitle: _notificationsEnabled ? 'Enabled' : 'Disabled',
+                  accent: Colors.redAccent,
+                  value: _notificationsEnabled,
+                  onChanged: _onPushNotificationsToggled,
+                ),
+                _SettingsToggleCard(
+                  icon: Icons.sms_outlined,
+                  title: 'Payment reader',
+                  subtitle: isListening
+                      ? 'Active and auto-detecting payments'
+                      : 'Off until you grant access',
+                  accent: Colors.orange,
+                  value: isListening,
+                  onChanged: _onListenerToggled,
+                ),
+                _SettingsActionCard(
+                  icon: Icons.pending_actions_outlined,
+                  title: 'Pending transactions',
+                  subtitle: 'Approve transactions found from alerts.',
+                  accent: Colors.brown,
+                  onTap: () =>
+                      context.pushNamed(RouteNames.pendingTransactions),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            const _SectionHeader(
+              title: 'Data and Backup',
+              subtitle:
+                  'Export, back up, and restore without digging through lists.',
+            ),
+            _AdaptiveCardGrid(
+              children: [
+                _SettingsActionCard(
+                  icon: Icons.file_download_outlined,
+                  title: 'Export transactions',
+                  subtitle: 'CSV or PDF output',
+                  accent: Colors.blueGrey,
+                  onTap: _showExportDialog,
+                ),
+                _SettingsActionCard(
+                  icon: Icons.backup_outlined,
+                  title: 'Backup and restore',
+                  subtitle: 'JSON snapshot of all app data',
+                  accent: Colors.blue,
+                  onTap: _showBackupDialog,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            const _SectionHeader(
+              title: 'About',
+              subtitle: 'Version details and app metadata.',
+            ),
+            _AdaptiveCardGrid(
+              children: [
+                _SettingsActionCard(
+                  icon: Icons.info_outline_rounded,
+                  title: 'About Cheddar',
+                  subtitle: 'v${AppConstants.appVersion}',
+                  accent: colors.primary,
+                  onTap: _showAboutDialog,
+                ),
+                _SettingsActionCard(
+                  icon: Icons.star_outline_rounded,
+                  title: 'Rate app',
+                  subtitle: 'Play Store link placeholder',
+                  accent: Colors.amber,
+                  onTap: () {},
+                ),
+                _SettingsActionCard(
+                  icon: Icons.share_outlined,
+                  title: 'Share app',
+                  subtitle: 'Invite friends to try Cheddar',
+                  accent: Colors.green,
+                  onTap: () {},
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            Center(
+              child: Column(
+                children: [
+                  Text(
+                    'Made with cheese in India',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant.withValues(alpha: 0.6),
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.xs),
+                  Text(
+                    'Cheddar v${AppConstants.appVersion}',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colors.onSurfaceVariant.withValues(alpha: 0.4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-
-  // ── Dialogs ──────────────────────────────────────────────────────────────
 
   void _showCurrencyPicker() {
     showModalBottomSheet(
@@ -612,17 +648,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                               ),
                               onChanged: (value) async {
                                 if (value == null) return;
-                                final prefs =
-                                    ref.read(sharedPreferencesProvider);
-                                await prefs.setString(
-                                  AppConstants.prefCurrency,
-                                  value,
-                                );
-                                ref
-                                    .read(currencyCodeProvider.notifier)
-                                    .state = value;
-                                setState(() => _currency = value);
-                                if (ctx.mounted) Navigator.pop(ctx);
+                                await _setCurrency(value, ctx);
                               },
                             );
                           },
@@ -645,8 +671,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       builder: (ctx) => AlertDialog(
         title: const Text('Export Transactions'),
         content: const Text(
-          'Choose a format to export your transactions. '
-          'The file will be saved to your Downloads folder.',
+          'Choose a format to export your transactions. The file will be saved to your Downloads folder.',
         ),
         actions: [
           TextButton(
@@ -676,10 +701,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Backup & Restore'),
+        title: const Text('Backup and Restore'),
         content: const Text(
-          'Create a JSON backup of all your data, '
-          'or restore from a previous backup file.',
+          'Create a JSON backup of all your data or restore from a previous backup file.',
         ),
         actions: [
           TextButton(
@@ -714,18 +738,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       children: [
         const SizedBox(height: AppSpacing.md),
         const Text(
-          'Cheddar is a personal finance tracker built with '
-          'Flutter. It helps you track expenses, set budgets, '
-          'and understand your spending personality.',
+          'Cheddar is a personal finance tracker built with Flutter. It helps you track expenses, set budgets, and keep your money organized.',
         ),
       ],
     );
   }
 
   Future<void> _exportData(String format) async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Exporting as $format...')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Exporting as $format...')));
   }
 
   Future<void> _createBackup() async {
@@ -736,9 +758,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       );
       await ref.read(exportServiceProvider).shareBackup();
     } catch (e) {
-      scaffold.showSnackBar(
-        SnackBar(content: Text('Backup failed: $e')),
-      );
+      scaffold.showSnackBar(SnackBar(content: Text('Backup failed: $e')));
     }
   }
 
@@ -762,18 +782,470 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       final total = counts.values.fold(0, (a, b) => a + b);
       if (mounted) {
         scaffold.showSnackBar(
-          SnackBar(content: Text('Restored $total items successfully!')),
+          SnackBar(content: Text('Restored $total items successfully.')),
         );
       }
     } catch (e) {
-      scaffold.showSnackBar(
-        SnackBar(content: Text('Restore failed: $e')),
-      );
+      scaffold.showSnackBar(SnackBar(content: Text('Restore failed: $e')));
     }
   }
 }
 
-// ── Permission Explanation Point ────────────────────────────────────────────
+class _HeroCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final Widget trailing;
+
+  const _HeroCard({
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        gradient: LinearGradient(
+          colors: [
+            colors.primaryContainer.withValues(alpha: 0.9),
+            colors.surfaceContainerHighest.withValues(alpha: 0.95),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    height: 1.45,
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          trailing,
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const _SectionHeader({required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(
+            subtitle,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AdaptiveCardGrid extends StatelessWidget {
+  final List<Widget> children;
+
+  const _AdaptiveCardGrid({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 680;
+        final columns = isWide ? 3 : 2;
+        final spacing = AppSpacing.sm;
+        final itemWidth =
+            (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            for (final child in children)
+              SizedBox(width: itemWidth, child: child),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _SettingsActionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color accent;
+  final VoidCallback onTap;
+
+  const _SettingsActionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.accent,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _SettingsCardFrame(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _CardIcon(icon: icon, accent: accent),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            subtitle,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Icon(
+              Icons.arrow_forward_rounded,
+              size: 18,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SettingsToggleCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color accent;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _SettingsToggleCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.accent,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _SettingsCardFrame(
+      onTap: () => onChanged(!value),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _CardIcon(icon: icon, accent: accent),
+              const Spacer(),
+              Switch.adaptive(value: value, onChanged: onChanged),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            subtitle,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FloatingNavEditorCard extends StatelessWidget {
+  final List<FloatingNavDestination> items;
+  final List<FloatingNavDestination> availableItems;
+  final ValueChanged<String> onAdd;
+  final ValueChanged<String> onRemove;
+  final Future<void> Function(int oldIndex, int newIndex) onReorder;
+
+  const _FloatingNavEditorCard({
+    required this.items,
+    required this.availableItems,
+    required this.onAdd,
+    required this.onRemove,
+    required this.onReorder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _CardIcon(
+                icon: Icons.dashboard_customize_rounded,
+                accent: colors.primary,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Floating nav bar',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      'Reorder pinned screens, remove extras, or add up to $kMaxFloatingNavItems items.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            ),
+            child: ReorderableListView.builder(
+              shrinkWrap: true,
+              buildDefaultDragHandles: false,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: items.length,
+              onReorder: onReorder,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return _PinnedNavTile(
+                  key: ValueKey(item.id),
+                  index: index,
+                  destination: item,
+                  onRemove: item.removable ? () => onRemove(item.id) : null,
+                );
+              },
+            ),
+          ),
+          if (availableItems.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'Add items',
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                for (final item in availableItems)
+                  ActionChip(
+                    avatar: Icon(
+                      navSettingsIconFor(item.id),
+                      size: 18,
+                      color: colors.primary,
+                    ),
+                    label: Text(item.label),
+                    onPressed: () => onAdd(item.id),
+                  ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _PinnedNavTile extends StatelessWidget {
+  final int index;
+  final FloatingNavDestination destination;
+  final VoidCallback? onRemove;
+
+  const _PinnedNavTile({
+    super.key,
+    required this.index,
+    required this.destination,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      key: key,
+      margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            navSettingsIconFor(destination.id),
+            size: 20,
+            color: colors.primary,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              destination.label,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+            ),
+          ),
+          if (onRemove != null)
+            IconButton(
+              onPressed: onRemove,
+              icon: const Icon(Icons.close_rounded),
+              tooltip: 'Remove from floating nav',
+            ),
+          ReorderableDragStartListener(
+            index: index,
+            child: const Padding(
+              padding: EdgeInsets.all(AppSpacing.xs),
+              child: Icon(Icons.drag_handle_rounded),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SettingsCardFrame extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onTap;
+
+  const _SettingsCardFrame({required this.child, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Material(
+      color: colors.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 156),
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+            border: Border.all(
+              color: colors.outlineVariant.withValues(alpha: 0.45),
+            ),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+class _CardIcon extends StatelessWidget {
+  final IconData icon;
+  final Color accent;
+
+  const _CardIcon({required this.icon, required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
+      child: Icon(icon, color: accent, size: 22),
+    );
+  }
+}
 
 class _PermissionPoint extends StatelessWidget {
   final IconData icon;
@@ -799,11 +1271,7 @@ class _PermissionPoint extends StatelessWidget {
             color: theme.colorScheme.secondaryContainer,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: theme.colorScheme.secondary,
-          ),
+          child: Icon(icon, size: 18, color: theme.colorScheme.secondary),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -831,79 +1299,9 @@ class _PermissionPoint extends StatelessWidget {
   }
 }
 
-// ── Section Header ───────────────────────────────────────────────────────────
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  const _SectionHeader({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.lg,
-        AppSpacing.md,
-        AppSpacing.xs,
-      ),
-      child: Text(
-        title.toUpperCase(),
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: Theme.of(context).colorScheme.primary,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 1.2,
-        ),
-      ),
-    );
-  }
-}
-
-// ── Quick Link Card ──────────────────────────────────────────────────────────
-
-class _QuickLink extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _QuickLink({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: AppSpacing.xxs),
-            Text(
-              label,
-              style: theme.textTheme.labelSmall?.copyWith(color: color),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _CurrencyBadge extends StatelessWidget {
   final CurrencyOption currency;
+
   const _CurrencyBadge({required this.currency});
 
   @override

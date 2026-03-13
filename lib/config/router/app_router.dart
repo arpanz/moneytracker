@@ -1,5 +1,5 @@
-import 'package:cheddar/domain/models/transaction_model.dart';
 import 'package:cheddar/domain/models/loan_model.dart';
+import 'package:cheddar/domain/models/transaction_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,41 +7,38 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/di/providers.dart';
 import '../../config/constants/app_constants.dart';
-import '../../ui/features/onboarding/screens/onboarding_screen.dart';
-import '../../ui/features/lock/screens/lock_screen.dart';
-import '../../ui/features/home/screens/home_screen.dart';
-import '../../ui/features/transactions/screens/transaction_list_screen.dart';
-import '../../ui/features/transactions/screens/add_transaction_screen.dart';
-import '../../ui/features/transactions/screens/transaction_detail_screen.dart';
-import '../../ui/features/stats/screens/stats_screen.dart';
-import '../../ui/features/budget/screens/budget_screen.dart';
-import '../../ui/features/budget/screens/budget_detail_screen.dart';
-import '../../ui/features/budget/screens/add_budget_screen.dart';
-import '../../ui/features/goals/screens/goals_screen.dart';
-import '../../ui/features/goals/screens/add_goal_screen.dart';
-import '../../ui/features/goals/screens/goal_detail_screen.dart';
-import '../../ui/features/subscriptions/screens/subscriptions_screen.dart';
-import '../../ui/features/subscriptions/screens/add_subscription_screen.dart';
-import '../../ui/features/split/screens/split_screen.dart';
-import '../../ui/features/split/screens/add_split_screen.dart';
+import '../../ui/core/shell/app_shell.dart';
+import '../../ui/features/accounts/screens/account_detail_screen.dart';
 import '../../ui/features/accounts/screens/accounts_screen.dart';
 import '../../ui/features/accounts/screens/add_account_screen.dart';
-import '../../ui/features/accounts/screens/account_detail_screen.dart';
-import '../../ui/features/loans/screens/loans_screen.dart';
+import '../../ui/features/budget/screens/add_budget_screen.dart';
+import '../../ui/features/budget/screens/budget_detail_screen.dart';
+import '../../ui/features/budget/screens/budget_screen.dart';
+import '../../ui/features/goals/screens/add_goal_screen.dart';
+import '../../ui/features/goals/screens/goal_detail_screen.dart';
+import '../../ui/features/goals/screens/goals_screen.dart';
+import '../../ui/features/home/screens/home_screen.dart';
 import '../../ui/features/loans/screens/add_loan_screen.dart';
 import '../../ui/features/loans/screens/loan_detail_screen.dart';
+import '../../ui/features/loans/screens/loans_screen.dart';
+import '../../ui/features/lock/screens/lock_screen.dart';
+import '../../ui/features/notifications/screens/pending_transactions_screen.dart';
+import '../../ui/features/onboarding/screens/onboarding_screen.dart';
+import '../../ui/features/scanner/screens/scanner_screen.dart';
 import '../../ui/features/settings/screens/settings_screen.dart';
 import '../../ui/features/settings/screens/theme_picker_screen.dart';
-import '../../ui/features/scanner/screens/scanner_screen.dart';
-import '../../ui/features/notifications/screens/pending_transactions_screen.dart';
-import '../../ui/core/shell/app_shell.dart';
+import '../../ui/features/split/screens/add_split_screen.dart';
+import '../../ui/features/split/screens/split_screen.dart';
+import '../../ui/features/stats/screens/stats_screen.dart';
+import '../../ui/features/subscriptions/screens/add_subscription_screen.dart';
+import '../../ui/features/subscriptions/screens/subscriptions_screen.dart';
+import '../../ui/features/transactions/screens/add_transaction_screen.dart';
+import '../../ui/features/transactions/screens/transaction_detail_screen.dart';
+import '../../ui/features/transactions/screens/transaction_list_screen.dart';
 import 'route_names.dart';
 
-/// Track whether the user has authenticated through the lock screen
-/// in the current app session. Reset on cold start.
 bool _isSessionAuthenticated = false;
 
-/// Called by LockScreen after successful authentication.
 void markSessionAuthenticated() {
   _isSessionAuthenticated = true;
 }
@@ -52,7 +49,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     debugLogDiagnostics: kDebugMode,
-
     redirect: (context, state) {
       final onboardingComplete =
           prefs.getBool(AppConstants.prefOnboardingComplete) ?? false;
@@ -76,9 +72,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       return null;
     },
-
     routes: [
-      // ── Onboarding ──
       GoRoute(
         path: '/',
         name: RouteNames.onboarding,
@@ -89,8 +83,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.lock,
         builder: (context, state) => const LockScreen(),
       ),
-
-      // ── Main App Shell with Bottom Nav (4 tabs: Home, Stats, Budget, More) ──
       ShellRoute(
         builder: (context, state, child) => AppShell(child: child),
         routes: [
@@ -124,17 +116,56 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               child: const SettingsScreen(),
             ),
           ),
+          GoRoute(
+            path: '/transactions',
+            name: RouteNames.transactions,
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const TransactionListScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/goals',
+            name: RouteNames.goals,
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const GoalsScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/subscriptions',
+            name: RouteNames.subscriptions,
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const SubscriptionsScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/split',
+            name: RouteNames.split,
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const SplitScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/accounts',
+            name: RouteNames.accounts,
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const AccountsScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/loans',
+            name: RouteNames.loans,
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const LoansScreen(),
+            ),
+          ),
         ],
       ),
-
-      // ── Transactions (accessible from FAB and deep links) ──
-      GoRoute(
-        path: '/transactions',
-        name: RouteNames.transactions,
-        builder: (context, state) => const TransactionListScreen(),
-      ),
-
-      // ── Detail / Modal Routes ──
       GoRoute(
         path: '/transaction/add',
         name: RouteNames.addTransaction,
@@ -167,11 +198,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             BudgetDetailScreen(budgetId: state.pathParameters['id']!),
       ),
       GoRoute(
-        path: '/goals',
-        name: RouteNames.goals,
-        builder: (context, state) => const GoalsScreen(),
-      ),
-      GoRoute(
         path: '/goal/add',
         name: RouteNames.addGoal,
         builder: (context, state) => const AddGoalScreen(),
@@ -186,34 +212,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/subscriptions',
-        name: RouteNames.subscriptions,
-        builder: (context, state) => const SubscriptionsScreen(),
-      ),
-      GoRoute(
         path: '/subscription/add',
         name: RouteNames.addSubscription,
         builder: (context, state) => const AddSubscriptionScreen(),
       ),
       GoRoute(
-        path: '/split',
-        name: RouteNames.split,
-        builder: (context, state) => const SplitScreen(),
-      ),
-      GoRoute(
         path: '/split/add',
         name: RouteNames.addSplit,
         builder: (context, state) => const AddSplitScreen(),
-      ),
-      GoRoute(
-        path: '/accounts',
-        name: RouteNames.accounts,
-        builder: (context, state) => const AccountsScreen(),
-      ),
-      GoRoute(
-        path: '/loans',
-        name: RouteNames.loans,
-        builder: (context, state) => const LoansScreen(),
       ),
       GoRoute(
         path: '/loan/add',

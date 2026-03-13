@@ -1,65 +1,26 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../config/router/route_names.dart';
 import '../../../config/theme/spacing.dart';
-
-class _NavTab {
-  final String label;
-  final FaIconData icon;
-  final FaIconData activeIcon;
-  final String path;
-
-  const _NavTab({
-    required this.label,
-    required this.icon,
-    required this.activeIcon,
-    required this.path,
-  });
-}
-
-const List<_NavTab> _tabs = [
-  _NavTab(
-    label: 'Home',
-    icon: FontAwesomeIcons.house,
-    activeIcon: FontAwesomeIcons.house,
-    path: '/home',
-  ),
-  _NavTab(
-    label: 'Stats',
-    icon: FontAwesomeIcons.chartPie,
-    activeIcon: FontAwesomeIcons.chartPie,
-    path: '/stats',
-  ),
-  _NavTab(
-    label: 'Budget',
-    icon: FontAwesomeIcons.wallet,
-    activeIcon: FontAwesomeIcons.wallet,
-    path: '/budget',
-  ),
-  _NavTab(
-    label: 'More',
-    icon: FontAwesomeIcons.ellipsis,
-    activeIcon: FontAwesomeIcons.ellipsis,
-    path: '/more',
-  ),
-];
+import 'floating_nav_config.dart';
 
 const double kFloatingNavBarHeight = 80.0;
 
-class AppShell extends StatefulWidget {
+class AppShell extends ConsumerStatefulWidget {
   final Widget child;
 
   const AppShell({super.key, required this.child});
 
   @override
-  State<AppShell> createState() => _AppShellState();
+  ConsumerState<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell>
+class _AppShellState extends ConsumerState<AppShell>
     with SingleTickerProviderStateMixin {
   bool _fabOpen = false;
 
@@ -85,19 +46,23 @@ class _AppShellState extends State<AppShell>
     _fabController.reverse();
   }
 
-  int _currentIndex(BuildContext context) {
+  int _currentIndex(BuildContext context, List<FloatingNavDestination> tabs) {
     final location = GoRouterState.of(context).uri.path;
-    for (int i = 0; i < _tabs.length; i++) {
-      if (location.startsWith(_tabs[i].path)) return i;
+    for (int i = 0; i < tabs.length; i++) {
+      if (location.startsWith(tabs[i].path)) return i;
     }
-    return 0;
+    return -1;
   }
 
-  void _onTabTapped(BuildContext context, int tabIndex) {
+  void _onTabTapped(
+    BuildContext context,
+    int tabIndex,
+    List<FloatingNavDestination> tabs,
+  ) {
     _closeFab();
-    final current = _currentIndex(context);
+    final current = _currentIndex(context, tabs);
     if (tabIndex == current) return;
-    context.go(_tabs[tabIndex].path);
+    context.go(tabs[tabIndex].path);
   }
 
   @override
@@ -108,9 +73,12 @@ class _AppShellState extends State<AppShell>
 
   @override
   Widget build(BuildContext context) {
+    final navItems = resolveFloatingNavItems(
+      ref.watch(floatingNavItemIdsProvider),
+    );
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final selectedIndex = _currentIndex(context);
+    final selectedIndex = _currentIndex(context, navItems);
     final bottomInset = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
@@ -171,8 +139,9 @@ class _AppShellState extends State<AppShell>
         ],
       ),
       bottomNavigationBar: _FloatingNavBar(
+        tabs: navItems,
         currentIndex: selectedIndex,
-        onTap: (index) => _onTabTapped(context, index),
+        onTap: (index) => _onTabTapped(context, index, navItems),
         colorScheme: colorScheme,
         bottomInset: bottomInset,
         onFabTap: _toggleFab,
@@ -365,6 +334,7 @@ class _FabActionButton extends StatelessWidget {
 }
 
 class _FloatingNavBar extends StatelessWidget {
+  final List<FloatingNavDestination> tabs;
   final int currentIndex;
   final ValueChanged<int> onTap;
   final ColorScheme colorScheme;
@@ -374,6 +344,7 @@ class _FloatingNavBar extends StatelessWidget {
   final AnimationController fabController;
 
   const _FloatingNavBar({
+    required this.tabs,
     required this.currentIndex,
     required this.onTap,
     required this.colorScheme,
@@ -385,6 +356,10 @@ class _FloatingNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final splitIndex = (tabs.length / 2).ceil();
+    final leftTabs = tabs.take(splitIndex).toList(growable: false);
+    final rightTabs = tabs.skip(splitIndex).toList(growable: false);
+
     return Container(
       margin: EdgeInsets.fromLTRB(
         Spacing.md,
@@ -416,19 +391,22 @@ class _FloatingNavBar extends StatelessWidget {
             vertical: Spacing.sm,
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _NavBarItem(
-                tab: _tabs[0],
-                isSelected: currentIndex == 0,
-                colorScheme: colorScheme,
-                onTap: () => onTap(0),
-              ),
-              _NavBarItem(
-                tab: _tabs[1],
-                isSelected: currentIndex == 1,
-                colorScheme: colorScheme,
-                onTap: () => onTap(1),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    for (final entry in leftTabs.indexed)
+                      Flexible(
+                        child: _NavBarItem(
+                          tab: entry.$2,
+                          isSelected: currentIndex == entry.$1,
+                          colorScheme: colorScheme,
+                          onTap: () => onTap(entry.$1),
+                        ),
+                      ),
+                  ],
+                ),
               ),
               _CentreFab(
                 colorScheme: colorScheme,
@@ -436,17 +414,21 @@ class _FloatingNavBar extends StatelessWidget {
                 controller: fabController,
                 onTap: onFabTap,
               ),
-              _NavBarItem(
-                tab: _tabs[2],
-                isSelected: currentIndex == 2,
-                colorScheme: colorScheme,
-                onTap: () => onTap(2),
-              ),
-              _NavBarItem(
-                tab: _tabs[3],
-                isSelected: currentIndex == 3,
-                colorScheme: colorScheme,
-                onTap: () => onTap(3),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    for (final entry in rightTabs.indexed)
+                      Flexible(
+                        child: _NavBarItem(
+                          tab: entry.$2,
+                          isSelected: currentIndex == entry.$1 + splitIndex,
+                          colorScheme: colorScheme,
+                          onTap: () => onTap(entry.$1 + splitIndex),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -497,7 +479,7 @@ class _CentreFab extends StatelessWidget {
 }
 
 class _NavBarItem extends StatelessWidget {
-  final _NavTab tab;
+  final FloatingNavDestination tab;
   final bool isSelected;
   final ColorScheme colorScheme;
   final VoidCallback onTap;
