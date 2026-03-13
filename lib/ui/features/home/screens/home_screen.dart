@@ -39,18 +39,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ref.invalidate(accountsListProvider);
   }
 
-  String _greeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final userName = ref.watch(userNameProvider);
     final currencySymbol = ref.watch(currencySymbolProvider);
     final showValues = ref.watch(showValuesProvider);
     final pendingCount = ref.watch(pendingTransactionsProvider).length;
@@ -76,34 +68,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               parent: BouncingScrollPhysics(),
             ),
             slivers: [
-              // ── Header (greeting + account switcher row) ──
+              // ── Top Bar (account chip + actions) ──
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(
-                    Spacing.lg, Spacing.lg, Spacing.lg, Spacing.sm,
+                    Spacing.lg,
+                    Spacing.lg,
+                    Spacing.sm,
+                    0,
                   ),
-                  child: _GreetingHeader(
-                    greeting: _greeting(),
-                    userName: userName,
-                    theme: theme,
+                  child: _HomeTopBar(
                     showValues: showValues,
                     pendingCount: pendingCount,
                     accounts: accountsAsync.value ?? [],
                     activeAccountId: activeAccountId,
+                    theme: theme,
+                    onToggleTheme: () =>
+                        ref.read(themeProvider.notifier).toggleTheme(),
                     onToggleVisibility: () async {
                       final nextValue = !ref.read(showValuesProvider);
                       ref.read(showValuesProvider.notifier).state = nextValue;
                       final prefs = ref.read(sharedPreferencesProvider);
                       await prefs.setBool(
-                          AppConstants.prefShowValues, nextValue);
+                        AppConstants.prefShowValues,
+                        nextValue,
+                      );
                     },
                     onPendingTap: () =>
                         context.pushNamed(RouteNames.pendingTransactions),
                     onAccountSelected: (id) async {
                       ref.read(activeAccountIdProvider.notifier).state = id;
                       final prefs = ref.read(sharedPreferencesProvider);
-                      await prefs.setInt(
-                          AppConstants.prefActiveAccountId, id);
+                      await prefs.setInt(AppConstants.prefActiveAccountId, id);
                       ref.invalidate(totalBalanceProvider);
                       ref.invalidate(monthlyIncomeProvider);
                       ref.invalidate(monthlyExpenseProvider);
@@ -112,6 +108,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     },
                     onMoreTap: () => context.pushNamed(RouteNames.accounts),
                   ),
+                ),
+              ),
+
+              // ── Month / Year Selector ──
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: Spacing.xs),
+                  child: _MonthYearSelector(),
                 ),
               ),
 
@@ -198,7 +202,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
               SliverToBoxAdapter(
                 child: SizedBox(
-                  height: kBottomNavigationBarHeight +
+                  height:
+                      kBottomNavigationBarHeight +
                       MediaQuery.of(context).padding.bottom +
                       Spacing.md,
                 ),
@@ -211,29 +216,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-// ══ Greeting Header ════════════════════════════════════════════════════════════
+// ══ Top Bar ════════════════════════════════════════════════════════════════════
 
-class _GreetingHeader extends StatelessWidget {
-  final String greeting;
-  final String userName;
+class _HomeTopBar extends StatelessWidget {
   final ThemeData theme;
   final bool showValues;
   final int pendingCount;
   final List<AccountModel> accounts;
   final int activeAccountId;
+  final VoidCallback onToggleTheme;
   final VoidCallback onToggleVisibility;
   final VoidCallback onPendingTap;
   final ValueChanged<int> onAccountSelected;
   final VoidCallback onMoreTap;
 
-  const _GreetingHeader({
-    required this.greeting,
-    required this.userName,
+  const _HomeTopBar({
     required this.theme,
     required this.showValues,
     required this.pendingCount,
     required this.accounts,
     required this.activeAccountId,
+    required this.onToggleTheme,
     required this.onToggleVisibility,
     required this.onPendingTap,
     required this.onAccountSelected,
@@ -242,145 +245,109 @@ class _GreetingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final dateStr = DateFormat('EEEE, MMM d').format(now);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final selectedAccount = _findSelectedAccount(accounts, activeAccountId);
 
-    final visibleAccounts = accounts.take(3).toList();
-    final hasMore = accounts.length > 3;
+    final accountLabel = activeAccountId == -1
+        ? 'All Accounts'
+        : selectedAccount?.name ?? 'Account';
+    final accountColor = activeAccountId == -1
+        ? colorScheme.primary
+        : Color(selectedAccount?.color ?? colorScheme.primary.value);
+    final accountIcon = activeAccountId == -1
+        ? Icons.account_balance_wallet_rounded
+        : _iconForType(selectedAccount?.accountType ?? 0);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        // ── Top row: greeting + icons ──
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                '$greeting${userName.isNotEmpty ? ', $userName' : ''}',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: _AccountDropdownChip(
+              label: accountLabel,
+              icon: accountIcon,
+              color: accountColor,
+              theme: theme,
+              onTap: () => _showAccountSwitcher(
+                context,
+                accounts,
+                activeAccountId,
+                onAccountSelected,
+                onMoreTap,
+                theme,
               ),
             ),
-            if (pendingCount > 0)
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  IconButton(
-                    onPressed: onPendingTap,
-                    tooltip:
-                        '$pendingCount pending transaction${pendingCount == 1 ? '' : 's'}',
-                    icon: const Icon(Icons.notifications_rounded),
-                    color: colorScheme.primary,
-                  ),
-                  Positioned(
-                    right: 6,
-                    top: 6,
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                          color: colorScheme.error, shape: BoxShape.circle),
-                      constraints: const BoxConstraints(
-                          minWidth: 16, minHeight: 16),
-                      child: Text(
-                        '$pendingCount',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onError,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                          height: 1,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            IconButton(
-              onPressed: onToggleVisibility,
-              tooltip: showValues ? 'Hide values' : 'Show values',
-              icon: Icon(showValues
-                  ? Icons.visibility_rounded
-                  : Icons.visibility_off_rounded),
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ],
+          ),
         ),
-
-        const SizedBox(height: Spacing.xs),
-        Text(
-          dateStr,
-          style: theme.textTheme.bodyMedium
-              ?.copyWith(color: colorScheme.onSurfaceVariant),
-        ),
-
-        const SizedBox(height: Spacing.md),
-
-        // ── Account switcher chips ──
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          clipBehavior: Clip.none,
-          child: Row(
+        if (pendingCount > 0)
+          Stack(
+            clipBehavior: Clip.none,
             children: [
-              _AccountChip(
-                label: 'All Accounts',
-                icon: Icons.account_balance_wallet_rounded,
+              IconButton(
+                onPressed: onPendingTap,
+                tooltip:
+                    '$pendingCount pending transaction${pendingCount == 1 ? '' : 's'}',
+                icon: const Icon(Icons.notifications_rounded),
                 color: colorScheme.primary,
-                isSelected: activeAccountId == -1,
-                onTap: () => onAccountSelected(-1),
-                theme: theme,
               ),
-              ...visibleAccounts.map((acc) {
-                final color = Color(acc.color);
-                return Padding(
-                  padding: const EdgeInsets.only(left: Spacing.sm),
-                  child: _AccountChip(
-                    label: acc.name,
-                    icon: _iconForType(acc.accountType),
-                    color: color,
-                    isSelected: activeAccountId == acc.id,
-                    onTap: () => onAccountSelected(acc.id),
-                    theme: theme,
+              Positioned(
+                right: 6,
+                top: 6,
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: colorScheme.error,
+                    shape: BoxShape.circle,
                   ),
-                );
-              }),
-              if (hasMore)
-                Padding(
-                  padding: const EdgeInsets.only(left: Spacing.sm),
-                  child: _AccountChip(
-                    label: 'More',
-                    icon: Icons.more_horiz_rounded,
-                    color: colorScheme.onSurfaceVariant,
-                    isSelected: false,
-                    onTap: () => _showAccountSwitcher(
-                      context,
-                      accounts,
-                      activeAccountId,
-                      onAccountSelected,
-                      onMoreTap,
-                      theme,
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    '$pendingCount',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onError,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                      height: 1,
                     ),
-                    theme: theme,
+                    textAlign: TextAlign.center,
                   ),
-                )
-              else
-                Padding(
-                  padding: const EdgeInsets.only(left: Spacing.sm),
-                  child: _AccountChip(
-                    label: 'Manage',
-                    icon: Icons.settings_rounded,
-                    color: colorScheme.onSurfaceVariant,
-                    isSelected: false,
-                    onTap: onMoreTap,
-                    theme: theme,
-                  ),
+                ),
               ),
             ],
           ),
+        IconButton(
+          onPressed: onToggleVisibility,
+          tooltip: showValues ? 'Hide values' : 'Show values',
+          icon: Icon(
+            showValues
+                ? Icons.visibility_rounded
+                : Icons.visibility_off_rounded,
+          ),
+          color: colorScheme.onSurfaceVariant,
+        ),
+        IconButton(
+          onPressed: onToggleTheme,
+          tooltip: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+          icon: Icon(
+            isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+          ),
+          color: colorScheme.onSurfaceVariant,
         ),
       ],
     );
+  }
+
+  static AccountModel? _findSelectedAccount(
+    List<AccountModel> accounts,
+    int id,
+  ) {
+    for (final account in accounts) {
+      if (account.id == id) return account;
+    }
+    return null;
   }
 
   static IconData _iconForType(int type) {
@@ -429,69 +396,204 @@ class _GreetingHeader extends StatelessWidget {
   }
 }
 
-// ══ Account Chip ════════════════════════════════════════════════════════════════
-
-class _AccountChip extends StatelessWidget {
+class _AccountDropdownChip extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color color;
-  final bool isSelected;
-  final VoidCallback onTap;
   final ThemeData theme;
+  final VoidCallback onTap;
 
-  const _AccountChip({
+  const _AccountDropdownChip({
     required this.label,
     required this.icon,
     required this.color,
-    required this.isSelected,
-    required this.onTap,
     required this.theme,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = theme.colorScheme;
-    final bg = isSelected
-        ? color.withValues(alpha: 0.18)
-        : colorScheme.surfaceContainerHigh;
-    final border = isSelected ? color : Colors.transparent;
-    final labelColor =
-        isSelected ? color : colorScheme.onSurfaceVariant;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        borderRadius: const BorderRadius.all(Radius.circular(999)),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: bg,
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            border: Border.all(color: border, width: 1.5),
+            color: colorScheme.surfaceContainerLow,
+            borderRadius: const BorderRadius.all(Radius.circular(999)),
+            border: Border.all(
+              color: color.withValues(alpha: 0.45),
+              width: 1.4,
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 14, color: labelColor),
-              const SizedBox(width: 5),
-              Text(
-                label,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: labelColor,
-                  fontWeight:
-                      isSelected ? FontWeight.w700 : FontWeight.w500,
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                child: Icon(icon, size: 14, color: color),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 18,
+                color: colorScheme.onSurfaceVariant,
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+// ══ Month / Year Selector ═════════════════════════════════════════════════════
+
+class _MonthYearSelector extends ConsumerWidget {
+  const _MonthYearSelector();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final selectedMonth = ref.watch(selectedMonthProvider);
+    final now = DateTime.now();
+    final isCurrentMonth =
+        selectedMonth.year == now.year && selectedMonth.month == now.month;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _MonthNavButton(
+          icon: Icons.chevron_left_rounded,
+          enabled: true,
+          onTap: () {
+            ref.read(selectedMonthProvider.notifier).state = DateTime(
+              selectedMonth.year,
+              selectedMonth.month - 1,
+            );
+          },
+        ),
+        const SizedBox(width: Spacing.sm),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _pickMonthYear(context, ref, selectedMonth),
+            borderRadius: const BorderRadius.all(Radius.circular(999)),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerLow,
+                borderRadius: const BorderRadius.all(Radius.circular(999)),
+                border: Border.all(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.55),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    DateFormat('MMMM yyyy').format(selectedMonth),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Icon(
+                    Icons.unfold_more_rounded,
+                    size: 18,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: Spacing.sm),
+        _MonthNavButton(
+          icon: Icons.chevron_right_rounded,
+          enabled: !isCurrentMonth,
+          onTap: () {
+            ref.read(selectedMonthProvider.notifier).state = DateTime(
+              selectedMonth.year,
+              selectedMonth.month + 1,
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  static Future<void> _pickMonthYear(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime selectedMonth,
+  ) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: selectedMonth,
+      firstDate: DateTime(2010, 1, 1),
+      lastDate: DateTime(DateTime.now().year + 5, 12, 31),
+      initialDatePickerMode: DatePickerMode.year,
+      helpText: 'Select month and year',
+    );
+
+    if (picked != null) {
+      ref.read(selectedMonthProvider.notifier).state = DateTime(
+        picked.year,
+        picked.month,
+      );
+    }
+  }
+}
+
+class _MonthNavButton extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  const _MonthNavButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return IconButton(
+      onPressed: enabled ? onTap : null,
+      visualDensity: VisualDensity.compact,
+      style: IconButton.styleFrom(
+        backgroundColor: colorScheme.surfaceContainerLow,
+        disabledBackgroundColor: colorScheme.surfaceContainerLow.withValues(
+          alpha: 0.6,
+        ),
+      ),
+      icon: Icon(icon),
+      color: colorScheme.onSurfaceVariant,
+      disabledColor: colorScheme.onSurface.withValues(alpha: 0.25),
     );
   }
 }
@@ -542,9 +644,12 @@ class _AccountSwitcherSheet extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Switch Account',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  'Switch Account',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 TextButton.icon(
                   onPressed: onMoreTap,
                   icon: const Icon(Icons.open_in_new_rounded, size: 16),
@@ -552,7 +657,9 @@ class _AccountSwitcherSheet extends StatelessWidget {
                   style: TextButton.styleFrom(
                     foregroundColor: colorScheme.primary,
                     textStyle: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.w600),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -568,17 +675,18 @@ class _AccountSwitcherSheet extends StatelessWidget {
             onTap: () => onSelected(-1),
             theme: theme,
           ),
-          ...accounts.map((acc) => _SheetAccountTile(
-                icon: _GreetingHeader._iconForType(acc.accountType),
-                label: acc.name,
-                subtitle: _typeLabel(acc.accountType),
-                color: Color(acc.color),
-                isSelected: activeAccountId == acc.id,
-                onTap: () => onSelected(acc.id),
-                theme: theme,
-              )),
-          SizedBox(
-              height: MediaQuery.of(context).padding.bottom + 16),
+          ...accounts.map(
+            (acc) => _SheetAccountTile(
+              icon: _HomeTopBar._iconForType(acc.accountType),
+              label: acc.name,
+              subtitle: _typeLabel(acc.accountType),
+              color: Color(acc.color),
+              isSelected: activeAccountId == acc.id,
+              onTap: () => onSelected(acc.id),
+              theme: theme,
+            ),
+          ),
+          SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
         ],
       ),
     );
@@ -632,8 +740,7 @@ class _SheetAccountTile extends StatelessWidget {
         color: isSelected ? color.withValues(alpha: 0.12) : Colors.transparent,
         borderRadius: const BorderRadius.all(Radius.circular(14)),
         border: isSelected
-            ? Border.all(
-                color: color.withValues(alpha: 0.35), width: 1.5)
+            ? Border.all(color: color.withValues(alpha: 0.35), width: 1.5)
             : Border.all(color: Colors.transparent),
       ),
       child: ListTile(
@@ -653,15 +760,15 @@ class _SheetAccountTile extends StatelessWidget {
         title: Text(
           label,
           style: theme.textTheme.bodyMedium?.copyWith(
-            fontWeight:
-                isSelected ? FontWeight.w700 : FontWeight.w500,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             color: isSelected ? color : colorScheme.onSurface,
           ),
         ),
         subtitle: Text(
           subtitle,
-          style: theme.textTheme.bodySmall
-              ?.copyWith(color: colorScheme.onSurfaceVariant),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
         trailing: isSelected
             ? Icon(Icons.check_circle_rounded, color: color, size: 20)
@@ -690,15 +797,16 @@ class _BalanceSection extends StatelessWidget {
 
     return balanceAsync.when(
       data: (balance) => BalanceCard(
-          balance: balance,
-          currencySymbol: currencySymbol,
-          obscureValues: !showValues,
-        ),
+        balance: balance,
+        currencySymbol: currencySymbol,
+        obscureValues: !showValues,
+      ),
       loading: () => const _BalanceCardShimmer(),
       error: (_, __) => BalanceCard(
-          balance: 0,
-          currencySymbol: currencySymbol,
-          obscureValues: !showValues),
+        balance: 0,
+        currencySymbol: currencySymbol,
+        obscureValues: !showValues,
+      ),
     );
   }
 }
@@ -719,8 +827,9 @@ class _BalanceCardShimmer extends StatelessWidget {
         )
         .animate(onPlay: (c) => c.repeat())
         .shimmer(
-            duration: AppDurations.shimmer,
-            color: colorScheme.surface.withValues(alpha: 0.5));
+          duration: AppDurations.shimmer,
+          color: colorScheme.surface.withValues(alpha: 0.5),
+        );
   }
 }
 
@@ -807,7 +916,8 @@ class _MiniStatCard extends StatelessWidget {
         color: colorScheme.surfaceContainerLow,
         borderRadius: Radii.borderLg,
         border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         children: [
@@ -827,8 +937,9 @@ class _MiniStatCard extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: colorScheme.onSurfaceVariant),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 isLoading
@@ -903,21 +1014,21 @@ class _SpendingChart extends StatelessWidget {
               color: theme.colorScheme.surfaceContainerLow,
               borderRadius: Radii.borderLg,
               border: Border.all(
-                  color: theme.colorScheme.outlineVariant
-                      .withValues(alpha: 0.3)),
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+              ),
             ),
             child: Row(
               children: [
-                Icon(Icons.pie_chart_outline_rounded,
-                    size: 32,
-                    color: theme.colorScheme.onSurface
-                        .withValues(alpha: 0.2)),
+                Icon(
+                  Icons.pie_chart_outline_rounded,
+                  size: 32,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                ),
                 const SizedBox(width: Spacing.md),
                 Text(
                   'No spending data yet',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface
-                        .withValues(alpha: 0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                 ),
               ],
@@ -931,121 +1042,110 @@ class _SpendingChart extends StatelessWidget {
         final total = top5.fold<double>(0, (s, e) => s + e.value);
 
         return Container(
-              padding: const EdgeInsets.all(Spacing.md),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerLow,
-                borderRadius: Radii.borderLg,
-                border: Border.all(
-                    color: theme.colorScheme.outlineVariant
-                        .withValues(alpha: 0.3)),
+          padding: const EdgeInsets.all(Spacing.md),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerLow,
+            borderRadius: Radii.borderLg,
+            border: Border.all(
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Spending Breakdown',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Spending Breakdown',
-                      style: theme.textTheme.titleSmall
-                          ?.copyWith(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: Spacing.md),
-                  SizedBox(
-                    height: 160,
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 120,
-                          height: 120,
-                          child: PieChart(PieChartData(
-                            sectionsSpace: 2,
-                            centerSpaceRadius: 28,
-                            sections:
-                                List.generate(top5.length, (i) {
-                              final entry = top5[i];
-                              final pct = total > 0
-                                  ? (entry.value / total) * 100
-                                  : 0.0;
-                              return PieChartSectionData(
-                                value: entry.value,
-                                color: chartColors[
-                                    i % chartColors.length],
-                                radius: 28,
-                                title: showValues
-                                    ? '${pct.round()}%'
-                                    : '••',
-                                titleStyle: theme
-                                    .textTheme.labelSmall
-                                    ?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
-                                ),
-                              );
-                            }),
-                          )),
+              const SizedBox(height: Spacing.md),
+              SizedBox(
+                height: 160,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 120,
+                      height: 120,
+                      child: PieChart(
+                        PieChartData(
+                          sectionsSpace: 2,
+                          centerSpaceRadius: 28,
+                          sections: List.generate(top5.length, (i) {
+                            final entry = top5[i];
+                            final pct = total > 0
+                                ? (entry.value / total) * 100
+                                : 0.0;
+                            return PieChartSectionData(
+                              value: entry.value,
+                              color: chartColors[i % chartColors.length],
+                              radius: 28,
+                              title: showValues ? '${pct.round()}%' : '••',
+                              titleStyle: theme.textTheme.labelSmall?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            );
+                          }),
                         ),
-                        const SizedBox(width: Spacing.lg),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment:
-                                MainAxisAlignment.center,
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            children: List.generate(top5.length,
-                                (i) {
-                              final entry = top5[i];
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 3),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 10,
-                                      height: 10,
-                                      decoration: BoxDecoration(
-                                        color: chartColors[
-                                            i % chartColors.length],
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    const SizedBox(width: Spacing.sm),
-                                    Expanded(
-                                      child: Text(
-                                        entry.key,
-                                        style: theme
-                                            .textTheme.bodySmall,
-                                        maxLines: 1,
-                                        overflow:
-                                            TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    _BlurredValue(
-                                      obscure: !showValues,
-                                      child: Text(
-                                        showValues
-                                            ? '$currencySymbol ${_MiniStatCard._formatCompact(entry.value)}'
-                                            : '$currencySymbol 0000',
-                                        style: theme.textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                                fontWeight:
-                                                    FontWeight.w600),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: Spacing.lg),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: List.generate(top5.length, (i) {
+                          final entry = top5[i];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 3),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: chartColors[i % chartColors.length],
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: Spacing.sm),
+                                Expanded(
+                                  child: Text(
+                                    entry.key,
+                                    style: theme.textTheme.bodySmall,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                _BlurredValue(
+                                  obscure: !showValues,
+                                  child: Text(
+                                    showValues
+                                        ? '$currencySymbol ${_MiniStatCard._formatCompact(entry.value)}'
+                                        : '$currencySymbol 0000',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            );
+            ],
+          ),
+        );
       },
       loading: () => const SizedBox(
         height: 160,
-        child:
-            Center(child: CircularProgressIndicator(strokeWidth: 2)),
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
       ),
       error: (_, __) => const SizedBox.shrink(),
     );
@@ -1080,8 +1180,7 @@ class _RecentTransactionsList extends StatefulWidget {
       _RecentTransactionsListState();
 }
 
-class _RecentTransactionsListState
-    extends State<_RecentTransactionsList> {
+class _RecentTransactionsListState extends State<_RecentTransactionsList> {
   final Set<int> _dismissedIds = {};
 
   @override
@@ -1102,14 +1201,12 @@ class _RecentTransactionsListState
               padding: Spacing.paddingLg,
               child: Column(
                 children: [
-                  SvgPicture.asset(AssetPaths.emptyTransactions,
-                      height: 120),
+                  SvgPicture.asset(AssetPaths.emptyTransactions, height: 120),
                   const SizedBox(height: Spacing.md),
                   Text(
                     'No transactions yet',
                     style: widget.theme.textTheme.bodyMedium?.copyWith(
-                      color: widget
-                          .theme.colorScheme.onSurfaceVariant,
+                      color: widget.theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: Spacing.sm),
@@ -1137,18 +1234,18 @@ class _RecentTransactionsListState
                 direction: DismissDirection.endToStart,
                 background: Container(
                   alignment: Alignment.centerRight,
-                  padding:
-                      const EdgeInsets.only(right: Spacing.lg),
+                  padding: const EdgeInsets.only(right: Spacing.lg),
                   decoration: BoxDecoration(
                     color: widget.theme.colorScheme.error,
                     borderRadius: Radii.borderMd,
                   ),
-                  child: const Icon(Icons.delete_outline_rounded,
-                      color: Colors.white),
+                  child: const Icon(
+                    Icons.delete_outline_rounded,
+                    color: Colors.white,
+                  ),
                 ),
                 confirmDismiss: (_) async =>
-                    await _showDeleteConfirmation(
-                        context, widget.theme),
+                    await _showDeleteConfirmation(context, widget.theme),
                 onDismissed: (_) {
                   setState(() => _dismissedIds.add(txn.id));
                   final deletedTxn = txn;
@@ -1162,34 +1259,33 @@ class _RecentTransactionsListState
                   widget.ref.invalidate(categoryTotalsProvider);
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
-                    ..showSnackBar(SnackBar(
-                      content: Text('${deletedTxn.category} deleted'),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: Radii.borderMd),
-                      action: SnackBarAction(
-                        label: 'Undo',
-                        onPressed: () async {
-                          await widget.ref
-                              .read(transactionRepositoryProvider)
-                              .add(deletedTxn);
-                          if (mounted) {
-                            setState(() => _dismissedIds
-                                .remove(deletedTxn.id));
-                          }
-                          widget.ref
-                              .invalidate(recentTransactionsProvider);
-                          widget.ref
-                              .invalidate(totalBalanceProvider);
-                          widget.ref
-                              .invalidate(monthlyIncomeProvider);
-                          widget.ref
-                              .invalidate(monthlyExpenseProvider);
-                          widget.ref
-                              .invalidate(categoryTotalsProvider);
-                        },
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text('${deletedTxn.category} deleted'),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: Radii.borderMd,
+                        ),
+                        action: SnackBarAction(
+                          label: 'Undo',
+                          onPressed: () async {
+                            await widget.ref
+                                .read(transactionRepositoryProvider)
+                                .add(deletedTxn);
+                            if (mounted) {
+                              setState(
+                                () => _dismissedIds.remove(deletedTxn.id),
+                              );
+                            }
+                            widget.ref.invalidate(recentTransactionsProvider);
+                            widget.ref.invalidate(totalBalanceProvider);
+                            widget.ref.invalidate(monthlyIncomeProvider);
+                            widget.ref.invalidate(monthlyExpenseProvider);
+                            widget.ref.invalidate(categoryTotalsProvider);
+                          },
+                        ),
                       ),
-                    ));
+                    );
                 },
                 child: _TransactionRow(
                   transaction: txn,
@@ -1211,31 +1307,35 @@ class _RecentTransactionsListState
         child: Padding(
           padding: Spacing.horizontalLg,
           child: Column(
-              children: List.generate(
-                  3, (_) => const _TransactionShimmer())),
+            children: List.generate(3, (_) => const _TransactionShimmer()),
+          ),
         ),
       ),
-      error: (_, __) =>
-          const SliverToBoxAdapter(child: SizedBox.shrink()),
+      error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
     );
   }
 
   static Future<bool?> _showDeleteConfirmation(
-      BuildContext context, ThemeData theme) async {
+    BuildContext context,
+    ThemeData theme,
+  ) async {
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete Transaction'),
         content: const Text(
-            'Are you sure you want to delete this transaction? This cannot be undone.'),
+          'Are you sure you want to delete this transaction? This cannot be undone.',
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Cancel')),
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: FilledButton.styleFrom(
-                backgroundColor: theme.colorScheme.error),
+              backgroundColor: theme.colorScheme.error,
+            ),
             child: const Text('Delete'),
           ),
         ],
@@ -1270,9 +1370,13 @@ class _TransactionRow extends StatelessWidget {
     final amountColor = isIncome
         ? (cheddarColors?.income ?? Colors.green)
         : isTransfer
-            ? (cheddarColors?.transfer ?? Colors.blue)
-            : (cheddarColors?.expense ?? Colors.red);
-    final prefix = isIncome ? '+' : isTransfer ? '' : '-';
+        ? (cheddarColors?.transfer ?? Colors.blue)
+        : (cheddarColors?.expense ?? Colors.red);
+    final prefix = isIncome
+        ? '+'
+        : isTransfer
+        ? ''
+        : '-';
     final dateStr = DateFormat('MMM d').format(transaction.date);
     final categoryIcon = _categoryToAssetPath(transaction.category);
 
@@ -1280,8 +1384,7 @@ class _TransactionRow extends StatelessWidget {
       onTap: onTap,
       borderRadius: Radii.borderMd,
       child: Padding(
-        padding:
-            const EdgeInsets.symmetric(vertical: Spacing.sm + 2),
+        padding: const EdgeInsets.symmetric(vertical: Spacing.sm + 2),
         child: Row(
           children: [
             Container(
@@ -1297,18 +1400,17 @@ class _TransactionRow extends StatelessWidget {
                   ],
                 ),
                 borderRadius: Radii.borderMd,
-                border: Border.all(
-                    color: amountColor.withValues(alpha: 0.28)),
+                border: Border.all(color: amountColor.withValues(alpha: 0.28)),
                 boxShadow: [
                   BoxShadow(
-                      color: amountColor.withValues(alpha: 0.12),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4)),
+                    color: amountColor.withValues(alpha: 0.12),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
               ),
               padding: const EdgeInsets.all(8),
-              child:
-                  SvgPicture.asset(categoryIcon, width: 26, height: 26),
+              child: SvgPicture.asset(categoryIcon, width: 26, height: 26),
             ),
             const SizedBox(width: Spacing.md),
             Expanded(
@@ -1317,8 +1419,9 @@ class _TransactionRow extends StatelessWidget {
                 children: [
                   Text(
                     transaction.category,
-                    style: theme.textTheme.bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1328,7 +1431,8 @@ class _TransactionRow extends StatelessWidget {
                         ? '${transaction.note} · $dateStr'
                         : dateStr,
                     style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant),
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1389,7 +1493,9 @@ class _BlurredValue extends StatelessWidget {
   Widget build(BuildContext context) {
     return ImageFiltered(
       imageFilter: ImageFilter.blur(
-          sigmaX: obscure ? 6 : 0, sigmaY: obscure ? 6 : 0),
+        sigmaX: obscure ? 6 : 0,
+        sigmaY: obscure ? 6 : 0,
+      ),
       child: child,
     );
   }
@@ -1404,53 +1510,57 @@ class _TransactionShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-          padding:
-              const EdgeInsets.symmetric(vertical: Spacing.sm),
+          padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
           child: Row(
             children: [
               Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest,
-                    borderRadius: Radii.borderMd,
-                  )),
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: Radii.borderMd,
+                ),
+              ),
               const SizedBox(width: Spacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                        width: 100,
-                        height: 12,
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainerHighest,
-                          borderRadius: Radii.borderSm,
-                        )),
+                      width: 100,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest,
+                        borderRadius: Radii.borderSm,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     Container(
-                        width: 60,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainerHighest,
-                          borderRadius: Radii.borderSm,
-                        )),
+                      width: 60,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest,
+                        borderRadius: Radii.borderSm,
+                      ),
+                    ),
                   ],
                 ),
               ),
               Container(
-                  width: 50,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest,
-                    borderRadius: Radii.borderSm,
-                  )),
+                width: 50,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: Radii.borderSm,
+                ),
+              ),
             ],
           ),
         )
         .animate(onPlay: (c) => c.repeat())
         .shimmer(
-            duration: AppDurations.shimmer,
-            color: colorScheme.surface.withValues(alpha: 0.5));
+          duration: AppDurations.shimmer,
+          color: colorScheme.surface.withValues(alpha: 0.5),
+        );
   }
 }

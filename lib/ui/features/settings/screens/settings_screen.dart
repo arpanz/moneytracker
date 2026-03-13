@@ -304,123 +304,120 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final selectedTheme = ref.watch(themeProvider).themeName;
     final isListening = ref.watch(isListeningProvider);
     final navItemIds = ref.watch(floatingNavItemIdsProvider);
     final navItems = resolveFloatingNavItems(navItemIds);
     final availableNavItems = kFloatingNavDestinations
         .where((item) => !navItemIds.contains(item.id))
         .toList(growable: false);
+    final currency = currencyOptionFor(_currency);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings'), centerTitle: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.md,
-          AppSpacing.sm,
-          AppSpacing.md,
-          AppSpacing.xxl,
+      appBar: AppBar(title: const Text('Settings')),
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              colors.surface,
+              colors.surfaceContainerLow.withValues(alpha: 0.45),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            AppSpacing.sm,
+            AppSpacing.md,
+            AppSpacing.xxl,
+          ),
           children: [
-            _HeroCard(
-              title: 'Everything in one place',
-              subtitle:
-                  'Tighter controls, faster shortcuts, and a nav bar you can reorganize.',
-              trailing: Icon(
-                Icons.tune_rounded,
-                size: 28,
-                color: colors.primary,
+            _SettingsSection(
+              title: 'Quick Access',
+              subtitle: 'Open frequently used tools in one tap.',
+              child: _QuickActionWrap(
+                children: [
+                  _QuickActionChip(
+                    icon: Icons.savings_outlined,
+                    label: 'Goals',
+                    accent: Colors.amber,
+                    onTap: () => context.pushNamed(RouteNames.goals),
+                  ),
+                  _QuickActionChip(
+                    icon: Icons.subscriptions_outlined,
+                    label: 'Subscriptions',
+                    accent: Colors.deepPurple,
+                    onTap: () => context.pushNamed(RouteNames.subscriptions),
+                  ),
+                  _QuickActionChip(
+                    icon: Icons.call_split_rounded,
+                    label: 'Splits',
+                    accent: Colors.teal,
+                    onTap: () => context.pushNamed(RouteNames.split),
+                  ),
+                  _QuickActionChip(
+                    icon: Icons.currency_exchange_rounded,
+                    label: 'Loans',
+                    accent: Colors.indigo,
+                    onTap: () => context.pushNamed(RouteNames.loans),
+                  ),
+                  _QuickActionChip(
+                    icon: Icons.account_balance_wallet_outlined,
+                    label: 'Accounts',
+                    accent: Colors.green,
+                    onTap: () => context.pushNamed(RouteNames.accounts),
+                  ),
+                  _QuickActionChip(
+                    icon: Icons.pending_actions_outlined,
+                    label: 'Pending',
+                    accent: Colors.deepOrange,
+                    onTap: () =>
+                        context.pushNamed(RouteNames.pendingTransactions),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            const _SectionHeader(
-              title: 'Quick Access',
-              subtitle: 'Frequently used screens in a compact grid.',
-            ),
-            _AdaptiveCardGrid(
-              children: [
-                _SettingsActionCard(
-                  icon: Icons.savings_outlined,
-                  title: 'Goals',
-                  subtitle: 'Track savings targets',
-                  accent: Colors.amber,
-                  onTap: () => context.pushNamed(RouteNames.goals),
-                ),
-                _SettingsActionCard(
-                  icon: Icons.subscriptions_outlined,
-                  title: 'Subscriptions',
-                  subtitle: 'Recurring payments',
-                  accent: Colors.purple,
-                  onTap: () => context.pushNamed(RouteNames.subscriptions),
-                ),
-                _SettingsActionCard(
-                  icon: Icons.call_split_rounded,
-                  title: 'Splits',
-                  subtitle: 'Shared expenses',
-                  accent: Colors.teal,
-                  onTap: () => context.pushNamed(RouteNames.split),
-                ),
-                _SettingsActionCard(
-                  icon: Icons.currency_exchange_rounded,
-                  title: 'Loans',
-                  subtitle: 'Lendings and borrowings',
-                  accent: Colors.indigo,
-                  onTap: () => context.pushNamed(RouteNames.loans),
-                ),
-                _SettingsActionCard(
-                  icon: Icons.account_balance_wallet_outlined,
-                  title: 'Accounts',
-                  subtitle: 'Wallets and banks',
-                  accent: Colors.green,
-                  onTap: () => context.pushNamed(RouteNames.accounts),
-                ),
-                _SettingsActionCard(
-                  icon: Icons.pending_actions_outlined,
-                  title: 'Pending',
-                  subtitle: 'Review detected alerts',
-                  accent: Colors.deepOrange,
-                  onTap: () =>
-                      context.pushNamed(RouteNames.pendingTransactions),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            const _SectionHeader(
+            _SettingsSection(
               title: 'Preferences',
-              subtitle: 'Core app controls with a cleaner, denser layout.',
-            ),
-            _AdaptiveCardGrid(
-              children: [
-                _SettingsActionCard(
-                  icon: Icons.palette_outlined,
-                  title: 'Theme and vibes',
-                  subtitle: ref.watch(themeProvider).themeName,
-                  accent: colors.primary,
-                  onTap: () => context.pushNamed(RouteNames.themePicker),
-                ),
-                _SettingsActionCard(
-                  icon: Icons.currency_exchange_rounded,
-                  title: 'Currency',
-                  subtitle: '${currencyOptionFor(_currency).name} ($_currency)',
-                  accent: Colors.blue,
-                  onTap: _showCurrencyPicker,
-                ),
-                _SettingsActionCard(
-                  icon: Icons.receipt_long_rounded,
-                  title: 'Activity',
-                  subtitle: 'Browse all transactions',
-                  accent: Colors.cyan,
-                  onTap: () => context.pushNamed(RouteNames.transactions),
-                ),
-                _SettingsActionCard(
-                  icon: Icons.account_balance_rounded,
-                  title: 'Manage accounts',
-                  subtitle: 'Banks, cards, wallets',
-                  accent: Colors.green,
-                  onTap: () => context.pushNamed(RouteNames.accounts),
-                ),
-              ],
+              subtitle: 'Appearance, currency, and account controls.',
+              child: _SettingsPanel(
+                children: [
+                  _SettingsActionRow(
+                    icon: Icons.palette_outlined,
+                    title: 'Theme and vibes',
+                    subtitle: selectedTheme,
+                    accent: colors.primary,
+                    onTap: () => context.pushNamed(RouteNames.themePicker),
+                  ),
+                  const Divider(height: 1),
+                  _SettingsActionRow(
+                    icon: Icons.currency_exchange_rounded,
+                    title: 'Currency',
+                    subtitle: '${currency.name} (${currency.code})',
+                    accent: Colors.blue,
+                    onTap: _showCurrencyPicker,
+                  ),
+                  const Divider(height: 1),
+                  _SettingsActionRow(
+                    icon: Icons.receipt_long_rounded,
+                    title: 'Transactions',
+                    subtitle: 'Browse all entries',
+                    accent: Colors.cyan,
+                    onTap: () => context.pushNamed(RouteNames.transactions),
+                  ),
+                  const Divider(height: 1),
+                  _SettingsActionRow(
+                    icon: Icons.account_balance_rounded,
+                    title: 'Manage accounts',
+                    subtitle: 'Banks, cards, and wallets',
+                    accent: Colors.green,
+                    onTap: () => context.pushNamed(RouteNames.accounts),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             _FloatingNavEditorCard(
@@ -431,105 +428,113 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               onReorder: _reorderFloatingNavItems,
             ),
             const SizedBox(height: AppSpacing.lg),
-            const _SectionHeader(
+            _SettingsSection(
               title: 'Security and Alerts',
-              subtitle: 'Lock access and manage the notification pipeline.',
-            ),
-            _AdaptiveCardGrid(
-              children: [
-                _SettingsToggleCard(
-                  icon: Icons.fingerprint_rounded,
-                  title: 'Biometric lock',
-                  subtitle: 'Require fingerprint or face to open the app.',
-                  accent: Colors.deepPurple,
-                  value: _biometricEnabled,
-                  onChanged: (value) async {
-                    final prefs = ref.read(sharedPreferencesProvider);
-                    await prefs.setBool(AppConstants.prefAppLockEnabled, value);
-                    setState(() => _biometricEnabled = value);
-                  },
-                ),
-                _SettingsToggleCard(
-                  icon: Icons.notifications_outlined,
-                  title: 'Push notifications',
-                  subtitle: _notificationsEnabled ? 'Enabled' : 'Disabled',
-                  accent: Colors.redAccent,
-                  value: _notificationsEnabled,
-                  onChanged: _onPushNotificationsToggled,
-                ),
-                _SettingsToggleCard(
-                  icon: Icons.sms_outlined,
-                  title: 'Payment reader',
-                  subtitle: isListening
-                      ? 'Active and auto-detecting payments'
-                      : 'Off until you grant access',
-                  accent: Colors.orange,
-                  value: isListening,
-                  onChanged: _onListenerToggled,
-                ),
-                _SettingsActionCard(
-                  icon: Icons.pending_actions_outlined,
-                  title: 'Pending transactions',
-                  subtitle: 'Approve transactions found from alerts.',
-                  accent: Colors.brown,
-                  onTap: () =>
-                      context.pushNamed(RouteNames.pendingTransactions),
-                ),
-              ],
+              subtitle: 'Secure the app and tune smart detection.',
+              child: _SettingsPanel(
+                children: [
+                  _SettingsToggleRow(
+                    icon: Icons.fingerprint_rounded,
+                    title: 'Biometric lock',
+                    subtitle: 'Require fingerprint or face to open app',
+                    accent: Colors.deepPurple,
+                    value: _biometricEnabled,
+                    onChanged: (value) async {
+                      final prefs = ref.read(sharedPreferencesProvider);
+                      await prefs.setBool(
+                        AppConstants.prefAppLockEnabled,
+                        value,
+                      );
+                      setState(() => _biometricEnabled = value);
+                    },
+                  ),
+                  const Divider(height: 1),
+                  _SettingsToggleRow(
+                    icon: Icons.notifications_outlined,
+                    title: 'Push notifications',
+                    subtitle: _notificationsEnabled ? 'Enabled' : 'Disabled',
+                    accent: Colors.redAccent,
+                    value: _notificationsEnabled,
+                    onChanged: _onPushNotificationsToggled,
+                  ),
+                  const Divider(height: 1),
+                  _SettingsToggleRow(
+                    icon: Icons.sms_outlined,
+                    title: 'Payment reader',
+                    subtitle: isListening
+                        ? 'Active and auto-detecting payments'
+                        : 'Off until you grant access',
+                    accent: Colors.orange,
+                    value: isListening,
+                    onChanged: _onListenerToggled,
+                  ),
+                  const Divider(height: 1),
+                  _SettingsActionRow(
+                    icon: Icons.pending_actions_outlined,
+                    title: 'Pending transactions',
+                    subtitle: 'Review transactions found from alerts',
+                    accent: Colors.brown,
+                    onTap: () =>
+                        context.pushNamed(RouteNames.pendingTransactions),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            const _SectionHeader(
+            _SettingsSection(
               title: 'Data and Backup',
-              subtitle:
-                  'Export, back up, and restore without digging through lists.',
-            ),
-            _AdaptiveCardGrid(
-              children: [
-                _SettingsActionCard(
-                  icon: Icons.file_download_outlined,
-                  title: 'Export transactions',
-                  subtitle: 'CSV or PDF output',
-                  accent: Colors.blueGrey,
-                  onTap: _showExportDialog,
-                ),
-                _SettingsActionCard(
-                  icon: Icons.backup_outlined,
-                  title: 'Backup and restore',
-                  subtitle: 'JSON snapshot of all app data',
-                  accent: Colors.blue,
-                  onTap: _showBackupDialog,
-                ),
-              ],
+              subtitle: 'Export, backup, and restore your data.',
+              child: _SettingsPanel(
+                children: [
+                  _SettingsActionRow(
+                    icon: Icons.file_download_outlined,
+                    title: 'Export transactions',
+                    subtitle: 'Download CSV or PDF files',
+                    accent: Colors.blueGrey,
+                    onTap: _showExportDialog,
+                  ),
+                  const Divider(height: 1),
+                  _SettingsActionRow(
+                    icon: Icons.backup_outlined,
+                    title: 'Backup and restore',
+                    subtitle: 'Create or restore JSON snapshot',
+                    accent: Colors.blue,
+                    onTap: _showBackupDialog,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            const _SectionHeader(
+            _SettingsSection(
               title: 'About',
-              subtitle: 'Version details and app metadata.',
-            ),
-            _AdaptiveCardGrid(
-              children: [
-                _SettingsActionCard(
-                  icon: Icons.info_outline_rounded,
-                  title: 'About Cheddar',
-                  subtitle: 'v${AppConstants.appVersion}',
-                  accent: colors.primary,
-                  onTap: _showAboutDialog,
-                ),
-                _SettingsActionCard(
-                  icon: Icons.star_outline_rounded,
-                  title: 'Rate app',
-                  subtitle: 'Play Store link placeholder',
-                  accent: Colors.amber,
-                  onTap: () {},
-                ),
-                _SettingsActionCard(
-                  icon: Icons.share_outlined,
-                  title: 'Share app',
-                  subtitle: 'Invite friends to try Cheddar',
-                  accent: Colors.green,
-                  onTap: () {},
-                ),
-              ],
+              subtitle: 'Version details and sharing.',
+              child: _SettingsPanel(
+                children: [
+                  _SettingsActionRow(
+                    icon: Icons.info_outline_rounded,
+                    title: 'About Cheddar',
+                    subtitle: 'v${AppConstants.appVersion}',
+                    accent: colors.primary,
+                    onTap: _showAboutDialog,
+                  ),
+                  const Divider(height: 1),
+                  _SettingsActionRow(
+                    icon: Icons.star_outline_rounded,
+                    title: 'Rate app',
+                    subtitle: 'Play Store link placeholder',
+                    accent: Colors.amber,
+                    onTap: () {},
+                  ),
+                  const Divider(height: 1),
+                  _SettingsActionRow(
+                    icon: Icons.share_outlined,
+                    title: 'Share app',
+                    subtitle: 'Invite friends to try Cheddar',
+                    accent: Colors.green,
+                    onTap: () {},
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.xl),
             Center(
@@ -791,110 +796,53 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   }
 }
 
-class _HeroCard extends StatelessWidget {
+class _SettingsSection extends StatelessWidget {
   final String title;
   final String subtitle;
-  final Widget trailing;
+  final Widget child;
 
-  const _HeroCard({
+  const _SettingsSection({
     required this.title,
     required this.subtitle,
-    required this.trailing,
+    required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        gradient: LinearGradient(
-          colors: [
-            colors.primaryContainer.withValues(alpha: 0.9),
-            colors.surfaceContainerHighest.withValues(alpha: 0.95),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    height: 1.45,
-                    color: colors.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
+        const SizedBox(height: AppSpacing.xxs),
+        Text(
+          subtitle,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(width: AppSpacing.md),
-          trailing,
-        ],
-      ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        child,
+      ],
     );
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final String subtitle;
-
-  const _SectionHeader({required this.title, required this.subtitle});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xxs),
-          Text(
-            subtitle,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AdaptiveCardGrid extends StatelessWidget {
+class _QuickActionWrap extends StatelessWidget {
   final List<Widget> children;
 
-  const _AdaptiveCardGrid({required this.children});
+  const _QuickActionWrap({required this.children});
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWide = constraints.maxWidth >= 680;
+        final isWide = constraints.maxWidth >= 720;
         final columns = isWide ? 3 : 2;
         final spacing = AppSpacing.sm;
         final itemWidth =
@@ -913,60 +861,141 @@ class _AdaptiveCardGrid extends StatelessWidget {
   }
 }
 
-class _SettingsActionCard extends StatelessWidget {
+class _QuickActionChip extends StatelessWidget {
   final IconData icon;
-  final String title;
-  final String subtitle;
+  final String label;
   final Color accent;
   final VoidCallback onTap;
 
-  const _SettingsActionCard({
+  const _QuickActionChip({
     required this.icon,
-    required this.title,
-    required this.subtitle,
+    required this.label,
     required this.accent,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return _SettingsCardFrame(
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _CardIcon(icon: icon, accent: accent),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+    return Material(
+      color: accent.withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.sm,
           ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            subtitle,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-              height: 1.4,
-            ),
+          child: Row(
+            children: [
+              Icon(icon, size: 18, color: accent),
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: accent,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Icon(Icons.arrow_forward_rounded, size: 16, color: accent),
+            ],
           ),
-          const SizedBox(height: AppSpacing.lg),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Icon(
-              Icons.arrow_forward_rounded,
-              size: 18,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _SettingsToggleCard extends StatelessWidget {
+class _SettingsPanel extends StatelessWidget {
+  final List<Widget> children;
+
+  const _SettingsPanel({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.4)),
+      ),
+      child: Column(children: children),
+    );
+  }
+}
+
+class _SettingsActionRow extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color accent;
+  final VoidCallback onTap;
+  final Widget? trailing;
+
+  const _SettingsActionRow({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.accent,
+    required this.onTap,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              _TileIcon(icon: icon, accent: accent),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              trailing ??
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 14,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsToggleRow extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
@@ -974,7 +1003,7 @@ class _SettingsToggleCard extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  const _SettingsToggleCard({
+  const _SettingsToggleRow({
     required this.icon,
     required this.title,
     required this.subtitle,
@@ -985,35 +1014,13 @@ class _SettingsToggleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _SettingsCardFrame(
+    return _SettingsActionRow(
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      accent: accent,
       onTap: () => onChanged(!value),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _CardIcon(icon: icon, accent: accent),
-              const Spacer(),
-              Switch.adaptive(value: value, onChanged: onChanged),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            subtitle,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-              height: 1.4,
-            ),
-          ),
-        ],
-      ),
+      trailing: Switch.adaptive(value: value, onChanged: onChanged),
     );
   }
 }
@@ -1038,50 +1045,21 @@ class _FloatingNavEditorCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.5)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return _SettingsSection(
+      title: 'Floating Navigation',
+      subtitle: 'Pin and reorder up to $kMaxFloatingNavItems tabs.',
+      child: _SettingsPanel(
         children: [
-          Row(
-            children: [
-              _CardIcon(
-                icon: Icons.dashboard_customize_rounded,
-                accent: colors.primary,
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Floating nav bar',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      'Reorder pinned screens, remove extras, or add up to $kMaxFloatingNavItems items.',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
           Container(
             padding: const EdgeInsets.all(AppSpacing.sm),
+            margin: const EdgeInsets.fromLTRB(
+              AppSpacing.sm,
+              AppSpacing.sm,
+              AppSpacing.sm,
+              0,
+            ),
             decoration: BoxDecoration(
-              color: colors.surface,
+              color: colors.surfaceContainerLow,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             ),
             child: ReorderableListView.builder(
@@ -1102,29 +1080,43 @@ class _FloatingNavEditorCard extends StatelessWidget {
             ),
           ),
           if (availableItems.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'Add items',
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w700,
+            const SizedBox(height: AppSpacing.sm),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Add more tabs',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.xs),
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: [
-                for (final item in availableItems)
-                  ActionChip(
-                    avatar: Icon(
-                      navSettingsIconFor(item.id),
-                      size: 18,
-                      color: colors.primary,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                0,
+                AppSpacing.md,
+                AppSpacing.sm,
+              ),
+              child: Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
+                children: [
+                  for (final item in availableItems)
+                    ActionChip(
+                      avatar: Icon(
+                        navSettingsIconFor(item.id),
+                        size: 18,
+                        color: colors.primary,
+                      ),
+                      label: Text(item.label),
+                      onPressed: () => onAdd(item.id),
                     ),
-                    label: Text(item.label),
-                    onPressed: () => onAdd(item.id),
-                  ),
-              ],
+                ],
+              ),
             ),
           ],
         ],
@@ -1157,8 +1149,11 @@ class _PinnedNavTile extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: colors.surfaceContainerHigh,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.35),
+        ),
       ),
       child: Row(
         children: [
@@ -1195,54 +1190,22 @@ class _PinnedNavTile extends StatelessWidget {
   }
 }
 
-class _SettingsCardFrame extends StatelessWidget {
-  final Widget child;
-  final VoidCallback onTap;
-
-  const _SettingsCardFrame({required this.child, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
-    return Material(
-      color: colors.surfaceContainerLow,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        onTap: onTap,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 156),
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-            border: Border.all(
-              color: colors.outlineVariant.withValues(alpha: 0.45),
-            ),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
-
-class _CardIcon extends StatelessWidget {
+class _TileIcon extends StatelessWidget {
   final IconData icon;
   final Color accent;
 
-  const _CardIcon({required this.icon, required this.accent});
+  const _TileIcon({required this.icon, required this.accent});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 42,
-      height: 42,
+      width: 36,
+      height: 36,
       decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.14),
+        color: accent.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
-      child: Icon(icon, color: accent, size: 22),
+      child: Icon(icon, color: accent, size: 20),
     );
   }
 }
