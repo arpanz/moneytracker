@@ -918,7 +918,9 @@ class _TransferAccountPicker extends StatelessWidget {
       ),
       child: accountsAsync.when(
         data: (accounts) {
-          onRestoreAccounts(accounts);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            onRestoreAccounts(accounts);
+          });
           return Row(
             children: [
               Expanded(
@@ -1043,7 +1045,9 @@ class _MetaRow extends StatelessWidget {
           Expanded(
             child: accountsAsync.when(
               data: (accounts) {
-                onRestoreAccounts(accounts);
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  onRestoreAccounts(accounts);
+                });
                 return ListView.separated(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(

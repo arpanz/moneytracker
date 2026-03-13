@@ -14,31 +14,31 @@ class GoalRepository {
   // ── Mapping ──────────────────────────────────────────────────────────────
 
   GoalModel _fromRow(Goal row) => GoalModel(
-        id: row.id,
-        name: row.name,
-        targetAmount: row.targetAmount,
-        currentAmount: row.currentAmount,
-        deadline: row.deadline,
-        icon: row.icon,
-        color: row.color,
-        linkedAccountId: row.linkedAccountId,
-        isCompleted: row.isCompleted,
-        createdAt: row.createdAt,
-        contributions: GoalContribution.listFromJson(row.contributions),
-      );
+    id: row.id,
+    name: row.name,
+    targetAmount: row.targetAmount,
+    currentAmount: row.currentAmount,
+    deadline: row.deadline,
+    icon: row.icon,
+    color: row.color,
+    linkedAccountId: row.linkedAccountId,
+    isCompleted: row.isCompleted,
+    createdAt: row.createdAt,
+    contributions: GoalContribution.listFromJson(row.contributions),
+  );
 
   GoalsCompanion _toCompanion(GoalModel g) => GoalsCompanion.insert(
-        name: g.name,
-        targetAmount: g.targetAmount,
-        currentAmount: Value(g.currentAmount),
-        deadline: Value(g.deadline),
-        icon: Value(g.icon),
-        color: Value(g.color),
-        linkedAccountId: Value(g.linkedAccountId),
-        isCompleted: Value(g.isCompleted),
-        createdAt: g.createdAt,
-        contributions: Value(GoalContribution.listToJson(g.contributions)),
-      );
+    name: g.name,
+    targetAmount: g.targetAmount,
+    currentAmount: Value(g.currentAmount),
+    deadline: Value(g.deadline),
+    icon: Value(g.icon),
+    color: Value(g.color),
+    linkedAccountId: Value(g.linkedAccountId),
+    isCompleted: Value(g.isCompleted),
+    createdAt: g.createdAt,
+    contributions: Value(GoalContribution.listToJson(g.contributions)),
+  );
 
   // ── CRUD ─────────────────────────────────────────────────────────────────
 
@@ -46,18 +46,19 @@ class GoalRepository {
       _d.into(_d.goals).insert(_toCompanion(goal));
 
   Future<void> update(GoalModel goal) async {
-    await (_d.update(_d.goals)..where((g) => g.id.equals(goal.id)))
-        .write(GoalsCompanion(
-      name: Value(goal.name),
-      targetAmount: Value(goal.targetAmount),
-      currentAmount: Value(goal.currentAmount),
-      deadline: Value(goal.deadline),
-      icon: Value(goal.icon),
-      color: Value(goal.color),
-      linkedAccountId: Value(goal.linkedAccountId),
-      isCompleted: Value(goal.isCompleted),
-      contributions: Value(GoalContribution.listToJson(goal.contributions)),
-    ));
+    await (_d.update(_d.goals)..where((g) => g.id.equals(goal.id))).write(
+      GoalsCompanion(
+        name: Value(goal.name),
+        targetAmount: Value(goal.targetAmount),
+        currentAmount: Value(goal.currentAmount),
+        deadline: Value(goal.deadline),
+        icon: Value(goal.icon),
+        color: Value(goal.color),
+        linkedAccountId: Value(goal.linkedAccountId),
+        isCompleted: Value(goal.isCompleted),
+        contributions: Value(GoalContribution.listToJson(goal.contributions)),
+      ),
+    );
   }
 
   Future<void> delete(int id) async {
@@ -65,22 +66,23 @@ class GoalRepository {
   }
 
   Future<GoalModel?> getById(int id) async {
-    final row = await (_d.select(_d.goals)..where((g) => g.id.equals(id)))
-        .getSingleOrNull();
+    final row = await (_d.select(
+      _d.goals,
+    )..where((g) => g.id.equals(id))).getSingleOrNull();
     return row == null ? null : _fromRow(row);
   }
 
   Future<List<GoalModel>> getAll() async {
-    final rows = await (_d.select(_d.goals)
-          ..orderBy([(g) => OrderingTerm.asc(g.createdAt)]))
-        .get();
+    final rows = await (_d.select(
+      _d.goals,
+    )..orderBy([(g) => OrderingTerm.asc(g.createdAt)])).get();
     return rows.map(_fromRow).toList();
   }
 
   Future<List<GoalModel>> getActive() async {
-    final rows = await (_d.select(_d.goals)
-          ..where((g) => g.isCompleted.equals(false)))
-        .get();
+    final rows = await (_d.select(
+      _d.goals,
+    )..where((g) => g.isCompleted.equals(false))).get();
     return rows.map(_fromRow).toList();
   }
 
@@ -117,6 +119,5 @@ class GoalRepository {
     return total;
   }
 
-  Stream<void> watchAll() =>
-      _d.select(_d.goals).watch().map((_) {});
+  Stream<void> watchAll() => _d.select(_d.goals).watch().map((_) {});
 }
