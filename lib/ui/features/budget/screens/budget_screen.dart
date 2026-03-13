@@ -45,9 +45,8 @@ class BudgetScreen extends ConsumerWidget {
           ),
 
           budgetsAsync.when(
-            loading: () => SliverFillRemaining(
-              child: _buildShimmerLoading(context),
-            ),
+            loading: () =>
+                SliverFillRemaining(child: _buildShimmerLoading(context)),
             error: (err, _) => SliverFillRemaining(
               child: Center(
                 child: Column(
@@ -71,9 +70,7 @@ class BudgetScreen extends ConsumerWidget {
             ),
             data: (budgets) {
               if (budgets.isEmpty) {
-                return SliverFillRemaining(
-                  child: _buildEmptyState(context),
-                );
+                return SliverFillRemaining(child: _buildEmptyState(context));
               }
               return SliverList(
                 delegate: SliverChildListDelegate([
@@ -86,10 +83,9 @@ class BudgetScreen extends ConsumerWidget {
                     padding: Spacing.horizontalMd,
                     child: Text(
                       'Active Budgets',
-                      style:
-                          Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   const SizedBox(height: Spacing.sm),
@@ -134,27 +130,23 @@ class BudgetScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SvgPicture.asset(
-              AssetPaths.emptyBudgets,
-              height: 180,
-            ),
+            SvgPicture.asset(AssetPaths.emptyBudgets, height: 180),
             const SizedBox(height: Spacing.lg),
             Text(
               'No Budgets Yet',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: Spacing.sm),
             Text(
               'Set spending limits for categories\nto keep your finances in check.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.6),
-                  ),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
             ),
             const SizedBox(height: Spacing.lg),
             FilledButton.icon(
@@ -176,18 +168,17 @@ class BudgetScreen extends ConsumerWidget {
       child: Column(
         children: List.generate(4, (i) {
           return Container(
-            height: 100,
-            margin: const EdgeInsets.only(bottom: Spacing.md),
-            decoration: BoxDecoration(
-              color: cheddarColors.shimmerBase,
-              borderRadius: Radii.borderLg,
-            ),
-          )
+                height: 100,
+                margin: const EdgeInsets.only(bottom: Spacing.md),
+                decoration: BoxDecoration(
+                  color: cheddarColors.shimmerBase,
+                  borderRadius: Radii.borderLg,
+                ),
+              )
               .animate(onPlay: (c) => c.repeat())
               .shimmer(
                 duration: 1500.ms,
-                color: cheddarColors.shimmerHighlight
-                    .withValues(alpha: 0.3),
+                color: cheddarColors.shimmerHighlight.withValues(alpha: 0.3),
               );
         }),
       ),
@@ -211,9 +202,22 @@ class _BudgetSummaryCard extends StatelessWidget {
     final theme = Theme.of(context);
     final cheddarColors = theme.extension<CheddarColors>()!;
     final formatter = NumberFormat('#,##,###', 'en_IN');
+    final gradientSample = Color.lerp(
+      cheddarColors.cardGradient.colors.first,
+      cheddarColors.cardGradient.colors.last,
+      0.5,
+    )!;
+    final summaryOnColor =
+        ThemeData.estimateBrightnessForColor(gradientSample) == Brightness.dark
+        ? Colors.white
+        : const Color(0xFF111111);
+    final summaryMuted = summaryOnColor.withValues(alpha: 0.7);
+    final summarySubtle = summaryOnColor.withValues(alpha: 0.6);
 
-    final totalLimit =
-        budgets.fold<double>(0.0, (sum, b) => sum + b.budget.limitAmount);
+    final totalLimit = budgets.fold<double>(
+      0.0,
+      (sum, b) => sum + b.budget.limitAmount,
+    );
     final totalSpent = budgets.fold<double>(0.0, (sum, b) => sum + b.spent);
     final overallPercentage = totalLimit > 0 ? totalSpent / totalLimit : 0.0;
 
@@ -235,7 +239,9 @@ class _BudgetSummaryCard extends StatelessWidget {
           borderRadius: Radii.borderXl,
           boxShadow: [
             BoxShadow(
-              color: theme.colorScheme.primary.withValues(alpha: 0.15),
+              color: theme.brightness == Brightness.dark
+                  ? theme.colorScheme.scrim.withValues(alpha: 0.38)
+                  : theme.colorScheme.primary.withValues(alpha: 0.15),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -247,8 +253,7 @@ class _BudgetSummaryCard extends StatelessWidget {
               width: 80,
               height: 80,
               child: TweenAnimationBuilder<double>(
-                tween:
-                    Tween(begin: 0, end: overallPercentage.clamp(0.0, 1.5)),
+                tween: Tween(begin: 0, end: overallPercentage.clamp(0.0, 1.5)),
                 duration: AppDurations.medium,
                 curve: Curves.easeOutCubic,
                 builder: (context, value, _) {
@@ -258,17 +263,15 @@ class _BudgetSummaryCard extends StatelessWidget {
                       CircularProgressIndicator(
                         value: value.clamp(0.0, 1.0),
                         strokeWidth: 8,
-                        backgroundColor: theme.colorScheme.onPrimary
-                            .withValues(alpha: 0.2),
-                        valueColor:
-                            AlwaysStoppedAnimation(progressColor),
+                        backgroundColor: summaryOnColor.withValues(alpha: 0.2),
+                        valueColor: AlwaysStoppedAnimation(progressColor),
                         strokeCap: StrokeCap.round,
                       ),
                       Text(
                         '${(value * 100).toInt()}%',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: theme.colorScheme.onPrimary,
+                          color: summaryOnColor,
                         ),
                       ),
                     ],
@@ -284,8 +287,7 @@ class _BudgetSummaryCard extends StatelessWidget {
                   Text(
                     'Monthly Budget',
                     style: theme.textTheme.titleSmall?.copyWith(
-                      color: theme.colorScheme.onPrimary
-                          .withValues(alpha: 0.7),
+                      color: summaryMuted,
                     ),
                   ),
                   const SizedBox(height: Spacing.xs),
@@ -294,14 +296,13 @@ class _BudgetSummaryCard extends StatelessWidget {
                     '$currencySymbol ${formatter.format(totalSpent.toInt())}',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.onPrimary,
+                      color: summaryOnColor,
                     ),
                   ),
                   Text(
                     'of $currencySymbol ${formatter.format(totalLimit.toInt())}',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onPrimary
-                          .withValues(alpha: 0.6),
+                      color: summarySubtle,
                     ),
                   ),
                 ],
@@ -346,7 +347,7 @@ class _BudgetCard extends ConsumerWidget {
 
     final categoryColor =
         cheddarColors.categoryColors[bws.budget.category.toLowerCase()] ??
-            theme.colorScheme.primary;
+        theme.colorScheme.primary;
 
     // FIX #7: _getCategoryIconPath now normalizes input to lowercase before
     // lookup so categories stored as 'Food', 'food', or 'FOOD' all resolve.
@@ -415,8 +416,9 @@ class _BudgetCard extends ConsumerWidget {
                           Text(
                             _periodLabel(bws.budget.period),
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.5),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.5,
+                              ),
                             ),
                           ),
                         ],
@@ -444,10 +446,7 @@ class _BudgetCard extends ConsumerWidget {
                 const SizedBox(height: Spacing.sm),
 
                 TweenAnimationBuilder<double>(
-                  tween: Tween(
-                    begin: 0,
-                    end: bws.percentage.clamp(0.0, 1.0),
-                  ),
+                  tween: Tween(begin: 0, end: bws.percentage.clamp(0.0, 1.0)),
                   duration: AppDurations.medium,
                   curve: Curves.easeOutCubic,
                   builder: (context, value, _) {
@@ -458,8 +457,7 @@ class _BudgetCard extends ConsumerWidget {
                         minHeight: 8,
                         backgroundColor:
                             theme.colorScheme.surfaceContainerHighest,
-                        valueColor:
-                            AlwaysStoppedAnimation(progressColor),
+                        valueColor: AlwaysStoppedAnimation(progressColor),
                       ),
                     );
                   },
@@ -473,8 +471,9 @@ class _BudgetCard extends ConsumerWidget {
                     Text(
                       '$currencySymbol ${formatter.format(bws.spent.toInt())} / $currencySymbol ${formatter.format(bws.budget.limitAmount.toInt())}',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
                     if (bws.status == BudgetStatus.overBudget)
@@ -589,7 +588,7 @@ class _UnbudgetedSection extends StatelessWidget {
           final cat = entry.value;
           final color =
               cheddarColors.categoryColors[cat.category.toLowerCase()] ??
-                  theme.colorScheme.tertiary;
+              theme.colorScheme.tertiary;
 
           return Padding(
             padding: const EdgeInsets.symmetric(

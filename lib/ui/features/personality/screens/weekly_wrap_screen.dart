@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../config/theme/spacing.dart';
+import '../../../../config/theme/theme_extensions.dart';
 import '../providers/personality_provider.dart';
 
 /// Spotify Wrapped-style weekly summary with 5 animated story pages.
@@ -109,29 +110,32 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
   @override
   Widget build(BuildContext context) {
     final wrapAsync = ref.watch(weeklyWrapProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: colorScheme.scrim,
       body: wrapAsync.when(
-        loading: () =>
-            const Center(child: CircularProgressIndicator(color: Colors.white)),
+        loading: () => Center(
+          child: CircularProgressIndicator(color: colorScheme.onSurface),
+        ),
         error: (error, _) => Center(
           child: Padding(
             padding: Spacing.paddingLg,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.error_outline,
                   size: 48,
-                  color: Colors.white54,
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(height: Spacing.md),
                 Text(
                   'Could not load weekly wrap',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium?.copyWith(color: Colors.white),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                  ),
                 ),
                 const SizedBox(height: Spacing.sm),
                 TextButton(
@@ -148,6 +152,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
   }
 
   Widget _buildWrap(BuildContext context, WeeklyWrapData data) {
+    final onColor = _onGradient(_pageGradients[_currentPage]);
     return GestureDetector(
       onTap: _goToNextPage,
       child: Stack(
@@ -183,8 +188,8 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
                       decoration: BoxDecoration(
                         borderRadius: Radii.borderFull,
                         color: i <= _currentPage
-                            ? Colors.white
-                            : Colors.white.withOpacity(0.3),
+                            ? onColor
+                            : onColor.withValues(alpha: 0.3),
                       ),
                     ),
                   );
@@ -197,7 +202,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             top: MediaQuery.of(context).padding.top + 16,
             right: 16,
             child: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white, size: 28),
+              icon: Icon(Icons.close, color: onColor, size: 28),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ),
@@ -209,8 +214,13 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
   // ── Page 1: Your Week in Numbers ──────────────────────────────────────
 
   Widget _buildPage1(BuildContext context, WeeklyWrapData data) {
+    final gradientColors = _pageGradients[0];
+    final onColor = _onGradient(gradientColors);
+    final onColorMuted = onColor.withValues(alpha: 0.70);
+    final onColorSubtle = onColor.withValues(alpha: 0.60);
+
     return _WrapPageContainer(
-      gradientColors: _pageGradients[0],
+      gradientColors: gradientColors,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -218,7 +228,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             'Your Week\nin Numbers',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              color: Colors.white,
+              color: onColor,
               fontWeight: FontWeight.bold,
               height: 1.2,
             ),
@@ -232,7 +242,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
                   return Text(
                     'Rs. ${_formatIndian(value)}',
                     style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      color: Colors.white,
+                      color: onColor,
                       fontWeight: FontWeight.w900,
                       fontSize: 48,
                     ),
@@ -250,14 +260,14 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             'spent this week',
             style: Theme.of(
               context,
-            ).textTheme.titleMedium?.copyWith(color: Colors.white70),
+            ).textTheme.titleMedium?.copyWith(color: onColorMuted),
           ).animate().fadeIn(delay: 600.ms),
           const SizedBox(height: Spacing.xl),
           Text(
             'across ${data.transactionCount} transactions',
             style: Theme.of(
               context,
-            ).textTheme.bodyLarge?.copyWith(color: Colors.white60),
+            ).textTheme.bodyLarge?.copyWith(color: onColorSubtle),
           ).animate().fadeIn(delay: 800.ms),
         ],
       ),
@@ -267,8 +277,13 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
   // ── Page 2: Top Category ──────────────────────────────────────────────
 
   Widget _buildPage2(BuildContext context, WeeklyWrapData data) {
+    final gradientColors = _pageGradients[1];
+    final onColor = _onGradient(gradientColors);
+    final onColorMuted = onColor.withValues(alpha: 0.70);
+    final onColorSubtle = onColor.withValues(alpha: 0.54);
+
     return _WrapPageContainer(
-      gradientColors: _pageGradients[1],
+      gradientColors: gradientColors,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -276,7 +291,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             'Your Top\nCategory',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              color: Colors.white,
+              color: onColor,
               fontWeight: FontWeight.bold,
               height: 1.2,
             ),
@@ -285,13 +300,13 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
           Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: onColor.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   _getCategoryIcon(data.topCategory),
                   size: 64,
-                  color: Colors.white,
+                  color: onColor,
                 ),
               )
               .animate()
@@ -301,7 +316,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
           Text(
             data.topCategory,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: Colors.white,
+              color: onColor,
               fontWeight: FontWeight.w700,
             ),
           ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.3, end: 0),
@@ -310,14 +325,14 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             'Rs. ${_formatIndian(data.topCategoryAmount)}',
             style: Theme.of(
               context,
-            ).textTheme.titleLarge?.copyWith(color: Colors.white70),
+            ).textTheme.titleLarge?.copyWith(color: onColorMuted),
           ).animate().fadeIn(delay: 700.ms),
           const SizedBox(height: Spacing.xs),
           Text(
             '${data.topCategoryPercentage.toStringAsFixed(0)}% of spending',
             style: Theme.of(
               context,
-            ).textTheme.bodyLarge?.copyWith(color: Colors.white54),
+            ).textTheme.bodyLarge?.copyWith(color: onColorSubtle),
           ).animate().fadeIn(delay: 800.ms),
         ],
       ),
@@ -327,6 +342,11 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
   // ── Page 3: Biggest Expense ───────────────────────────────────────────
 
   Widget _buildPage3(BuildContext context, WeeklyWrapData data) {
+    final gradientColors = _pageGradients[2];
+    final onColor = _onGradient(gradientColors);
+    final onColorMuted = onColor.withValues(alpha: 0.72);
+    final onColorSubtle = onColor.withValues(alpha: 0.56);
+
     final dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final dayName = dayNames[data.biggestExpenseDate.weekday - 1];
     final dateStr =
@@ -334,7 +354,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
         '${data.biggestExpenseDate.month}';
 
     return _WrapPageContainer(
-      gradientColors: _pageGradients[2],
+      gradientColors: gradientColors,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -342,13 +362,13 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             'Biggest\nExpense',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              color: Colors.white,
+              color: onColor,
               fontWeight: FontWeight.bold,
               height: 1.2,
             ),
           ).animate().fadeIn(duration: 400.ms),
           const SizedBox(height: Spacing.xl),
-          Icon(Icons.receipt_long_rounded, size: 56, color: Colors.white70)
+          Icon(Icons.receipt_long_rounded, size: 56, color: onColorMuted)
               .animate()
               .fadeIn(delay: 300.ms)
               .shake(delay: 500.ms, hz: 2, duration: 400.ms),
@@ -361,7 +381,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
               return Text(
                 'Rs. ${_formatIndian(value)}',
                 style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  color: Colors.white,
+                  color: onColor,
                   fontWeight: FontWeight.w900,
                 ),
               );
@@ -372,14 +392,14 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             data.biggestExpenseName,
             style: Theme.of(
               context,
-            ).textTheme.titleLarge?.copyWith(color: Colors.white70),
+            ).textTheme.titleLarge?.copyWith(color: onColorMuted),
           ).animate().fadeIn(delay: 600.ms),
           const SizedBox(height: Spacing.xs),
           Text(
             dateStr,
             style: Theme.of(
               context,
-            ).textTheme.bodyLarge?.copyWith(color: Colors.white54),
+            ).textTheme.bodyLarge?.copyWith(color: onColorSubtle),
           ).animate().fadeIn(delay: 700.ms),
         ],
       ),
@@ -389,6 +409,11 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
   // ── Page 4: Daily Breakdown ───────────────────────────────────────────
 
   Widget _buildPage4(BuildContext context, WeeklyWrapData data) {
+    final gradientColors = _pageGradients[3];
+    final onColor = _onGradient(gradientColors);
+    final onColorMuted = onColor.withValues(alpha: 0.70);
+    final onColorSubtle = onColor.withValues(alpha: 0.60);
+
     final dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final now = DateTime.now();
     final weekStart = DateTime(
@@ -404,7 +429,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
     );
 
     return _WrapPageContainer(
-      gradientColors: _pageGradients[3],
+      gradientColors: gradientColors,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -412,7 +437,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             'Daily\nBreakdown',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              color: Colors.white,
+              color: onColor,
               fontWeight: FontWeight.bold,
               height: 1.2,
             ),
@@ -441,8 +466,8 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               dayLabels[dayDate.weekday - 1],
-                              style: const TextStyle(
-                                color: Colors.white60,
+                              style: TextStyle(
+                                color: onColorSubtle,
                                 fontSize: 11,
                               ),
                             ),
@@ -469,7 +494,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
                       barRods: [
                         BarChartRodData(
                           toY: data.dailyBreakdown[i] ?? 0,
-                          color: Colors.white.withOpacity(0.9),
+                          color: onColor.withValues(alpha: 0.9),
                           width: 20,
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(6),
@@ -487,7 +512,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             'Daily average: Rs. ${_formatIndian(data.dailyAverage)}',
             style: Theme.of(
               context,
-            ).textTheme.titleMedium?.copyWith(color: Colors.white70),
+            ).textTheme.titleMedium?.copyWith(color: onColorMuted),
           ).animate().fadeIn(delay: 800.ms),
         ],
       ),
@@ -497,6 +522,13 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
   // ── Page 5: The Verdict ───────────────────────────────────────────────
 
   Widget _buildPage5(BuildContext context, WeeklyWrapData data) {
+    final theme = Theme.of(context);
+    final cheddarColors = theme.extension<CheddarColors>();
+    final gradientColors = _pageGradients[4];
+    final onColor = _onGradient(gradientColors);
+    final onColorMuted = onColor.withValues(alpha: 0.70);
+    final onColorSubtle = onColor.withValues(alpha: 0.60);
+
     final isUp = data.comparedToLastWeek > 0;
     final changeAbs = data.comparedToLastWeek.abs();
     final savingsPositive = data.savingsRate > 0;
@@ -515,14 +547,14 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
     }
 
     return _WrapPageContainer(
-      gradientColors: _pageGradients[4],
+      gradientColors: gradientColors,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             'The Verdict',
             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              color: Colors.white,
+              color: onColor,
               fontWeight: FontWeight.bold,
             ),
           ).animate().fadeIn(duration: 400.ms),
@@ -534,7 +566,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
                   vertical: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: onColor.withValues(alpha: 0.15),
                   borderRadius: Radii.borderLg,
                 ),
                 child: Column(
@@ -543,15 +575,15 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
                       'Savings Rate',
                       style: Theme.of(
                         context,
-                      ).textTheme.bodyMedium?.copyWith(color: Colors.white60),
+                      ).textTheme.bodyMedium?.copyWith(color: onColorSubtle),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${data.savingsRate.toStringAsFixed(1)}%',
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         color: savingsPositive
-                            ? Colors.white
-                            : Colors.redAccent,
+                            ? onColor
+                            : cheddarColors?.expense ?? Colors.redAccent,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -571,7 +603,9 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             children: [
               Icon(
                 isUp ? Icons.trending_up : Icons.trending_down,
-                color: isUp ? Colors.redAccent : Colors.greenAccent,
+                color: isUp
+                    ? cheddarColors?.expense ?? Colors.redAccent
+                    : cheddarColors?.income ?? Colors.greenAccent,
                 size: 28,
               ),
               const SizedBox(width: 8),
@@ -579,7 +613,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
                 '${changeAbs.toStringAsFixed(1)}% ${isUp ? "more" : "less"} than last week',
                 style: Theme.of(
                   context,
-                ).textTheme.titleMedium?.copyWith(color: Colors.white70),
+                ).textTheme.titleMedium?.copyWith(color: onColorMuted),
               ),
             ],
           ).animate().fadeIn(delay: 500.ms).slideX(begin: 0.3, end: 0),
@@ -591,7 +625,7 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
               message,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.white.withOpacity(0.85),
+                color: onColor.withValues(alpha: 0.85),
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -603,15 +637,25 @@ class _WeeklyWrapScreenState extends ConsumerState<WeeklyWrapScreen> {
             icon: const Icon(Icons.share_rounded),
             label: const Text('Share Wrap'),
             style: FilledButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: _pageGradients[4][0],
+              backgroundColor: onColor.withValues(alpha: 0.16),
+              foregroundColor: onColor,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
+              shape: RoundedRectangleBorder(
+                borderRadius: Radii.borderMd,
+                side: BorderSide(color: onColor.withValues(alpha: 0.4)),
+              ),
             ),
           ).animate().fadeIn(delay: 900.ms).slideY(begin: 0.3, end: 0),
         ],
       ),
     );
+  }
+
+  Color _onGradient(List<Color> colors) {
+    final sample = Color.lerp(colors.first, colors.last, 0.5)!;
+    return ThemeData.estimateBrightnessForColor(sample) == Brightness.dark
+        ? Colors.white
+        : const Color(0xFF111111);
   }
 
   IconData _getCategoryIcon(String category) {

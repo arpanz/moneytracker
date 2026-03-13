@@ -24,9 +24,10 @@ class _ViewfinderOverlayState extends State<ViewfinderOverlay>
       duration: const Duration(milliseconds: 2500),
     )..repeat(reverse: true);
 
-    _scanLineAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scanLineAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -39,6 +40,7 @@ class _ViewfinderOverlayState extends State<ViewfinderOverlay>
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final colorScheme = Theme.of(context).colorScheme;
         final size = constraints.biggest;
         // Cutout dimensions: ~80% width, slightly wider than tall
         final cutoutWidth = size.width * 0.80;
@@ -58,20 +60,28 @@ class _ViewfinderOverlayState extends State<ViewfinderOverlay>
             // Semi-transparent overlay with cutout
             CustomPaint(
               size: size,
-              painter: _ViewfinderPainter(cutoutRect: cutoutRect),
+              painter: _ViewfinderPainter(
+                cutoutRect: cutoutRect,
+                overlayColor: colorScheme.scrim.withValues(alpha: 0.62),
+                borderColor: colorScheme.onSurface.withValues(alpha: 0.22),
+              ),
             ),
 
             // Corner brackets
             CustomPaint(
               size: size,
-              painter: _CornerBracketPainter(cutoutRect: cutoutRect),
+              painter: _CornerBracketPainter(
+                cutoutRect: cutoutRect,
+                bracketColor: colorScheme.onSurface,
+              ),
             ),
 
             // Animated scanning line
             AnimatedBuilder(
               animation: _scanLineAnimation,
               builder: (context, child) {
-                final lineY = cutoutRect.top +
+                final lineY =
+                    cutoutRect.top +
                     (_scanLineAnimation.value * cutoutRect.height);
                 return Positioned(
                   left: cutoutRect.left + 8,
@@ -83,9 +93,9 @@ class _ViewfinderOverlayState extends State<ViewfinderOverlay>
                       gradient: LinearGradient(
                         colors: [
                           Colors.transparent,
-                          Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                          Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                          colorScheme.primary.withValues(alpha: 0.8),
+                          colorScheme.primary,
+                          colorScheme.primary.withValues(alpha: 0.8),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.15, 0.5, 0.85, 1.0],
@@ -93,10 +103,7 @@ class _ViewfinderOverlayState extends State<ViewfinderOverlay>
                       borderRadius: BorderRadius.circular(1),
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.4),
+                          color: colorScheme.primary.withValues(alpha: 0.4),
                           blurRadius: 8,
                           spreadRadius: 2,
                         ),
@@ -116,10 +123,10 @@ class _ViewfinderOverlayState extends State<ViewfinderOverlay>
                 'Position receipt within the frame',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.9),
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.3,
-                    ),
+                  color: colorScheme.onSurface.withValues(alpha: 0.9),
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.3,
+                ),
               ),
             ),
           ],
@@ -133,27 +140,31 @@ class _ViewfinderOverlayState extends State<ViewfinderOverlay>
 
 class _ViewfinderPainter extends CustomPainter {
   final Rect cutoutRect;
+  final Color overlayColor;
+  final Color borderColor;
 
-  const _ViewfinderPainter({required this.cutoutRect});
+  const _ViewfinderPainter({
+    required this.cutoutRect,
+    required this.overlayColor,
+    required this.borderColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final overlayPaint = Paint()
-      ..color = Colors.black.withOpacity(0.6)
+      ..color = overlayColor
       ..style = PaintingStyle.fill;
 
     final overlayPath = Path()
       ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..addRRect(
-        RRect.fromRectAndRadius(cutoutRect, const Radius.circular(16)),
-      )
+      ..addRRect(RRect.fromRectAndRadius(cutoutRect, const Radius.circular(16)))
       ..fillType = PathFillType.evenOdd;
 
     canvas.drawPath(overlayPath, overlayPaint);
 
     // Subtle border around the cutout
     final borderPaint = Paint()
-      ..color = Colors.white.withOpacity(0.15)
+      ..color = borderColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
@@ -165,15 +176,21 @@ class _ViewfinderPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_ViewfinderPainter oldDelegate) =>
-      cutoutRect != oldDelegate.cutoutRect;
+      cutoutRect != oldDelegate.cutoutRect ||
+      overlayColor != oldDelegate.overlayColor ||
+      borderColor != oldDelegate.borderColor;
 }
 
 // ── Corner bracket decorations ──
 
 class _CornerBracketPainter extends CustomPainter {
   final Rect cutoutRect;
+  final Color bracketColor;
 
-  const _CornerBracketPainter({required this.cutoutRect});
+  const _CornerBracketPainter({
+    required this.cutoutRect,
+    required this.bracketColor,
+  });
 
   static const _bracketLength = 28.0;
   static const _bracketThickness = 3.0;
@@ -182,7 +199,7 @@ class _CornerBracketPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white
+      ..color = bracketColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = _bracketThickness
       ..strokeCap = StrokeCap.round;
@@ -229,7 +246,8 @@ class _CornerBracketPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_CornerBracketPainter oldDelegate) =>
-      cutoutRect != oldDelegate.cutoutRect;
+      cutoutRect != oldDelegate.cutoutRect ||
+      bracketColor != oldDelegate.bracketColor;
 }
 
 // ── AnimatedBuilder helper (delegates to AnimatedWidget) ──

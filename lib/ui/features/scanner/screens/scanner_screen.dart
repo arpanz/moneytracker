@@ -297,9 +297,10 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
   Widget build(BuildContext context) {
     final scannerState = ref.watch(scannerStateProvider);
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: colorScheme.scrim,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -328,8 +329,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     }
 
     if (!_isCameraInitialized || _cameraController == null) {
-      return const Center(
-        child: CircularProgressIndicator(color: Colors.white),
+      return Center(
+        child: CircularProgressIndicator(color: theme.colorScheme.onSurface),
       );
     }
 
@@ -346,14 +347,14 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
             FaIcon(
               FontAwesomeIcons.cameraRotate,
               size: 56,
-              color: Colors.white.withOpacity(0.5),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
             ),
             const SizedBox(height: Spacing.md),
             Text(
               _permissionError ?? 'Camera unavailable',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: Colors.white.withOpacity(0.8),
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: Spacing.lg),
@@ -375,11 +376,11 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
               icon: FaIcon(
                 FontAwesomeIcons.images,
                 size: 16,
-                color: Colors.white.withOpacity(0.8),
+                color: theme.colorScheme.onSurface,
               ),
               label: Text(
                 'Pick from Gallery',
-                style: TextStyle(color: Colors.white.withOpacity(0.8)),
+                style: TextStyle(color: theme.colorScheme.onSurface),
               ),
             ),
           ],
@@ -453,7 +454,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
                 child: Text(
                   'Cancel',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withOpacity(0.8),
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -466,7 +467,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
 
   Widget _buildLoadingOverlay(ThemeData theme) {
     return Container(
-      color: Colors.black.withOpacity(0.7),
+      color: theme.colorScheme.scrim.withValues(alpha: 0.72),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -479,7 +480,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
             Text(
               'Processing receipt...',
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -487,7 +488,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
             Text(
               'Extracting text with OCR',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: Colors.white.withOpacity(0.6),
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -507,13 +508,17 @@ class _CaptureButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Container(
       width: 76,
       height: 76,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 4),
+        border: Border.all(
+          color: colorScheme.onSurface.withValues(alpha: 0.88),
+          width: 4,
+        ),
       ),
       padding: const EdgeInsets.all(4),
       child: AnimatedContainer(
@@ -521,22 +526,22 @@ class _CaptureButton extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: isCapturing
-              ? theme.colorScheme.primary.withOpacity(0.5)
-              : theme.colorScheme.primary,
+              ? colorScheme.primary.withValues(alpha: 0.5)
+              : colorScheme.primary,
         ),
         child: Center(
           child: isCapturing
-              ? const SizedBox(
+              ? SizedBox(
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                     strokeWidth: 2,
                   ),
                 )
-              : const FaIcon(
+              : FaIcon(
                   FontAwesomeIcons.camera,
-                  color: Colors.white,
+                  color: colorScheme.onPrimary,
                   size: 24,
                 ),
         ),
@@ -560,6 +565,7 @@ class _CircleIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onPressed,
       child: Container(
@@ -568,14 +574,16 @@ class _CircleIconButton extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: isActive
-              ? Colors.white.withOpacity(0.3)
-              : Colors.black.withOpacity(0.4),
-          border: Border.all(color: Colors.white.withOpacity(0.2)),
+              ? colorScheme.primary.withValues(alpha: 0.30)
+              : colorScheme.scrim.withValues(alpha: 0.42),
+          border: Border.all(
+            color: colorScheme.onSurface.withValues(alpha: 0.22),
+          ),
         ),
         child: Center(
           child: FaIcon(
             icon,
-            color: isActive ? Colors.yellow : Colors.white,
+            color: isActive ? colorScheme.secondary : colorScheme.onSurface,
             size: 18,
           ),
         ),
@@ -761,7 +769,8 @@ class _ReceiptResultSheetState extends State<_ReceiptResultSheet> {
                             ),
                             decoration: InputDecoration(
                               labelText: 'Total Amount',
-                              prefixText: '${ref.watch(currencySymbolProvider)} ',
+                              prefixText:
+                                  '${ref.watch(currencySymbolProvider)} ',
                               prefixIcon: const Icon(Icons.currency_exchange),
                             ),
                           ),

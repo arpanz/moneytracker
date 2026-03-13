@@ -535,14 +535,15 @@ class _ReceiptSection extends StatelessWidget {
   }
 
   void _viewFullscreen(BuildContext context) {
+    final theme = Theme.of(context);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.black,
-            iconTheme: const IconThemeData(color: Colors.white),
+            backgroundColor: theme.colorScheme.surface,
+            iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
           ),
-          backgroundColor: Colors.black,
+          backgroundColor: theme.colorScheme.surface,
           body: Center(
             child: InteractiveViewer(child: Image.file(File(imagePath))),
           ),
