@@ -77,8 +77,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   // We store a list of tokens: numbers (as strings) + operators (+,-,*,/)
   // e.g. ['123', '+', '45'] means 123 + 45
   String _currentInput = ''; // the number currently being typed
-  String? _pendingOperator;  // operator waiting to be applied
-  double? _accumulator;      // result so far
+  String? _pendingOperator; // operator waiting to be applied
+  double? _accumulator; // result so far
   bool _justEvaluated = false; // true after = so next digit starts fresh
 
   static const int _maxIntDigits = 10;
@@ -104,11 +104,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   double _applyOp(double a, String op, double b) {
     switch (op) {
-      case '+': return a + b;
-      case '−': return a - b;
-      case '×': return a * b;
-      case '÷': return b == 0 ? a : a / b;
-      default: return b;
+      case '+':
+        return a + b;
+      case '−':
+        return a - b;
+      case '×':
+        return a * b;
+      case '÷':
+        return b == 0 ? a : a / b;
+      default:
+        return b;
     }
   }
 
@@ -208,7 +213,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     setState(() {
       if (_pendingOperator != null && _currentInput.isNotEmpty) {
         _accumulator = _applyOp(
-          _accumulator ?? 0, _pendingOperator!, _currentInputValue);
+          _accumulator ?? 0,
+          _pendingOperator!,
+          _currentInputValue,
+        );
         _currentInput = '';
         _pendingOperator = null;
         _justEvaluated = true;
@@ -297,20 +305,35 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     if (accounts.isEmpty) return;
     bool changed = false;
     if (_editAccountId != null && _selectedAccount == null) {
-      final m = accounts.where((a) => a.id.toString() == _editAccountId).firstOrNull;
-      if (m != null) { _selectedAccount = m; changed = true; }
+      final m = accounts
+          .where((a) => a.id.toString() == _editAccountId)
+          .firstOrNull;
+      if (m != null) {
+        _selectedAccount = m;
+        changed = true;
+      }
     }
     if (_editToAccountId != null && _selectedToAccount == null) {
-      final m = accounts.where((a) => a.id.toString() == _editToAccountId).firstOrNull;
-      if (m != null) { _selectedToAccount = m; changed = true; }
+      final m = accounts
+          .where((a) => a.id.toString() == _editToAccountId)
+          .firstOrNull;
+      if (m != null) {
+        _selectedToAccount = m;
+        changed = true;
+      }
     }
     if (!_isEditing && _selectedAccount == null && accounts.isNotEmpty) {
       _selectedAccount = accounts.first;
       changed = true;
     }
-    if (_type == 2 && !_isEditing && _selectedToAccount == null && accounts.length > 1) {
-      _selectedToAccount = accounts.firstWhere((a) => a.id != _selectedAccount?.id,
-          orElse: () => accounts.last);
+    if (_type == 2 &&
+        !_isEditing &&
+        _selectedToAccount == null &&
+        accounts.length > 1) {
+      _selectedToAccount = accounts.firstWhere(
+        (a) => a.id != _selectedAccount?.id,
+        orElse: () => accounts.last,
+      );
       changed = true;
     }
     if (changed && mounted) setState(() {});
@@ -326,10 +349,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   // ── Accent colour ─────────────────────────────────────────────────────────
 
   Color _accentColor(CheddarColors cc) => switch (_type) {
-        0 => cc.income,
-        2 => cc.transfer,
-        _ => cc.expense,
-      };
+    0 => cc.income,
+    2 => cc.transfer,
+    _ => cc.expense,
+  };
 
   // ── Category color ────────────────────────────────────────────────────────
 
@@ -375,7 +398,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             Expanded(
               child: _categorySelected
                   ? _buildInputPhase(
-                      context, theme, cc, accent, accountsAsync, currencySymbol)
+                      context,
+                      theme,
+                      cc,
+                      accent,
+                      accountsAsync,
+                      currencySymbol,
+                    )
                   : _buildCategoryPhase(context, theme, cc),
             ),
           ],
@@ -387,7 +416,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   // ── Phase 0: category selection ───────────────────────────────────────────
 
   Widget _buildCategoryPhase(
-      BuildContext context, ThemeData theme, CheddarColors cc) {
+    BuildContext context,
+    ThemeData theme,
+    CheddarColors cc,
+  ) {
     return _CategorySelectionPhase(
       transactionType: _type,
       editCategoryName: _editCategoryName,
@@ -462,7 +494,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         // ── Amount display ────────────────────────────────────────────────
         Padding(
           padding: const EdgeInsets.symmetric(
-              horizontal: Spacing.lg, vertical: Spacing.sm),
+            horizontal: Spacing.lg,
+            vertical: Spacing.sm,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -530,11 +564,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         // ── Note field ────────────────────────────────────────────────────
         Padding(
           padding: const EdgeInsets.symmetric(
-              horizontal: Spacing.md, vertical: Spacing.xs),
-          child: _NoteField(
-            controller: _noteController,
-            accent: accent,
+            horizontal: Spacing.md,
+            vertical: Spacing.xs,
           ),
+          child: _NoteField(controller: _noteController, accent: accent),
         ),
 
         // ── More options ──────────────────────────────────────────────────
@@ -558,16 +591,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   isSplit: _isSplit,
                   onTagAdded: (t) => setState(() => _tags.add(t)),
                   onTagRemoved: (t) => setState(() => _tags.remove(t)),
-                  onRecurringChanged: (v) =>
-                      setState(() => _isRecurring = v),
+                  onRecurringChanged: (v) => setState(() => _isRecurring = v),
                   onFrequencyChanged: (f) =>
                       setState(() => _recurringFrequency = f),
                   onSplitChanged: (v) {
                     setState(() => _isSplit = v);
                     if (v) context.pushNamed(RouteNames.addSplit);
                   },
-                  onReceiptTap: () =>
-                      context.pushNamed(RouteNames.scanner),
+                  onReceiptTap: () => context.pushNamed(RouteNames.scanner),
                 )
               : const SizedBox.shrink(),
         ),
@@ -608,12 +639,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   Future<void> _pickTime() async {
     final picked = await showTimePicker(
-        context: context, initialTime: _selectedTime);
+      context: context,
+      initialTime: _selectedTime,
+    );
     if (picked != null) setState(() => _selectedTime = picked);
   }
 
   void _showAccountPicker(
-      BuildContext context, AsyncValue<List<AccountModel>> accountsAsync) {
+    BuildContext context,
+    AsyncValue<List<AccountModel>> accountsAsync,
+  ) {
     final accounts = accountsAsync.valueOrNull ?? [];
     if (accounts.isEmpty) {
       _showCreateAccountSheet(context);
@@ -622,14 +657,18 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.vertical(top: Radius.circular(Radii.xl))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl)),
+      ),
       builder: (ctx) {
         final theme = Theme.of(ctx);
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
-                Spacing.md, Spacing.md, Spacing.md, Spacing.lg),
+              Spacing.md,
+              Spacing.md,
+              Spacing.md,
+              Spacing.lg,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -639,22 +678,28 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     width: 36,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.15,
+                      ),
                       borderRadius: Radii.borderFull,
                     ),
                   ),
                 ),
                 const SizedBox(height: Spacing.md),
-                Text('Select Account',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700)),
+                Text(
+                  'Select Account',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 const SizedBox(height: Spacing.sm),
                 ...accounts.map((acc) {
                   final isSel = _selectedAccount?.id == acc.id;
                   final accColor = Color(acc.color);
                   return ListTile(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: Spacing.xs),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: Spacing.xs,
+                    ),
                     leading: Container(
                       width: 40,
                       height: 40,
@@ -662,17 +707,24 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                         color: accColor.withValues(alpha: 0.12),
                         borderRadius: Radii.borderMd,
                       ),
-                      child: Icon(Icons.account_balance_wallet_rounded,
-                          color: accColor, size: 20),
+                      child: Icon(
+                        Icons.account_balance_wallet_rounded,
+                        color: accColor,
+                        size: 20,
+                      ),
                     ),
-                    title: Text(acc.name,
-                        style: TextStyle(
-                            fontWeight: isSel
-                                ? FontWeight.w700
-                                : FontWeight.w500)),
+                    title: Text(
+                      acc.name,
+                      style: TextStyle(
+                        fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                    ),
                     trailing: isSel
-                        ? Icon(Icons.check_circle_rounded,
-                            color: accColor, size: 20)
+                        ? Icon(
+                            Icons.check_circle_rounded,
+                            color: accColor,
+                            size: 20,
+                          )
                         : null,
                     onTap: () {
                       setState(() => _selectedAccount = acc);
@@ -682,8 +734,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 }),
                 const Divider(height: Spacing.md),
                 ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: Spacing.xs),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: Spacing.xs,
+                  ),
                   leading: Container(
                     width: 40,
                     height: 40,
@@ -691,13 +744,19 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       color: theme.colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: Radii.borderMd,
                     ),
-                    child: Icon(Icons.add_rounded,
-                        color: theme.colorScheme.primary, size: 20),
+                    child: Icon(
+                      Icons.add_rounded,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
                   ),
-                  title: Text('New Account',
-                      style: TextStyle(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w600)),
+                  title: Text(
+                    'New Account',
+                    style: TextStyle(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   onTap: () {
                     Navigator.of(ctx).pop();
                     _showCreateAccountSheet(context);
@@ -724,8 +783,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.vertical(top: Radius.circular(Radii.xl))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl)),
+      ),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setS) => Padding(
           padding: EdgeInsets.only(
@@ -743,20 +802,20 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Theme.of(ctx)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.15),
+                    color: Theme.of(
+                      ctx,
+                    ).colorScheme.onSurface.withValues(alpha: 0.15),
                     borderRadius: Radii.borderFull,
                   ),
                 ),
               ),
               const SizedBox(height: Spacing.md),
-              Text('New Account',
-                  style: Theme.of(ctx)
-                      .textTheme
-                      .titleLarge
-                      ?.copyWith(fontWeight: FontWeight.w600)),
+              Text(
+                'New Account',
+                style: Theme.of(
+                  ctx,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+              ),
               const SizedBox(height: Spacing.md),
               TextField(
                 controller: nameCtrl,
@@ -764,29 +823,31 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
                   labelText: 'Account name',
-                  border:
-                      OutlineInputBorder(borderRadius: Radii.borderMd),
+                  border: OutlineInputBorder(borderRadius: Radii.borderMd),
                 ),
               ),
               const SizedBox(height: Spacing.md),
-              Text('Account type',
-                  style: Theme.of(ctx)
-                      .textTheme
-                      .titleSmall
-                      ?.copyWith(fontWeight: FontWeight.w600)),
+              Text(
+                'Account type',
+                style: Theme.of(
+                  ctx,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+              ),
               const SizedBox(height: Spacing.sm),
               Wrap(
                 spacing: Spacing.sm,
                 children: accountTypes
-                    .map((t) => ChoiceChip(
-                          avatar: Icon(t.icon, size: 16),
-                          label: Text(t.label),
-                          selected: selectedType == t.value,
-                          onSelected: (_) =>
-                              setS(() => selectedType = t.value),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: Radii.borderFull),
-                        ))
+                    .map(
+                      (t) => ChoiceChip(
+                        avatar: Icon(t.icon, size: 16),
+                        label: Text(t.label),
+                        selected: selectedType == t.value,
+                        onSelected: (_) => setS(() => selectedType = t.value),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: Radii.borderFull,
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
               const SizedBox(height: Spacing.md),
@@ -864,27 +925,31 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     (icon: FontAwesomeIcons.mobileScreen, label: 'subscriptions'),
   ];
 
-  int get _categoryType => switch (_type) { 0 => 1, 1 => 0, _ => 2 };
+  int get _categoryType => switch (_type) {
+    0 => 1,
+    1 => 0,
+    _ => 2,
+  };
 
   String _svgForLabel(String label) => switch (label) {
-        'food' => AssetPaths.categoryFood,
-        'transport' => AssetPaths.categoryTransport,
-        'shopping' => AssetPaths.categoryShopping,
-        'bills' => AssetPaths.categoryBills,
-        'entertainment' => AssetPaths.categoryEntertainment,
-        'health' => AssetPaths.categoryHealth,
-        'education' => AssetPaths.categoryEducation,
-        'travel' => AssetPaths.categoryTravel,
-        'gifts' => AssetPaths.categoryGifts,
-        'salary' => AssetPaths.categorySalary,
-        'freelance' => AssetPaths.categoryFreelance,
-        'investments' => AssetPaths.categoryInvestments,
-        'rent' => AssetPaths.categoryRent,
-        'groceries' => AssetPaths.categoryGroceries,
-        'pets' => AssetPaths.categoryPets,
-        'subscriptions' => AssetPaths.categorySubscriptions,
-        _ => AssetPaths.categoryDefault,
-      };
+    'food' => AssetPaths.categoryFood,
+    'transport' => AssetPaths.categoryTransport,
+    'shopping' => AssetPaths.categoryShopping,
+    'bills' => AssetPaths.categoryBills,
+    'entertainment' => AssetPaths.categoryEntertainment,
+    'health' => AssetPaths.categoryHealth,
+    'education' => AssetPaths.categoryEducation,
+    'travel' => AssetPaths.categoryTravel,
+    'gifts' => AssetPaths.categoryGifts,
+    'salary' => AssetPaths.categorySalary,
+    'freelance' => AssetPaths.categoryFreelance,
+    'investments' => AssetPaths.categoryInvestments,
+    'rent' => AssetPaths.categoryRent,
+    'groceries' => AssetPaths.categoryGroceries,
+    'pets' => AssetPaths.categoryPets,
+    'subscriptions' => AssetPaths.categorySubscriptions,
+    _ => AssetPaths.categoryDefault,
+  };
 
   void _showNewCategoryDialog(BuildContext context) {
     final nameCtrl = TextEditingController();
@@ -911,14 +976,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     textCapitalization: TextCapitalization.words,
                     decoration: InputDecoration(
                       labelText: 'Category name',
-                      border: OutlineInputBorder(
-                          borderRadius: Radii.borderMd),
+                      border: OutlineInputBorder(borderRadius: Radii.borderMd),
                     ),
                   ),
                   const SizedBox(height: Spacing.md),
-                  Text('Choose icon',
-                      style: theme.textTheme.labelLarge
-                          ?.copyWith(fontWeight: FontWeight.w600)),
+                  Text(
+                    'Choose icon',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   const SizedBox(height: Spacing.sm),
                   SizedBox(
                     height: 180,
@@ -926,10 +993,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                       physics: const BouncingScrollPhysics(),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 5,
-                              mainAxisSpacing: Spacing.sm,
-                              crossAxisSpacing: Spacing.sm,
-                              childAspectRatio: 1),
+                            crossAxisCount: 5,
+                            mainAxisSpacing: Spacing.sm,
+                            crossAxisSpacing: Spacing.sm,
+                            childAspectRatio: 1,
+                          ),
                       itemCount: _iconOptions.length,
                       itemBuilder: (_, i) {
                         final opt = _iconOptions[i];
@@ -943,8 +1011,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                             duration: AppDurations.fast,
                             decoration: BoxDecoration(
                               color: isSel
-                                  ? theme.colorScheme.primary
-                                      .withValues(alpha: 0.15)
+                                  ? theme.colorScheme.primary.withValues(
+                                      alpha: 0.15,
+                                    )
                                   : theme.colorScheme.surfaceContainerLow,
                               borderRadius: Radii.borderMd,
                               border: Border.all(
@@ -960,8 +1029,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                 size: 18,
                                 color: isSel
                                     ? theme.colorScheme.primary
-                                    : theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.6),
+                                    : theme.colorScheme.onSurface.withValues(
+                                        alpha: 0.6,
+                                      ),
                               ),
                             ),
                           ),
@@ -981,20 +1051,18 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 onPressed: () async {
                   final name = nameCtrl.text.trim();
                   if (name.isEmpty) return;
-                  final categoryRepo =
-                      ref.read(categoryRepositoryProvider);
-                  final existing =
-                      await categoryRepo.getByType(_categoryType);
-                  final dup = existing.any((c) =>
-                      c.name.trim().toLowerCase() ==
-                      name.toLowerCase());
+                  final categoryRepo = ref.read(categoryRepositoryProvider);
+                  final existing = await categoryRepo.getByType(_categoryType);
+                  final dup = existing.any(
+                    (c) => c.name.trim().toLowerCase() == name.toLowerCase(),
+                  );
                   if (dup) {
                     if (ctx.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                            content: Text(
-                                '"$name" already exists.'),
-                            behavior: SnackBarBehavior.floating),
+                          content: Text('"$name" already exists.'),
+                          behavior: SnackBarBehavior.floating,
+                        ),
                       );
                     }
                     return;
@@ -1066,16 +1134,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         _selectedTime.hour,
         _selectedTime.minute,
       );
-      final txn =
-          _isEditing ? widget.existingTransaction! : TransactionModel();
+      final txn = _isEditing ? widget.existingTransaction! : TransactionModel();
       txn
         ..amount = amount
         ..type = _type
-        ..category =
-            _type == 2 ? 'Transfer' : _selectedCategory!.name
+        ..category = _type == 2 ? 'Transfer' : _selectedCategory!.name
         ..accountId = _selectedAccount!.id.toString()
-        ..toAccountId =
-            _type == 2 ? _selectedToAccount?.id.toString() : null
+        ..toAccountId = _type == 2 ? _selectedToAccount?.id.toString() : null
         ..date = dt
         ..note = _noteController.text.trim().isEmpty
             ? null
@@ -1086,7 +1151,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             ? json.encode({
                 'frequency': _recurringFrequency.toLowerCase(),
                 'interval': 1,
-                'endDate': null
+                'endDate': null,
               })
             : null;
 
@@ -1104,12 +1169,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   }
 
   void _snack(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(msg),
-      duration: AppConstants.snackBarDuration,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        duration: AppConstants.snackBarDuration,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
+      ),
+    );
   }
 }
 
@@ -1145,7 +1212,11 @@ class _TopBar extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-          Spacing.xs, Spacing.xs, Spacing.md, Spacing.xs),
+        Spacing.xs,
+        Spacing.xs,
+        Spacing.md,
+        Spacing.xs,
+      ),
       child: Row(
         children: [
           // Close button
@@ -1160,8 +1231,9 @@ class _TopBar extends StatelessWidget {
             child: Container(
               height: 38,
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.5),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
                 borderRadius: Radii.borderFull,
               ),
               child: Row(
@@ -1182,7 +1254,7 @@ class _TopBar extends StatelessWidget {
                                     color: t.color.withValues(alpha: 0.3),
                                     blurRadius: 6,
                                     offset: const Offset(0, 2),
-                                  )
+                                  ),
                                 ]
                               : null,
                         ),
@@ -1196,8 +1268,7 @@ class _TopBar extends StatelessWidget {
                                   : FontWeight.w500,
                               color: isSel
                                   ? Colors.white
-                                  : theme
-                                      .colorScheme.onSurfaceVariant,
+                                  : theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ),
@@ -1243,12 +1314,13 @@ class _CategorySelectionPhaseState
   @override
   Widget build(BuildContext context) {
     final categoriesAsync = ref.watch(
-        _categoriesByTypeProvider(widget.transactionType));
+      _categoriesByTypeProvider(widget.transactionType),
+    );
     final theme = Theme.of(context);
 
     return categoriesAsync.when(
-      loading: () => const Center(
-          child: CircularProgressIndicator(strokeWidth: 2)),
+      loading: () =>
+          const Center(child: CircularProgressIndicator(strokeWidth: 2)),
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (cats) {
         return Column(
@@ -1256,7 +1328,11 @@ class _CategorySelectionPhaseState
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(
-                  Spacing.md, Spacing.sm, Spacing.md, Spacing.xs),
+                Spacing.md,
+                Spacing.sm,
+                Spacing.md,
+                Spacing.xs,
+              ),
               child: Text(
                 'Choose a category',
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -1267,10 +1343,13 @@ class _CategorySelectionPhaseState
             Expanded(
               child: GridView.builder(
                 padding: const EdgeInsets.fromLTRB(
-                    Spacing.md, Spacing.xs, Spacing.md, Spacing.md),
+                  Spacing.md,
+                  Spacing.xs,
+                  Spacing.md,
+                  Spacing.md,
+                ),
                 physics: const BouncingScrollPhysics(),
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   mainAxisSpacing: Spacing.sm,
                   crossAxisSpacing: Spacing.sm,
@@ -1280,17 +1359,14 @@ class _CategorySelectionPhaseState
                 itemBuilder: (context, i) {
                   // Last tile = New category
                   if (i == cats.length) {
-                    return _NewCategoryTile(
-                        onTap: widget.onNewCategory);
+                    return _NewCategoryTile(onTap: widget.onNewCategory);
                   }
 
                   final cat = cats[i];
-                  final isPreSelected =
-                      widget.editCategoryName == cat.name;
+                  final isPreSelected = widget.editCategoryName == cat.name;
                   final catColor =
-                      widget.cc.categoryColors[
-                              cat.name.toLowerCase()] ??
-                          Color(cat.color);
+                      widget.cc.categoryColors[cat.name.toLowerCase()] ??
+                      Color(cat.color);
 
                   return _CategoryTile(
                     category: cat,
@@ -1337,9 +1413,10 @@ class _CategoryTileState extends State<_CategoryTile>
   void initState() {
     super.initState();
     _pressCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 80));
-    _scaleAnim =
-        Tween<double>(begin: 1.0, end: 0.94).animate(_pressCtrl);
+      vsync: this,
+      duration: const Duration(milliseconds: 80),
+    );
+    _scaleAnim = Tween<double>(begin: 1.0, end: 0.94).animate(_pressCtrl);
   }
 
   @override
@@ -1384,8 +1461,7 @@ class _CategoryTileState extends State<_CategoryTile>
                   borderRadius: BorderRadius.circular(14),
                   color: widget.catColor.withValues(alpha: 0.1),
                   border: Border.all(
-                    color:
-                        widget.catColor.withValues(alpha: 0.25),
+                    color: widget.catColor.withValues(alpha: 0.25),
                     width: 1,
                   ),
                 ),
@@ -1407,8 +1483,7 @@ class _CategoryTileState extends State<_CategoryTile>
               ),
               const SizedBox(height: Spacing.xs),
               Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: Spacing.xs),
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.xs),
                 child: Text(
                   widget.category.name,
                   style: TextStyle(
@@ -1459,8 +1534,7 @@ class _NewCategoryTile extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
-                color:
-                    theme.colorScheme.primary.withValues(alpha: 0.08),
+                color: theme.colorScheme.primary.withValues(alpha: 0.08),
               ),
               child: Icon(
                 Icons.add_rounded,
@@ -1508,9 +1582,15 @@ class _CategoryPill extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.fromLTRB(
-            Spacing.md, Spacing.sm, Spacing.md, Spacing.xs),
+          Spacing.md,
+          Spacing.sm,
+          Spacing.md,
+          Spacing.xs,
+        ),
         padding: const EdgeInsets.symmetric(
-            horizontal: Spacing.md, vertical: Spacing.sm),
+          horizontal: Spacing.md,
+          vertical: Spacing.sm,
+        ),
         decoration: BoxDecoration(
           color: catColor.withValues(alpha: 0.1),
           borderRadius: Radii.borderFull,
@@ -1522,20 +1602,18 @@ class _CategoryPill extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (category != null) ...([
-              SvgPicture.asset(
-                category!.icon,
-                width: 16,
-                height: 16,
-                fit: BoxFit.contain,
-                placeholderBuilder: (_) => Icon(
-                  Icons.category_rounded,
-                  size: 16,
-                  color: catColor,
+            if (category != null)
+              ...([
+                SvgPicture.asset(
+                  category!.icon,
+                  width: 16,
+                  height: 16,
+                  fit: BoxFit.contain,
+                  placeholderBuilder: (_) =>
+                      Icon(Icons.category_rounded, size: 16, color: catColor),
                 ),
-              ),
-              const SizedBox(width: Spacing.xs),
-            ]),
+                const SizedBox(width: Spacing.xs),
+              ]),
             Text(
               name,
               style: theme.textTheme.labelMedium?.copyWith(
@@ -1544,8 +1622,11 @@ class _CategoryPill extends StatelessWidget {
               ),
             ),
             const SizedBox(width: Spacing.xs),
-            Icon(Icons.keyboard_arrow_down_rounded,
-                size: 16, color: catColor.withValues(alpha: 0.7)),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 16,
+              color: catColor.withValues(alpha: 0.7),
+            ),
           ],
         ),
       ),
@@ -1579,11 +1660,16 @@ class _TransferHeader extends StatelessWidget {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-          Spacing.md, Spacing.sm, Spacing.md, Spacing.xs),
+        Spacing.md,
+        Spacing.sm,
+        Spacing.md,
+        Spacing.xs,
+      ),
       child: accountsAsync.when(
         data: (accounts) {
           WidgetsBinding.instance.addPostFrameCallback(
-              (_) => onRestoreAccounts(accounts));
+            (_) => onRestoreAccounts(accounts),
+          );
           return Row(
             children: [
               Expanded(
@@ -1595,8 +1681,7 @@ class _TransferHeader extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: Spacing.sm),
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.sm),
                 child: Icon(
                   Icons.arrow_forward_rounded,
                   color: theme.colorScheme.onSurfaceVariant,
@@ -1615,9 +1700,9 @@ class _TransferHeader extends StatelessWidget {
           );
         },
         loading: () => const SizedBox(
-            height: 52,
-            child: Center(
-                child: CircularProgressIndicator(strokeWidth: 2))),
+          height: 52,
+          child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+        ),
         error: (e, _) => Text('Error: $e'),
       ),
     );
@@ -1643,11 +1728,13 @@ class _TransferAccountDrop extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
-            )),
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         const SizedBox(height: Spacing.xxs),
         DropdownButtonFormField<AccountModel>(
           value: selected,
@@ -1655,17 +1742,22 @@ class _TransferAccountDrop extends StatelessWidget {
           decoration: InputDecoration(
             isDense: true,
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: Spacing.sm, vertical: Spacing.sm),
-            border:
-                OutlineInputBorder(borderRadius: Radii.borderMd),
+              horizontal: Spacing.sm,
+              vertical: Spacing.sm,
+            ),
+            border: OutlineInputBorder(borderRadius: Radii.borderMd),
           ),
           items: accounts
-              .map((a) => DropdownMenuItem(
-                    value: a,
-                    child: Text(a.name,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 13)),
-                  ))
+              .map(
+                (a) => DropdownMenuItem(
+                  value: a,
+                  child: Text(
+                    a.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ),
+              )
               .toList(),
           onChanged: (a) {
             if (a != null) onChanged(a);
@@ -1710,72 +1802,79 @@ class _MetaRow extends StatelessWidget {
     final theme = Theme.of(context);
     final dateStr = DateFormat('MMM d').format(selectedDate);
     final isToday = DateUtils.isSameDay(selectedDate, DateTime.now());
-    final timeStr = DateFormat('hh:mm a').format(
-      DateTime(0, 1, 1, selectedTime.hour, selectedTime.minute),
-    );
+    final timeStr = DateFormat(
+      'hh:mm a',
+    ).format(DateTime(0, 1, 1, selectedTime.hour, selectedTime.minute));
 
     // Restore accounts on data load
     accountsAsync.whenData(
-        (accounts) => WidgetsBinding.instance.addPostFrameCallback(
-            (_) => onRestoreAccounts(accounts)));
+      (accounts) => WidgetsBinding.instance.addPostFrameCallback(
+        (_) => onRestoreAccounts(accounts),
+      ),
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-          horizontal: Spacing.md, vertical: Spacing.xs),
+        horizontal: Spacing.md,
+        vertical: Spacing.xs,
+      ),
       child: Row(
         children: [
           // Account tap pill (not shown for transfer since it has its own picker)
-          if (!showForTransfer) ...([
-            GestureDetector(
-              onTap: onPickAccount,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: Spacing.sm, vertical: Spacing.xs),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.6),
-                  borderRadius: Radii.borderFull,
-                  border: Border.all(
-                    color: selectedAccount != null
-                        ? Color(selectedAccount!.color)
-                            .withValues(alpha: 0.4)
-                        : theme.colorScheme.outline
-                            .withValues(alpha: 0.3),
+          if (!showForTransfer)
+            ...([
+              GestureDetector(
+                onTap: onPickAccount,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Spacing.sm,
+                    vertical: Spacing.xs,
                   ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.account_balance_wallet_rounded,
-                      size: 13,
-                      color: selectedAccount != null
-                          ? Color(selectedAccount!.color)
-                          : theme.colorScheme.onSurfaceVariant,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.6,
                     ),
-                    const SizedBox(width: Spacing.xxs + 2),
-                    Text(
-                      selectedAccount?.name ?? 'Account',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
+                    borderRadius: Radii.borderFull,
+                    border: Border.all(
+                      color: selectedAccount != null
+                          ? Color(selectedAccount!.color).withValues(alpha: 0.4)
+                          : theme.colorScheme.outline.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.account_balance_wallet_rounded,
+                        size: 13,
                         color: selectedAccount != null
                             ? Color(selectedAccount!.color)
                             : theme.colorScheme.onSurfaceVariant,
                       ),
-                    ),
-                    const SizedBox(width: Spacing.xxs),
-                    Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      size: 14,
-                      color: theme.colorScheme.onSurfaceVariant
-                          .withValues(alpha: 0.6),
-                    ),
-                  ],
+                      const SizedBox(width: Spacing.xxs + 2),
+                      Text(
+                        selectedAccount?.name ?? 'Account',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: selectedAccount != null
+                              ? Color(selectedAccount!.color)
+                              : theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(width: Spacing.xxs),
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 14,
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.6,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const Spacer(),
-          ]),
+              const Spacer(),
+            ]),
 
           if (showForTransfer) const Spacer(),
 
@@ -1784,18 +1883,23 @@ class _MetaRow extends StatelessWidget {
             onTap: onPickDate,
             child: Container(
               padding: const EdgeInsets.symmetric(
-                  horizontal: Spacing.sm, vertical: Spacing.xs),
+                horizontal: Spacing.sm,
+                vertical: Spacing.xs,
+              ),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.6),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.6,
+                ),
                 borderRadius: Radii.borderFull,
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.calendar_today_rounded,
-                      size: 11,
-                      color: theme.colorScheme.onSurfaceVariant),
+                  Icon(
+                    Icons.calendar_today_rounded,
+                    size: 11,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                   const SizedBox(width: Spacing.xxs + 2),
                   Text(
                     isToday ? 'Today' : dateStr,
@@ -1815,18 +1919,23 @@ class _MetaRow extends StatelessWidget {
             onTap: onPickTime,
             child: Container(
               padding: const EdgeInsets.symmetric(
-                  horizontal: Spacing.sm, vertical: Spacing.xs),
+                horizontal: Spacing.sm,
+                vertical: Spacing.xs,
+              ),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.6),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.6,
+                ),
                 borderRadius: Radii.borderFull,
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.access_time_rounded,
-                      size: 11,
-                      color: theme.colorScheme.onSurfaceVariant),
+                  Icon(
+                    Icons.access_time_rounded,
+                    size: 11,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                   const SizedBox(width: Spacing.xxs + 2),
                   Text(
                     timeStr,
@@ -1863,14 +1972,18 @@ class _NoteField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: 'Add a note…',
         hintStyle: theme.textTheme.bodyMedium?.copyWith(
-          color:
-              theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
         ),
-        prefixIcon: Icon(Icons.edit_note_rounded,
-            size: 20, color: theme.colorScheme.onSurfaceVariant),
+        prefixIcon: Icon(
+          Icons.edit_note_rounded,
+          size: 20,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(
-            horizontal: Spacing.sm, vertical: Spacing.sm),
+          horizontal: Spacing.sm,
+          vertical: Spacing.sm,
+        ),
         filled: true,
         fillColor: theme.colorScheme.surfaceContainerLow,
         border: OutlineInputBorder(
@@ -1883,8 +1996,10 @@ class _NoteField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: Radii.borderMd,
-          borderSide:
-              BorderSide(color: accent.withValues(alpha: 0.5), width: 1.5),
+          borderSide: BorderSide(
+            color: accent.withValues(alpha: 0.5),
+            width: 1.5,
+          ),
         ),
       ),
     );
@@ -1914,13 +2029,13 @@ class _MoreOptionsToggle extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-            horizontal: Spacing.md, vertical: Spacing.xs),
+          horizontal: Spacing.md,
+          vertical: Spacing.xs,
+        ),
         child: Row(
           children: [
             Icon(
-              showMore
-                  ? Icons.expand_less_rounded
-                  : Icons.expand_more_rounded,
+              showMore ? Icons.expand_less_rounded : Icons.expand_more_rounded,
               size: 16,
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -1937,7 +2052,9 @@ class _MoreOptionsToggle extends StatelessWidget {
                 width: 6,
                 height: 6,
                 decoration: BoxDecoration(
-                    color: accent, shape: BoxShape.circle),
+                  color: accent,
+                  shape: BoxShape.circle,
+                ),
               ),
             ],
           ],
@@ -1984,8 +2101,7 @@ class _MoreOptions extends StatelessWidget {
     const frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-          Spacing.md, 0, Spacing.md, Spacing.xs),
+      padding: const EdgeInsets.fromLTRB(Spacing.md, 0, Spacing.md, Spacing.xs),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1994,24 +2110,21 @@ class _MoreOptions extends StatelessWidget {
             spacing: Spacing.xs,
             runSpacing: Spacing.xs,
             children: [
-              ...tags.map((tag) => InputChip(
-                    label: Text(tag,
-                        style: const TextStyle(fontSize: 11)),
-                    onDeleted: () => onTagRemoved(tag),
-                    deleteIcon: const Icon(Icons.close, size: 13),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: Radii.borderFull),
-                    visualDensity: VisualDensity.compact,
-                    padding: EdgeInsets.zero,
-                  )),
+              ...tags.map(
+                (tag) => InputChip(
+                  label: Text(tag, style: const TextStyle(fontSize: 11)),
+                  onDeleted: () => onTagRemoved(tag),
+                  deleteIcon: const Icon(Icons.close, size: 13),
+                  shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                ),
+              ),
               ActionChip(
-                avatar:
-                    const Icon(Icons.label_outline, size: 13),
-                label: const Text('Tag',
-                    style: TextStyle(fontSize: 11)),
+                avatar: const Icon(Icons.label_outline, size: 13),
+                label: const Text('Tag', style: TextStyle(fontSize: 11)),
                 onPressed: () => _addTagDialog(context),
-                shape: RoundedRectangleBorder(
-                    borderRadius: Radii.borderFull),
+                shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
               ),
@@ -2054,17 +2167,16 @@ class _MoreOptions extends StatelessWidget {
                 final isSel = recurringFrequency == f;
                 return Expanded(
                   child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: ChoiceChip(
-                      label: Text(f,
-                          style: const TextStyle(fontSize: 10)),
+                      label: Text(f, style: const TextStyle(fontSize: 10)),
                       selected: isSel,
                       onSelected: (s) {
                         if (s) onFrequencyChanged(f);
                       },
                       shape: RoundedRectangleBorder(
-                          borderRadius: Radii.borderFull),
+                        borderRadius: Radii.borderFull,
+                      ),
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
                     ),
@@ -2088,8 +2200,7 @@ class _MoreOptions extends StatelessWidget {
         content: TextField(
           controller: tagController,
           autofocus: true,
-          decoration:
-              const InputDecoration(hintText: 'Tag name…'),
+          decoration: const InputDecoration(hintText: 'Tag name…'),
           textCapitalization: TextCapitalization.words,
           onSubmitted: (_) {
             final t = tagController.text.trim();
@@ -2099,8 +2210,9 @@ class _MoreOptions extends StatelessWidget {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel')),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             onPressed: () {
               final t = tagController.text.trim();
@@ -2138,11 +2250,11 @@ class _ToggleTile extends StatelessWidget {
       child: AnimatedContainer(
         duration: AppDurations.fast,
         padding: const EdgeInsets.symmetric(
-            horizontal: Spacing.sm, vertical: Spacing.sm),
+          horizontal: Spacing.sm,
+          vertical: Spacing.sm,
+        ),
         decoration: BoxDecoration(
-          color: value
-              ? accent.withValues(alpha: 0.1)
-              : Colors.transparent,
+          color: value ? accent.withValues(alpha: 0.1) : Colors.transparent,
           border: Border.all(
             color: value
                 ? accent.withValues(alpha: 0.45)
@@ -2153,20 +2265,17 @@ class _ToggleTile extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FaIcon(icon,
-                size: 12,
-                color: value
-                    ? accent
-                    : theme.colorScheme.onSurfaceVariant),
+            FaIcon(
+              icon,
+              size: 12,
+              color: value ? accent : theme.colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(width: Spacing.xs),
             Text(
               label,
               style: theme.textTheme.labelSmall?.copyWith(
-                fontWeight:
-                    value ? FontWeight.w700 : FontWeight.w500,
-                color: value
-                    ? accent
-                    : theme.colorScheme.onSurfaceVariant,
+                fontWeight: value ? FontWeight.w700 : FontWeight.w500,
+                color: value ? accent : theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -2187,19 +2296,23 @@ class _ReceiptButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(
-            horizontal: Spacing.sm, vertical: Spacing.sm),
+          horizontal: Spacing.sm,
+          vertical: Spacing.sm,
+        ),
         decoration: BoxDecoration(
           border: Border.all(
-              color:
-                  theme.colorScheme.outline.withValues(alpha: 0.3)),
+            color: theme.colorScheme.outline.withValues(alpha: 0.3),
+          ),
           borderRadius: Radii.borderMd,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FaIcon(FontAwesomeIcons.camera,
-                size: 12,
-                color: theme.colorScheme.onSurfaceVariant),
+            FaIcon(
+              FontAwesomeIcons.camera,
+              size: 12,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(width: Spacing.xs),
             Text(
               'Receipt',
@@ -2262,17 +2375,12 @@ class _CalcPad extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _calcRow([
-            _CalcKey(label: '7', bg: bg, fg: fg,
-                onTap: () => onDigit('7')),
-            _CalcKey(label: '8', bg: bg, fg: fg,
-                onTap: () => onDigit('8')),
-            _CalcKey(label: '9', bg: bg, fg: fg,
-                onTap: () => onDigit('9')),
+            _CalcKey(label: '7', bg: bg, fg: fg, onTap: () => onDigit('7')),
+            _CalcKey(label: '8', bg: bg, fg: fg, onTap: () => onDigit('8')),
+            _CalcKey(label: '9', bg: bg, fg: fg, onTap: () => onDigit('9')),
             _CalcKey(
               label: '÷',
-              bg: pendingOperator == '÷'
-                  ? accent.withValues(alpha: 0.2)
-                  : opBg,
+              bg: pendingOperator == '÷' ? accent.withValues(alpha: 0.2) : opBg,
               fg: pendingOperator == '÷' ? accent : opFg,
               onTap: () => onOperator('÷'),
               fontWeight: FontWeight.w600,
@@ -2280,17 +2388,12 @@ class _CalcPad extends StatelessWidget {
           ]),
           const SizedBox(height: Spacing.xs),
           _calcRow([
-            _CalcKey(label: '4', bg: bg, fg: fg,
-                onTap: () => onDigit('4')),
-            _CalcKey(label: '5', bg: bg, fg: fg,
-                onTap: () => onDigit('5')),
-            _CalcKey(label: '6', bg: bg, fg: fg,
-                onTap: () => onDigit('6')),
+            _CalcKey(label: '4', bg: bg, fg: fg, onTap: () => onDigit('4')),
+            _CalcKey(label: '5', bg: bg, fg: fg, onTap: () => onDigit('5')),
+            _CalcKey(label: '6', bg: bg, fg: fg, onTap: () => onDigit('6')),
             _CalcKey(
               label: '×',
-              bg: pendingOperator == '×'
-                  ? accent.withValues(alpha: 0.2)
-                  : opBg,
+              bg: pendingOperator == '×' ? accent.withValues(alpha: 0.2) : opBg,
               fg: pendingOperator == '×' ? accent : opFg,
               onTap: () => onOperator('×'),
               fontWeight: FontWeight.w600,
@@ -2298,17 +2401,12 @@ class _CalcPad extends StatelessWidget {
           ]),
           const SizedBox(height: Spacing.xs),
           _calcRow([
-            _CalcKey(label: '1', bg: bg, fg: fg,
-                onTap: () => onDigit('1')),
-            _CalcKey(label: '2', bg: bg, fg: fg,
-                onTap: () => onDigit('2')),
-            _CalcKey(label: '3', bg: bg, fg: fg,
-                onTap: () => onDigit('3')),
+            _CalcKey(label: '1', bg: bg, fg: fg, onTap: () => onDigit('1')),
+            _CalcKey(label: '2', bg: bg, fg: fg, onTap: () => onDigit('2')),
+            _CalcKey(label: '3', bg: bg, fg: fg, onTap: () => onDigit('3')),
             _CalcKey(
               label: '−',
-              bg: pendingOperator == '−'
-                  ? accent.withValues(alpha: 0.2)
-                  : opBg,
+              bg: pendingOperator == '−' ? accent.withValues(alpha: 0.2) : opBg,
               fg: pendingOperator == '−' ? accent : opFg,
               onTap: () => onOperator('−'),
               fontWeight: FontWeight.w600,
@@ -2323,8 +2421,7 @@ class _CalcPad extends StatelessWidget {
               onTap: onDecimal,
               fontWeight: FontWeight.w700,
             ),
-            _CalcKey(label: '0', bg: bg, fg: fg,
-                onTap: () => onDigit('0')),
+            _CalcKey(label: '0', bg: bg, fg: fg, onTap: () => onDigit('0')),
             _CalcKey(
               icon: Icons.backspace_outlined,
               bg: bg,
@@ -2334,9 +2431,7 @@ class _CalcPad extends StatelessWidget {
             ),
             _CalcKey(
               label: '+',
-              bg: pendingOperator == '+'
-                  ? accent.withValues(alpha: 0.2)
-                  : opBg,
+              bg: pendingOperator == '+' ? accent.withValues(alpha: 0.2) : opBg,
               fg: pendingOperator == '+' ? accent : opFg,
               onTap: () => onOperator('+'),
               fontWeight: FontWeight.w600,
@@ -2374,8 +2469,10 @@ class _CalcPad extends StatelessWidget {
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                color: Colors.white))
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
                         : null,
                   ),
                 ),
@@ -2437,9 +2534,13 @@ class _CalcKeyState extends State<_CalcKey>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 70));
-    _scale = Tween<double>(begin: 1.0, end: 0.92).animate(
-        CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+      vsync: this,
+      duration: const Duration(milliseconds: 70),
+    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 0.92,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
   }
 
   @override
@@ -2468,10 +2569,10 @@ class _CalcKeyState extends State<_CalcKey>
             borderRadius: Radii.borderMd,
           ),
           child: Center(
-            child: widget.child ??
+            child:
+                widget.child ??
                 (widget.icon != null
-                    ? Icon(widget.icon,
-                        color: widget.fg, size: 22)
+                    ? Icon(widget.icon, color: widget.fg, size: 22)
                     : Text(
                         widget.label ?? '',
                         style: TextStyle(
@@ -2497,5 +2598,5 @@ final _activeAccountsProvider = FutureProvider<List<AccountModel>>((ref) {
 
 final _categoriesByTypeProvider =
     FutureProvider.family<List<CategoryModel>, int>((ref, type) {
-  return ref.watch(categoryRepositoryProvider).getByType(type);
-});
+      return ref.watch(categoryRepositoryProvider).getByType(type);
+    });
