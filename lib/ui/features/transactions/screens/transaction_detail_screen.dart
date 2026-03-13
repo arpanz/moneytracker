@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/di/providers.dart';
-import '../../../../config/constants/app_constants.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../config/theme/theme_extensions.dart';
@@ -69,6 +68,7 @@ class _TransactionDetailContent extends ConsumerWidget {
     final formatter = NumberFormat('#,##,###.##', 'en_IN');
     final dateFormat = DateFormat('EEEE, MMMM d, yyyy');
     final timeFormat = DateFormat('hh:mm a');
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -104,7 +104,7 @@ class _TransactionDetailContent extends ConsumerWidget {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          '$_amountPrefix${AppConstants.currencySymbol}'
+                          '$_amountPrefix$currencySymbol'
                           '${formatter.format(transaction.amount)}',
                           style: theme.textTheme.displayMedium?.copyWith(
                             fontSize: 42,
@@ -660,6 +660,7 @@ class _SplitSection extends StatelessWidget {
     final cheddarColors = theme.extension<CheddarColors>()!;
     final splitRepo = ref.watch(splitRepositoryProvider);
     final formatter = NumberFormat('#,##,###.##', 'en_IN');
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     return FutureBuilder<SplitModel?>(
       future: splitRepo.getById(int.tryParse(splitId) ?? 0),
@@ -696,7 +697,7 @@ class _SplitSection extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    'Total: ${AppConstants.currencySymbol}'
+                    'Total: $currencySymbol'
                     '${formatter.format(split.totalAmount)}',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
@@ -759,7 +760,7 @@ class _SplitSection extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${AppConstants.currencySymbol}'
+                        '$currencySymbol'
                         '${formatter.format(participant.amount)}',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,

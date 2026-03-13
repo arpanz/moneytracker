@@ -50,6 +50,8 @@ final activeAccountIdProvider = StateProvider<int>((ref) {
 // ── Total Balance ────────────────────────────────────────────────────────────
 
 final totalBalanceProvider = FutureProvider<double>((ref) async {
+  ref.watch(accountStreamProvider);
+  ref.watch(transactionStreamProvider);
   final activeId = ref.watch(activeAccountIdProvider);
   final repo = ref.watch(accountRepositoryProvider);
   if (activeId == -1) {
@@ -62,6 +64,7 @@ final totalBalanceProvider = FutureProvider<double>((ref) async {
 // ── Monthly Income ───────────────────────────────────────────────────────────
 
 final monthlyIncomeProvider = FutureProvider<double>((ref) async {
+  ref.watch(transactionStreamProvider);
   final activeId = ref.watch(activeAccountIdProvider);
   final repo = ref.watch(transactionRepositoryProvider);
   if (activeId == -1) {
@@ -69,16 +72,19 @@ final monthlyIncomeProvider = FutureProvider<double>((ref) async {
   }
   final txns = await repo.getByAccount(activeId.toString());
   return txns
-      .where((t) =>
-          t.type == 0 &&
-          !t.date.isBefore(_monthStart()) &&
-          !t.date.isAfter(_monthEnd()))
-      .fold(0.0, (s, t) => s + t.amount);
+      .where(
+        (t) =>
+            t.type == 0 &&
+            !t.date.isBefore(_monthStart()) &&
+            !t.date.isAfter(_monthEnd()),
+      )
+      .fold<double>(0.0, (s, t) => s + t.amount);
 });
 
 // ── Monthly Expense ──────────────────────────────────────────────────────────
 
 final monthlyExpenseProvider = FutureProvider<double>((ref) async {
+  ref.watch(transactionStreamProvider);
   final activeId = ref.watch(activeAccountIdProvider);
   final repo = ref.watch(transactionRepositoryProvider);
   if (activeId == -1) {
@@ -86,17 +92,21 @@ final monthlyExpenseProvider = FutureProvider<double>((ref) async {
   }
   final txns = await repo.getByAccount(activeId.toString());
   return txns
-      .where((t) =>
-          t.type == 1 &&
-          !t.date.isBefore(_monthStart()) &&
-          !t.date.isAfter(_monthEnd()))
-      .fold(0.0, (s, t) => s + t.amount);
+      .where(
+        (t) =>
+            t.type == 1 &&
+            !t.date.isBefore(_monthStart()) &&
+            !t.date.isAfter(_monthEnd()),
+      )
+      .fold<double>(0.0, (s, t) => s + t.amount);
 });
 
 // ── Recent Transactions ──────────────────────────────────────────────────────
 
-final recentTransactionsProvider =
-    FutureProvider<List<TransactionModel>>((ref) async {
+final recentTransactionsProvider = FutureProvider<List<TransactionModel>>((
+  ref,
+) async {
+  ref.watch(transactionStreamProvider);
   final activeId = ref.watch(activeAccountIdProvider);
   final repo = ref.watch(transactionRepositoryProvider);
   if (activeId == -1) {
@@ -108,8 +118,8 @@ final recentTransactionsProvider =
 
 // ── Category Totals ───────────────────────────────────────────────────────────
 
-final categoryTotalsProvider =
-    FutureProvider<Map<String, double>>((ref) async {
+final categoryTotalsProvider = FutureProvider<Map<String, double>>((ref) async {
+  ref.watch(transactionStreamProvider);
   final activeId = ref.watch(activeAccountIdProvider);
   final repo = ref.watch(transactionRepositoryProvider);
   if (activeId == -1) {

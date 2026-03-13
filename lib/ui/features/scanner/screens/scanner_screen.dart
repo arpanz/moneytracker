@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../../../app/di/providers.dart';
 import '../../../../config/constants/app_constants.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
@@ -278,14 +279,14 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     Navigator.of(context).pop();
 
     // Create a pre-filled transaction model and navigate to add screen
-    final transaction = TransactionModel()
-      ..amount = data.totalAmount ?? 0.0
-      ..type =
-          1 // expense
-      ..note = data.merchantName ?? ''
-      ..date = data.date ?? DateTime.now()
-      ..receiptImagePath = savedImagePath
-      ..createdAt = DateTime.now();
+    final transaction = TransactionModel(
+      amount: data.totalAmount ?? 0.0,
+      type: 1, // expense
+      note: data.merchantName ?? '',
+      date: data.date ?? DateTime.now(),
+      receiptImagePath: savedImagePath,
+      createdAt: DateTime.now(),
+    );
 
     context.pushNamed(RouteNames.addTransaction, extra: transaction);
   }
@@ -751,16 +752,18 @@ class _ReceiptResultSheetState extends State<_ReceiptResultSheet> {
                   Row(
                     children: [
                       Expanded(
-                        child: TextField(
-                          controller: _amountController,
-                          onChanged: (_) => _notifyChanges(),
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          decoration: InputDecoration(
-                            labelText: 'Total Amount',
-                            prefixText: '${AppConstants.currencySymbol} ',
-                            prefixIcon: const Icon(Icons.currency_rupee),
+                        child: Consumer(
+                          builder: (context, ref, _) => TextField(
+                            controller: _amountController,
+                            onChanged: (_) => _notifyChanges(),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            decoration: InputDecoration(
+                              labelText: 'Total Amount',
+                              prefixText: '${ref.watch(currencySymbolProvider)} ',
+                              prefixIcon: const Icon(Icons.currency_exchange),
+                            ),
                           ),
                         ),
                       ),

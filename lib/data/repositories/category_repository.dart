@@ -1,136 +1,162 @@
-import 'package:isar/isar.dart';
+import 'package:drift/drift.dart';
 
 import '../../domain/models/category_model.dart';
-import '../../config/constants/asset_paths.dart';
 import '../local/database_service.dart';
 
 /// Repository for managing transaction categories.
-///
-/// Provides CRUD operations, type-based filtering, custom category queries,
-/// default category seeding, and a real-time watch stream.
 class CategoryRepository {
   final DatabaseService _db;
 
   CategoryRepository(this._db);
 
-  Isar get _isar => _db.isar;
+  AppDatabase get _d => _db.db;
 
-  // ── CRUD ──────────────────────────────────────────────────────────────────
+  // ── Mapping ──────────────────────────────────────────────────────────────
 
-  /// Inserts a new category and returns its auto-generated id.
-  Future<int> add(CategoryModel category) async {
-    return _isar.writeTxn(() async {
-      return _isar.categoryModels.put(category);
-    });
-  }
+  CategoryModel _fromRow(Category row) => CategoryModel(
+        id: row.id,
+        name: row.name,
+        icon: row.icon,
+        color: row.color,
+        type: row.type,
+        isCustom: row.isCustom,
+        parentId: row.parentId,
+        sortOrder: row.sortOrder,
+        createdAt: row.createdAt,
+      );
 
-  /// Updates an existing category in-place.
+  CategoriesCompanion _toCompanion(CategoryModel c) =>
+      CategoriesCompanion.insert(
+        name: c.name,
+        icon: c.icon,
+        color: Value(c.color),
+        type: Value(c.type),
+        isCustom: Value(c.isCustom),
+        parentId: Value(c.parentId),
+        sortOrder: Value(c.sortOrder),
+        createdAt: c.createdAt,
+      );
+
+  // ── CRUD ─────────────────────────────────────────────────────────────────
+
+  Future<int> add(CategoryModel category) =>
+      _d.into(_d.categories).insert(_toCompanion(category));
+
   Future<void> update(CategoryModel category) async {
-    await _isar.writeTxn(() async {
-      await _isar.categoryModels.put(category);
-    });
+    await (_d.update(_d.categories)
+          ..where((c) => c.id.equals(category.id)))
+        .write(CategoriesCompanion(
+      name: Value(category.name),
+      icon: Value(category.icon),
+      color: Value(category.color),
+      type: Value(category.type),
+      isCustom: Value(category.isCustom),
+      parentId: Value(category.parentId),
+      sortOrder: Value(category.sortOrder),
+    ));
   }
 
-  /// Deletes a category by its id.
   Future<void> delete(int id) async {
-    await _isar.writeTxn(() async {
-      await _isar.categoryModels.delete(id);
-    });
+    await (_d.delete(_d.categories)..where((c) => c.id.equals(id))).go();
   }
 
-  /// Retrieves a single category by id, or null if not found.
   Future<CategoryModel?> getById(int id) async {
-    return _isar.categoryModels.get(id);
+    final row = await (_d.select(_d.categories)
+          ..where((c) => c.id.equals(id)))
+        .getSingleOrNull();
+    return row == null ? null : _fromRow(row);
   }
 
-  /// Returns all categories ordered by sort order.
   Future<List<CategoryModel>> getAll() async {
-    return _isar.categoryModels
-        .where()
-        .sortBySortOrder()
-        .findAll();
+    final rows = await (_d.select(_d.categories)
+          ..orderBy([
+            (c) => OrderingTerm.asc(c.sortOrder),
+            (c) => OrderingTerm.asc(c.name),
+          ]))
+        .get();
+    return rows.map(_fromRow).toList();
   }
 
-  // ── FILTERED QUERIES ─────────────────────────────────────────────────────
-
-  /// Returns categories of a given type (0=expense, 1=income, 2=both).
-  ///
-  /// Also includes categories marked as type 2 (both) in the results.
   Future<List<CategoryModel>> getByType(int type) async {
-    return _isar.categoryModels
-        .filter()
-        .typeEqualTo(type)
-        .or()
-        .typeEqualTo(2) // include "both" categories
-        .sortBySortOrder()
-        .findAll();
+    final rows = await (_d.select(_d.categories)
+          ..where((c) => c.type.equals(type) | c.type.equals(2))
+          ..orderBy([
+            (c) => OrderingTerm.asc(c.sortOrder),
+            (c) => OrderingTerm.asc(c.name),
+          ]))
+        .get();
+    return rows.map(_fromRow).toList();
   }
 
-  /// Returns all user-created (custom) categories.
   Future<List<CategoryModel>> getCustom() async {
-    return _isar.categoryModels
-        .filter()
-        .isCustomEqualTo(true)
-        .sortBySortOrder()
-        .findAll();
+    final rows = await (_d.select(_d.categories)
+          ..where((c) => c.isCustom.equals(true)))
+        .get();
+    return rows.map(_fromRow).toList();
   }
 
-  // ── SEED DEFAULTS ────────────────────────────────────────────────────────
+  Future<bool> exists(String name, int type) async {
+    final row = await (_d.select(_d.categories)
+          ..where((c) => c.name.equals(name) & c.type.equals(type)))
+        .getSingleOrNull();
+    return row != null;
+  }
 
-  /// Seeds the 16 default categories if the collection is empty.
-  ///
-  /// Called during app initialization to ensure categories are available
-  /// on first launch. Does nothing if categories already exist.
-  Future<void> seedDefaults() async {
-    final count = await _isar.categoryModels.count();
-    if (count > 0) return;
+  /// Seeds the default categories if the table is empty.
+  Future<void> seedDefaultsIfEmpty() async {
+    final count = await _d.select(_d.categories).get();
+    if (count.isNotEmpty) return;
 
-    final defaults = <CategoryModel>[
-      _makeCategory('Food', AssetPaths.categoryFood, 0xFFFF6B6B, 0, 0),
-      _makeCategory('Transport', AssetPaths.categoryTransport, 0xFF4ECDC4, 0, 1),
-      _makeCategory('Shopping', AssetPaths.categoryShopping, 0xFFFF8A65, 0, 2),
-      _makeCategory('Bills', AssetPaths.categoryBills, 0xFFFFD93D, 0, 3),
-      _makeCategory('Entertainment', AssetPaths.categoryEntertainment, 0xFFA78BFA, 0, 4),
-      _makeCategory('Health', AssetPaths.categoryHealth, 0xFFEF4444, 0, 5),
-      _makeCategory('Education', AssetPaths.categoryEducation, 0xFF60A5FA, 0, 6),
-      _makeCategory('Travel', AssetPaths.categoryTravel, 0xFF34D399, 0, 7),
-      _makeCategory('Gifts', AssetPaths.categoryGifts, 0xFFF472B6, 0, 8),
-      _makeCategory('Rent', AssetPaths.categoryRent, 0xFF8B5CF6, 0, 9),
-      _makeCategory('Groceries', AssetPaths.categoryGroceries, 0xFF10B981, 0, 10),
-      _makeCategory('Pets', AssetPaths.categoryPets, 0xFFFBBF24, 0, 11),
-      _makeCategory('Subscriptions', AssetPaths.categorySubscriptions, 0xFF6366F1, 0, 12),
-      _makeCategory('Salary', AssetPaths.categorySalary, 0xFF22C55E, 1, 13),
-      _makeCategory('Freelance', AssetPaths.categoryFreelance, 0xFF06B6D4, 1, 14),
-      _makeCategory('Investments', AssetPaths.categoryInvestments, 0xFF14B8A6, 2, 15),
+    final defaults = _defaultCategories();
+    for (final cat in defaults) {
+      await add(cat);
+    }
+  }
+
+  List<CategoryModel> _defaultCategories() {
+    final now = DateTime.now();
+    var order = 0;
+
+    CategoryModel make(
+      String name,
+      String icon,
+      int color,
+      int type, {
+      bool isCustom = false,
+    }) =>
+        CategoryModel(
+          name: name,
+          icon: icon,
+          color: color,
+          type: type,
+          isCustom: isCustom,
+          sortOrder: order++,
+          createdAt: now,
+        );
+
+    return [
+      // Expense categories
+      make('Food', 'assets/svg/categories/food.svg', 0xFFFF6B6B, 0),
+      make('Transport', 'assets/svg/categories/transport.svg', 0xFF4ECDC4, 0),
+      make('Shopping', 'assets/svg/categories/shopping.svg', 0xFFFFE66D, 0),
+      make('Bills', 'assets/svg/categories/bills.svg', 0xFF95E1D3, 0),
+      make('Entertainment', 'assets/svg/categories/entertainment.svg', 0xFFF38181, 0),
+      make('Health', 'assets/svg/categories/health.svg', 0xFF6BCB77, 0),
+      make('Education', 'assets/svg/categories/education.svg', 0xFF4D96FF, 0),
+      make('Travel', 'assets/svg/categories/travel.svg', 0xFFFF9F1C, 0),
+      make('Gifts', 'assets/svg/categories/gifts.svg', 0xFFE76F51, 0),
+      make('Rent', 'assets/svg/categories/rent.svg', 0xFF9B5DE5, 0),
+      make('Groceries', 'assets/svg/categories/groceries.svg', 0xFF56CFE1, 0),
+      make('Pets', 'assets/svg/categories/pets.svg', 0xFFFF99C8, 0),
+      make('Subscriptions', 'assets/svg/categories/subscriptions.svg', 0xFF7209B7, 0),
+      make('Other', 'assets/svg/categories/other.svg', 0xFF9E9E9E, 0),
+      // Income categories
+      make('Salary', 'assets/svg/categories/salary.svg', 0xFF2EC4B6, 1),
+      make('Freelance', 'assets/svg/categories/freelance.svg', 0xFFFF9F1C, 1),
+      make('Investments', 'assets/svg/categories/investments.svg', 0xFF6BCB77, 1),
     ];
-
-    await _isar.writeTxn(() async {
-      await _isar.categoryModels.putAll(defaults);
-    });
   }
 
-  /// Helper to construct a default category.
-  CategoryModel _makeCategory(
-    String name,
-    String icon,
-    int color,
-    int type,
-    int sortOrder,
-  ) {
-    return CategoryModel()
-      ..name = name
-      ..icon = icon
-      ..color = color
-      ..type = type
-      ..isCustom = false
-      ..sortOrder = sortOrder
-      ..createdAt = DateTime.now();
-  }
-
-  // ── REAL-TIME STREAM ─────────────────────────────────────────────────────
-
-  /// Watches the entire category collection for any changes.
-  Stream<void> watchAll() {
-    return _isar.categoryModels.watchLazy();
-  }
+  Stream<void> watchAll() =>
+      _d.select(_d.categories).watch().map((_) {});
 }

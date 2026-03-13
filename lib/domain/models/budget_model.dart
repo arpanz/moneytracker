@@ -1,32 +1,28 @@
-import 'package:isar/isar.dart';
-
-part 'budget_model.g.dart';
-
 /// Represents a spending budget for a specific category.
-@collection
 class BudgetModel {
-  Id id = Isar.autoIncrement;
+  int id;
 
-  @Index()
-  late String category;
+  String category;
 
-  late double limitAmount;
+  double limitAmount;
 
   /// 0 = weekly, 1 = monthly, 2 = yearly
-  late int period;
+  int period;
 
-  late DateTime startDate;
+  DateTime startDate;
 
-  late bool isActive;
+  bool isActive;
 
-  late DateTime createdAt;
+  DateTime createdAt;
 
-  /// Composite index on [category, period] for unique budget lookups.
-  @Index(composite: [CompositeIndex('period')])
-  String get compositeCategoryPeriod => category;
-
-  BudgetModel()
-      : period = 1,
-        isActive = true,
-        createdAt = DateTime.now();
+  BudgetModel({
+    this.id = 0,
+    this.category = '',
+    this.limitAmount = 0.0,
+    this.period = 1,
+    DateTime? startDate,
+    this.isActive = true,
+    DateTime? createdAt,
+  })  : startDate = startDate ?? DateTime.now(),
+        createdAt = createdAt ?? DateTime.now();
 }

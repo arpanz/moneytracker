@@ -12,6 +12,7 @@ import '../../data/repositories/loan_repository.dart';
 import '../../data/repositories/split_repository.dart';
 import '../../data/repositories/subscription_repository.dart';
 import '../../data/repositories/transaction_repository.dart';
+import '../../data/services/export_service.dart';
 
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError('SharedPreferences must be overridden in main');
@@ -51,6 +52,17 @@ final splitRepositoryProvider = Provider<SplitRepository>((ref) {
 
 final loanRepositoryProvider = Provider<LoanRepository>((ref) {
   return LoanRepository(ref.watch(databaseServiceProvider));
+});
+
+final exportServiceProvider = Provider<ExportService>((ref) {
+  return ExportService(
+    transactionRepo: ref.watch(transactionRepositoryProvider),
+    accountRepo: ref.watch(accountRepositoryProvider),
+    budgetRepo: ref.watch(budgetRepositoryProvider),
+    goalRepo: ref.watch(goalRepositoryProvider),
+    subscriptionRepo: ref.watch(subscriptionRepositoryProvider),
+    splitRepo: ref.watch(splitRepositoryProvider),
+  );
 });
 
 final currencyCodeProvider = StateProvider<String>((ref) {

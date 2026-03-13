@@ -1,41 +1,40 @@
-import 'package:isar/isar.dart';
-
-part 'account_model.g.dart';
-
 /// Represents a financial account (checking, savings, credit, cash, investment).
-@collection
 class AccountModel {
-  Id id = Isar.autoIncrement;
+  int id;
 
-  @Index(unique: true)
-  late String name;
+  /// Unique account name.
+  String name;
 
   /// 0 = checking, 1 = savings, 2 = credit, 3 = cash, 4 = investment
-  @Index()
-  late int accountType;
+  int accountType;
 
-  late double balance;
+  double balance;
 
   /// Only applicable for credit card accounts.
   double? creditLimit;
 
-  late String currency;
+  String currency;
 
   /// FontAwesome icon name (e.g. 'wallet', 'credit-card').
-  late String icon;
+  String icon;
 
   /// Color value stored as int (e.g. 0xFF4CAF50).
-  late int color;
+  int color;
 
-  late bool isArchived;
+  bool isArchived;
 
-  late DateTime createdAt;
+  DateTime createdAt;
 
-  AccountModel()
-      : balance = 0.0,
-        currency = 'INR',
-        icon = 'wallet',
-        color = 0xFF4CAF50,
-        isArchived = false,
-        createdAt = DateTime.now();
+  AccountModel({
+    this.id = 0,
+    this.name = '',
+    this.accountType = 0,
+    this.balance = 0.0,
+    this.creditLimit,
+    this.currency = 'INR',
+    this.icon = 'wallet',
+    this.color = 0xFF4CAF50,
+    this.isArchived = false,
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 }

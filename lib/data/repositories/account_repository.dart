@@ -1,129 +1,132 @@
-import 'package:isar/isar.dart';
+import 'package:drift/drift.dart';
 
 import '../../domain/models/account_model.dart';
 import '../local/database_service.dart';
 
 /// Repository for managing financial accounts.
-///
-/// Provides CRUD operations, balance calculations, net worth,
-/// archiving, and a real-time watch stream.
 class AccountRepository {
   final DatabaseService _db;
 
   AccountRepository(this._db);
 
-  Isar get _isar => _db.isar;
+  AppDatabase get _d => _db.db;
 
-  // ── CRUD ──────────────────────────────────────────────────────────────────
+  // ── Mapping ──────────────────────────────────────────────────────────────
 
-  /// Inserts a new account and returns its auto-generated id.
-  Future<int> add(AccountModel account) async {
-    return _isar.writeTxn(() async {
-      return _isar.accountModels.put(account);
-    });
-  }
+  AccountModel _fromRow(Account row) => AccountModel(
+        id: row.id,
+        name: row.name,
+        accountType: row.accountType,
+        balance: row.balance,
+        creditLimit: row.creditLimit,
+        currency: row.currency,
+        icon: row.icon,
+        color: row.color,
+        isArchived: row.isArchived,
+        createdAt: row.createdAt,
+      );
 
-  /// Updates an existing account in-place.
+  AccountsCompanion _toCompanion(AccountModel a) =>
+      AccountsCompanion.insert(
+        name: a.name,
+        accountType: Value(a.accountType),
+        balance: Value(a.balance),
+        creditLimit: Value(a.creditLimit),
+        currency: Value(a.currency),
+        icon: Value(a.icon),
+        color: Value(a.color),
+        isArchived: Value(a.isArchived),
+        createdAt: a.createdAt,
+      );
+
+  // ── CRUD ─────────────────────────────────────────────────────────────────
+
+  Future<int> add(AccountModel account) =>
+      _d.into(_d.accounts).insert(_toCompanion(account));
+
   Future<void> update(AccountModel account) async {
-    await _isar.writeTxn(() async {
-      await _isar.accountModels.put(account);
-    });
+    await (_d.update(_d.accounts)
+          ..where((a) => a.id.equals(account.id)))
+        .write(AccountsCompanion(
+      name: Value(account.name),
+      accountType: Value(account.accountType),
+      balance: Value(account.balance),
+      creditLimit: Value(account.creditLimit),
+      currency: Value(account.currency),
+      icon: Value(account.icon),
+      color: Value(account.color),
+      isArchived: Value(account.isArchived),
+    ));
   }
 
-  /// Deletes an account by its id.
   Future<void> delete(int id) async {
-    await _isar.writeTxn(() async {
-      await _isar.accountModels.delete(id);
-    });
+    await (_d.delete(_d.accounts)..where((a) => a.id.equals(id))).go();
   }
 
-  /// Retrieves a single account by id, or null if not found.
   Future<AccountModel?> getById(int id) async {
-    return _isar.accountModels.get(id);
+    final row = await (_d.select(_d.accounts)
+          ..where((a) => a.id.equals(id)))
+        .getSingleOrNull();
+    return row == null ? null : _fromRow(row);
   }
 
-  /// Returns all accounts ordered by name.
   Future<List<AccountModel>> getAll() async {
-    return _isar.accountModels
-        .where()
-        .sortByName()
-        .findAll();
+    final rows = await (_d.select(_d.accounts)
+          ..orderBy([(a) => OrderingTerm.asc(a.name)]))
+        .get();
+    return rows.map(_fromRow).toList();
   }
 
-  // ── FILTERED QUERIES ─────────────────────────────────────────────────────
+  // ── Filtered Queries ─────────────────────────────────────────────────────
 
-  /// Returns accounts of a given type (0=checking, 1=savings, etc.).
   Future<List<AccountModel>> getByType(int type) async {
-    return _isar.accountModels
-        .where()
-        .accountTypeEqualTo(type)
-        .sortByName()
-        .findAll();
+    final rows = await (_d.select(_d.accounts)
+          ..where((a) => a.accountType.equals(type))
+          ..orderBy([(a) => OrderingTerm.asc(a.name)]))
+        .get();
+    return rows.map(_fromRow).toList();
   }
 
-  /// Returns all non-archived (active) accounts.
   Future<List<AccountModel>> getActive() async {
-    return _isar.accountModels
-        .filter()
-        .isArchivedEqualTo(false)
-        .sortByName()
-        .findAll();
+    final rows = await (_d.select(_d.accounts)
+          ..where((a) => a.isArchived.equals(false))
+          ..orderBy([(a) => OrderingTerm.asc(a.name)]))
+        .get();
+    return rows.map(_fromRow).toList();
   }
 
-  // ── BALANCE OPERATIONS ───────────────────────────────────────────────────
+  // ── Balance Operations ────────────────────────────────────────────────────
 
-  /// Calculates the sum of all active account balances.
-  ///
-  /// Excludes archived accounts.
   Future<double> getTotalBalance() async {
     final accounts = await getActive();
     return accounts.fold<double>(0.0, (sum, a) => sum + a.balance);
   }
 
-  /// Calculates net worth: total assets minus credit card balances.
-  ///
-  /// Credit accounts (type 2) are treated as liabilities. All other
-  /// non-archived accounts are treated as assets.
   Future<double> getNetWorth() async {
     final accounts = await getActive();
     double netWorth = 0.0;
-    for (final account in accounts) {
-      if (account.accountType == 2) {
-        // Credit card: negative balance is debt owed
-        netWorth -= account.balance.abs();
+    for (final a in accounts) {
+      if (a.accountType == 2) {
+        netWorth -= a.balance.abs();
       } else {
-        netWorth += account.balance;
+        netWorth += a.balance;
       }
     }
     return netWorth;
   }
 
-  /// Directly updates the balance of a specific account.
   Future<void> updateBalance(int id, double newBalance) async {
-    await _isar.writeTxn(() async {
-      final account = await _isar.accountModels.get(id);
-      if (account != null) {
-        account.balance = newBalance;
-        await _isar.accountModels.put(account);
-      }
-    });
+    await (_d.update(_d.accounts)..where((a) => a.id.equals(id)))
+        .write(AccountsCompanion(balance: Value(newBalance)));
   }
 
-  /// Archives an account so it no longer appears in active lists.
   Future<void> archive(int id) async {
-    await _isar.writeTxn(() async {
-      final account = await _isar.accountModels.get(id);
-      if (account != null) {
-        account.isArchived = true;
-        await _isar.accountModels.put(account);
-      }
-    });
+    await (_d.update(_d.accounts)..where((a) => a.id.equals(id)))
+        .write(const AccountsCompanion(isArchived: Value(true)));
   }
 
-  // ── REAL-TIME STREAM ─────────────────────────────────────────────────────
+  // ── Real-Time Stream ─────────────────────────────────────────────────────
 
-  /// Watches the entire account collection for any changes.
-  Stream<void> watchAll() {
-    return _isar.accountModels.watchLazy();
-  }
+  Stream<void> watchAll() =>
+      _d.select(_d.accounts).watch().map((_) {});
 }

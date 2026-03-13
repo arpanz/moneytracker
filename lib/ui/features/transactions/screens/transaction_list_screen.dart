@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../config/constants/app_constants.dart';
+import '../../../../app/di/providers.dart';
 import '../../../../config/constants/asset_paths.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
@@ -286,7 +286,7 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
         title: const Text('Delete Transaction'),
         content: Text(
           'Are you sure you want to delete this ${txn.category} '
-          'transaction of ${AppConstants.currencySymbol}'
+          'transaction of ${ref.read(currencySymbolProvider)}'
           '${NumberFormat('#,##,###.##', 'en_IN').format(txn.amount)}?',
         ),
         actions: [
@@ -375,7 +375,7 @@ class _FilterChip extends StatelessWidget {
 
 // ── Date Section Header ─────────────────────────────────────────────────────
 
-class _DateSectionHeader extends StatelessWidget {
+class _DateSectionHeader extends ConsumerWidget {
   final DateTime date;
   final double dayTotal;
   final CheddarColors cheddarColors;
@@ -398,10 +398,11 @@ class _DateSectionHeader extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final formatter = NumberFormat('#,##,###.##', 'en_IN');
     final isPositive = dayTotal >= 0;
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(
@@ -423,7 +424,7 @@ class _DateSectionHeader extends StatelessWidget {
             ),
           ),
           Text(
-            '${isPositive ? '+' : '-'}${AppConstants.currencySymbol}'
+            '${isPositive ? '+' : '-'}$currencySymbol'
             '${formatter.format(dayTotal.abs())}',
             style: theme.textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.w600,
@@ -438,7 +439,7 @@ class _DateSectionHeader extends StatelessWidget {
 
 // ── Transaction Tile ────────────────────────────────────────────────────────
 
-class _TransactionTile extends StatelessWidget {
+class _TransactionTile extends ConsumerWidget {
   final TransactionModel transaction;
   final CheddarColors cheddarColors;
   final VoidCallback onTap;
@@ -496,9 +497,10 @@ class _TransactionTile extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final formatter = NumberFormat('#,##,###.##', 'en_IN');
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Dismissible(
       key: ValueKey(transaction.id),
@@ -572,7 +574,7 @@ class _TransactionTile extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: Text(
-              '$_amountPrefix${AppConstants.currencySymbol}'
+              '$_amountPrefix$currencySymbol'
               '${formatter.format(transaction.amount)}',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,

@@ -250,15 +250,16 @@ class ExportService {
     'createdAt': t.createdAt.toIso8601String(),
   };
 
-  TransactionModel _txnFromJson(Map<String, dynamic> j) => TransactionModel()
-    ..amount = (j['amount'] as num).toDouble()
-    ..type = j['type'] as int
-    ..category = j['category'] as String
-    ..note = j['note'] as String?
-    ..date = DateTime.parse(j['date'] as String)
-    ..accountId = j['accountId'] as String
-    ..receiptImagePath = j['receiptImagePath'] as String?
-    ..createdAt = DateTime.parse(j['createdAt'] as String);
+  TransactionModel _txnFromJson(Map<String, dynamic> j) => TransactionModel(
+    amount: (j['amount'] as num).toDouble(),
+    type: j['type'] as int,
+    category: j['category'] as String,
+    note: j['note'] as String?,
+    date: DateTime.parse(j['date'] as String),
+    accountId: j['accountId'] as String,
+    receiptImagePath: j['receiptImagePath'] as String?,
+    createdAt: DateTime.parse(j['createdAt'] as String),
+  );
 
   Map<String, dynamic> _accountToJson(AccountModel a) => {
     'name': a.name,
@@ -267,11 +268,12 @@ class ExportService {
     'createdAt': a.createdAt.toIso8601String(),
   };
 
-  AccountModel _accountFromJson(Map<String, dynamic> j) => AccountModel()
-    ..name = j['name'] as String
-    ..accountType = j['accountType'] as int
-    ..balance = (j['balance'] as num).toDouble()
-    ..createdAt = DateTime.parse(j['createdAt'] as String);
+  AccountModel _accountFromJson(Map<String, dynamic> j) => AccountModel(
+    name: j['name'] as String,
+    accountType: j['accountType'] as int,
+    balance: (j['balance'] as num).toDouble(),
+    createdAt: DateTime.parse(j['createdAt'] as String),
+  );
 
   Map<String, dynamic> _budgetToJson(BudgetModel b) => {
     'category': b.category,
@@ -280,11 +282,12 @@ class ExportService {
     'createdAt': b.createdAt.toIso8601String(),
   };
 
-  BudgetModel _budgetFromJson(Map<String, dynamic> j) => BudgetModel()
-    ..category = j['category'] as String
-    ..limitAmount = (j['limitAmount'] as num).toDouble()
-    ..period = j['period'] as int
-    ..createdAt = DateTime.parse(j['createdAt'] as String);
+  BudgetModel _budgetFromJson(Map<String, dynamic> j) => BudgetModel(
+    category: j['category'] as String,
+    limitAmount: (j['limitAmount'] as num).toDouble(),
+    period: j['period'] as int,
+    createdAt: DateTime.parse(j['createdAt'] as String),
+  );
 
   Map<String, dynamic> _goalToJson(GoalModel g) => {
     'name': g.name,
@@ -297,15 +300,16 @@ class ExportService {
     'createdAt': g.createdAt.toIso8601String(),
   };
 
-  GoalModel _goalFromJson(Map<String, dynamic> j) => GoalModel()
-    ..name = j['name'] as String
-    ..targetAmount = (j['targetAmount'] as num).toDouble()
-    ..currentAmount = (j['currentAmount'] as num).toDouble()
-    ..deadline = DateTime.parse(j['deadline'] as String)
-    ..icon = j['icon'] as String
-    ..color = j['color'] as int
-    ..linkedAccountId = j['linkedAccountId'] as String?
-    ..createdAt = DateTime.parse(j['createdAt'] as String);
+  GoalModel _goalFromJson(Map<String, dynamic> j) => GoalModel(
+    name: j['name'] as String,
+    targetAmount: (j['targetAmount'] as num).toDouble(),
+    currentAmount: (j['currentAmount'] as num).toDouble(),
+    deadline: j['deadline'] != null ? DateTime.parse(j['deadline'] as String) : null,
+    icon: j['icon'] as String,
+    color: j['color'] as int,
+    linkedAccountId: j['linkedAccountId'] as String?,
+    createdAt: DateTime.parse(j['createdAt'] as String),
+  );
 
   Map<String, dynamic> _subscriptionToJson(SubscriptionModel s) => {
     'name': s.name,
@@ -321,17 +325,18 @@ class ExportService {
   };
 
   SubscriptionModel _subscriptionFromJson(Map<String, dynamic> j) =>
-      SubscriptionModel()
-        ..name = j['name'] as String
-        ..amount = (j['amount'] as num).toDouble()
-        ..frequency = j['frequency'] as int
-        ..nextBillDate = DateTime.parse(j['nextBillDate'] as String)
-        ..category = j['category'] as String? ?? 'Subscriptions'
-        ..logoUrl = j['logoUrl'] as String?
-        ..notes = j['notes'] as String?
-        ..isActive = j['isActive'] as bool? ?? true
-        ..isAutoDetected = j['isAutoDetected'] as bool? ?? false
-        ..createdAt = DateTime.parse(j['createdAt'] as String);
+      SubscriptionModel(
+        name: j['name'] as String,
+        amount: (j['amount'] as num).toDouble(),
+        frequency: j['frequency'] as int,
+        nextBillDate: DateTime.parse(j['nextBillDate'] as String),
+        category: j['category'] as String? ?? 'Subscriptions',
+        logoUrl: j['logoUrl'] as String?,
+        notes: j['notes'] as String?,
+        isActive: j['isActive'] as bool? ?? true,
+        isAutoDetected: j['isAutoDetected'] as bool? ?? false,
+        createdAt: DateTime.parse(j['createdAt'] as String),
+      );
 
   Map<String, dynamic> _splitToJson(SplitModel s) => {
     'description': s.description,
@@ -353,23 +358,23 @@ class ExportService {
   };
 
   SplitModel _splitFromJson(Map<String, dynamic> j) {
-    final split = SplitModel()
-      ..description = j['description'] as String
-      ..totalAmount = (j['totalAmount'] as num).toDouble()
-      ..splitMethod = j['splitMethod'] as int
-      ..isFullySettled = j['isFullySettled'] as bool? ?? false
-      ..createdAt = DateTime.parse(j['createdAt'] as String);
-
-    split.participants = ((j['participants'] as List?) ?? []).map((pj) {
-      final p = SplitParticipant()
-        ..name = pj['name'] as String
-        ..contact = pj['contact'] as String?
-        ..amount = (pj['amount'] as num).toDouble()
-        ..percentage = (pj['percentage'] as num?)?.toDouble()
-        ..isSettled = pj['isSettled'] as bool? ?? false;
-      return p;
+    final participants = ((j['participants'] as List?) ?? []).map((pj) {
+      return SplitParticipant(
+        name: pj['name'] as String,
+        contact: pj['contact'] as String?,
+        amount: (pj['amount'] as num).toDouble(),
+        percentage: (pj['percentage'] as num?)?.toDouble(),
+        isSettled: pj['isSettled'] as bool? ?? false,
+      );
     }).toList();
 
-    return split;
+    return SplitModel(
+      description: j['description'] as String,
+      totalAmount: (j['totalAmount'] as num).toDouble(),
+      splitMethod: j['splitMethod'] as int,
+      isFullySettled: j['isFullySettled'] as bool? ?? false,
+      participants: participants,
+      createdAt: DateTime.parse(j['createdAt'] as String),
+    );
   }
 }

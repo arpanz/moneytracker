@@ -187,11 +187,59 @@ final addTransactionProvider =
   return id;
 });
 
-/// Updates an existing transaction and invalidates caches.
+/// Updates an existing transaction, reverses the old balance impact, applies
+/// the new one, then invalidates caches.
 final updateTransactionProvider =
     FutureProvider.family<void, TransactionModel>((ref, transaction) async {
-  final repo = ref.read(transactionRepositoryProvider);
-  await repo.update(transaction);
+  final txnRepo = ref.read(transactionRepositoryProvider);
+  final accRepo = ref.read(accountRepositoryProvider);
+
+  // Fetch the OLD snapshot before overwriting so we can reverse its effect.
+  final old = await txnRepo.getById(transaction.id);
+
+  await txnRepo.update(transaction);
+
+  // ── Reverse old balance impact ──
+  if (old != null) {
+    final oldSrcId = int.tryParse(old.accountId);
+    if (oldSrcId != null) {
+      final src = await accRepo.getById(oldSrcId);
+      if (src != null) {
+        final double reverseDelta = old.type == 0 ? -old.amount : old.amount;
+        await accRepo.updateBalance(oldSrcId, src.balance + reverseDelta);
+      }
+    }
+    if (old.type == 2 && old.toAccountId != null) {
+      final oldDstId = int.tryParse(old.toAccountId!);
+      if (oldDstId != null) {
+        final dst = await accRepo.getById(oldDstId);
+        if (dst != null) {
+          await accRepo.updateBalance(oldDstId, dst.balance - old.amount);
+        }
+      }
+    }
+  }
+
+  // ── Apply new balance impact ──
+  final newSrcId = int.tryParse(transaction.accountId);
+  if (newSrcId != null) {
+    final src = await accRepo.getById(newSrcId);
+    if (src != null) {
+      final double delta =
+          transaction.type == 0 ? transaction.amount : -transaction.amount;
+      await accRepo.updateBalance(newSrcId, src.balance + delta);
+    }
+  }
+  if (transaction.type == 2 && transaction.toAccountId != null) {
+    final newDstId = int.tryParse(transaction.toAccountId!);
+    if (newDstId != null) {
+      final dst = await accRepo.getById(newDstId);
+      if (dst != null) {
+        await accRepo.updateBalance(newDstId, dst.balance + transaction.amount);
+      }
+    }
+  }
+
   ref.invalidate(allTransactionsProvider);
   ref.invalidate(filteredTransactionsProvider);
   ref.invalidate(groupedTransactionsProvider);

@@ -1,191 +1,187 @@
-import 'package:isar/isar.dart';
+import 'dart:convert';
+
+import 'package:drift/drift.dart';
 
 import '../../domain/models/transaction_model.dart';
 import '../local/database_service.dart';
 
 /// Repository for managing financial transactions.
-///
-/// Provides full CRUD operations, filtered queries by date/category/account/type,
-/// aggregate calculations, and a real-time watch stream.
 class TransactionRepository {
   final DatabaseService _db;
 
   TransactionRepository(this._db);
 
-  Isar get _isar => _db.isar;
+  AppDatabase get _d => _db.db;
 
-  // -- CRUD ------------------------------------------------------------------
+  // ── Mapping ──────────────────────────────────────────────────────────────
 
-  /// Inserts a new transaction and returns its auto-generated id.
-  Future<int> add(TransactionModel transaction) async {
-    return _isar.writeTxn(() async {
-      return _isar.transactionModels.put(transaction);
-    });
-  }
+  TransactionModel _fromRow(Transaction row) => TransactionModel(
+        id: row.id,
+        amount: row.amount,
+        category: row.category,
+        subcategory: row.subcategory,
+        note: row.note,
+        date: row.date,
+        type: row.type,
+        receiptImagePath: row.receiptImagePath,
+        isRecurring: row.isRecurring,
+        recurringRule: row.recurringRule,
+        splitId: row.splitId,
+        tags: List<String>.from(jsonDecode(row.tags) as List),
+        accountId: row.accountId,
+        toAccountId: row.toAccountId,
+        createdAt: row.createdAt,
+      );
 
-  /// Updates an existing transaction in-place.
+  TransactionsCompanion _toCompanion(TransactionModel t) =>
+      TransactionsCompanion.insert(
+        amount: t.amount,
+        category: t.category,
+        subcategory: Value(t.subcategory),
+        note: Value(t.note),
+        date: t.date,
+        type: Value(t.type),
+        receiptImagePath: Value(t.receiptImagePath),
+        isRecurring: Value(t.isRecurring),
+        recurringRule: Value(t.recurringRule),
+        splitId: Value(t.splitId),
+        tags: Value(jsonEncode(t.tags)),
+        accountId: t.accountId,
+        toAccountId: Value(t.toAccountId),
+        createdAt: t.createdAt,
+      );
+
+  // ── CRUD ─────────────────────────────────────────────────────────────────
+
+  Future<int> add(TransactionModel transaction) =>
+      _d.into(_d.transactions).insert(_toCompanion(transaction));
+
   Future<void> update(TransactionModel transaction) async {
-    await _isar.writeTxn(() async {
-      await _isar.transactionModels.put(transaction);
-    });
+    await (_d.update(_d.transactions)
+          ..where((t) => t.id.equals(transaction.id)))
+        .write(TransactionsCompanion(
+      amount: Value(transaction.amount),
+      category: Value(transaction.category),
+      subcategory: Value(transaction.subcategory),
+      note: Value(transaction.note),
+      date: Value(transaction.date),
+      type: Value(transaction.type),
+      receiptImagePath: Value(transaction.receiptImagePath),
+      isRecurring: Value(transaction.isRecurring),
+      recurringRule: Value(transaction.recurringRule),
+      splitId: Value(transaction.splitId),
+      tags: Value(jsonEncode(transaction.tags)),
+      accountId: Value(transaction.accountId),
+      toAccountId: Value(transaction.toAccountId),
+    ));
   }
 
-  /// Deletes a transaction by its id.
   Future<void> delete(int id) async {
-    await _isar.writeTxn(() async {
-      await _isar.transactionModels.delete(id);
-    });
+    await (_d.delete(_d.transactions)..where((t) => t.id.equals(id))).go();
   }
 
-  /// Retrieves a single transaction by id, or null if not found.
   Future<TransactionModel?> getById(int id) async {
-    return _isar.transactionModels.get(id);
+    final row = await (_d.select(_d.transactions)
+          ..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
+    return row == null ? null : _fromRow(row);
   }
 
-  /// Returns all transactions with optional pagination.
-  ///
-  /// Results are ordered by [date] descending (newest first).
-  ///
-  /// FIX: Removed `dynamic` typing that caused NoSuchMethodError at runtime.
-  /// Isar's `.offset()`, `.limit()`, and `.findAll()` are extension methods
-  /// on specific generic QueryBuilder types. Casting to `dynamic` strips
-  /// those extensions, making them invisible at runtime. Instead, we use
-  /// explicit branches to keep the full type chain intact.
   Future<List<TransactionModel>> getAll({int? limit, int? offset}) async {
-    final baseQuery = _isar.transactionModels
-        .where()
-        .sortByDateDesc();
-
-    if (offset != null && offset > 0 && limit != null && limit > 0) {
-      return baseQuery.offset(offset).limit(limit).findAll();
-    } else if (limit != null && limit > 0) {
-      return baseQuery.limit(limit).findAll();
-    } else if (offset != null && offset > 0) {
-      return baseQuery.offset(offset).findAll();
-    }
-
-    return baseQuery.findAll();
+    var q = _d.select(_d.transactions)..orderBy([(t) => OrderingTerm.desc(t.date)]);
+    if (offset != null) q = q..where((t) => const Constant(true));
+    final rows = await q.get();
+    var result = rows.map(_fromRow).toList();
+    if (offset != null) result = result.skip(offset).toList();
+    if (limit != null) result = result.take(limit).toList();
+    return result;
   }
 
-  // -- FILTERED QUERIES ------------------------------------------------------
+  // ── Filtered Queries ─────────────────────────────────────────────────────
 
-  /// Returns transactions within the given date range (inclusive).
   Future<List<TransactionModel>> getByDateRange(
     DateTime start,
     DateTime end,
   ) async {
-    return _isar.transactionModels
-        .where()
-        .dateBetween(start, end)
-        .sortByDateDesc()
-        .findAll();
+    final rows = await (_d.select(_d.transactions)
+          ..where((t) => t.date.isBetweenValues(start, end))
+          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+        .get();
+    return rows.map(_fromRow).toList();
   }
 
-  /// Returns transactions matching a specific category.
   Future<List<TransactionModel>> getByCategory(String category) async {
-    return _isar.transactionModels
-        .where()
-        .categoryEqualTo(category)
-        .sortByDateDesc()
-        .findAll();
+    final rows = await (_d.select(_d.transactions)
+          ..where((t) => t.category.equals(category))
+          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+        .get();
+    return rows.map(_fromRow).toList();
   }
 
-  /// Returns transactions for a specific account.
   Future<List<TransactionModel>> getByAccount(String accountId) async {
-    return _isar.transactionModels
-        .where()
-        .accountIdEqualTo(accountId)
-        .sortByDateDesc()
-        .findAll();
+    final rows = await (_d.select(_d.transactions)
+          ..where((t) => t.accountId.equals(accountId))
+          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+        .get();
+    return rows.map(_fromRow).toList();
   }
 
-  /// Returns transactions of a given type (0=income, 1=expense, 2=transfer).
   Future<List<TransactionModel>> getByType(int type) async {
-    return _isar.transactionModels
-        .where()
-        .typeEqualTo(type)
-        .sortByDateDesc()
-        .findAll();
+    final rows = await (_d.select(_d.transactions)
+          ..where((t) => t.type.equals(type))
+          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+        .get();
+    return rows.map(_fromRow).toList();
   }
 
-  /// Full-text search across category, subcategory, note, and tags.
   Future<List<TransactionModel>> search(String query) async {
     final lowerQuery = query.toLowerCase();
-    return _isar.transactionModels
-        .where()
-        .sortByDateDesc()
-        .findAll()
-        .then((all) => all.where((t) {
-              if (t.category.toLowerCase().contains(lowerQuery)) return true;
-              if (t.subcategory?.toLowerCase().contains(lowerQuery) == true) {
-                return true;
-              }
-              if (t.note?.toLowerCase().contains(lowerQuery) == true) {
-                return true;
-              }
-              if (t.tags.any((tag) => tag.toLowerCase().contains(lowerQuery))) {
-                return true;
-              }
-              return false;
-            }).toList());
+    final all = await getAll();
+    return all.where((t) {
+      if (t.category.toLowerCase().contains(lowerQuery)) return true;
+      if (t.subcategory?.toLowerCase().contains(lowerQuery) == true) return true;
+      if (t.note?.toLowerCase().contains(lowerQuery) == true) return true;
+      if (t.tags.any((tag) => tag.toLowerCase().contains(lowerQuery))) return true;
+      return false;
+    }).toList();
   }
 
-  /// Returns all recurring transactions.
   Future<List<TransactionModel>> getRecurring() async {
-    return _isar.transactionModels
-        .filter()
-        .isRecurringEqualTo(true)
-        .sortByDateDesc()
-        .findAll();
+    final rows = await (_d.select(_d.transactions)
+          ..where((t) => t.isRecurring.equals(true))
+          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+        .get();
+    return rows.map(_fromRow).toList();
   }
 
-  // -- AGGREGATES ------------------------------------------------------------
+  // ── Aggregates ───────────────────────────────────────────────────────────
 
-  /// Calculates the total amount for a given type within a date range.
-  ///
-  /// Useful for "total income this month" or "total expenses this week".
-  Future<double> getTotalByType(
-    int type,
-    DateTime start,
-    DateTime end,
-  ) async {
-    final transactions = await _isar.transactionModels
-        .where()
-        .dateBetween(start, end)
-        .filter()
-        .typeEqualTo(type)
-        .findAll();
-
-    return transactions.fold<double>(0.0, (sum, t) => sum + t.amount);
+  Future<double> getTotalByType(int type, DateTime start, DateTime end) async {
+    final txns = await (_d.select(_d.transactions)
+          ..where((t) =>
+              t.type.equals(type) & t.date.isBetweenValues(start, end)))
+        .get();
+    return txns.fold<double>(0.0, (s, t) => s + t.amount);
   }
 
-  /// Returns a map of category -> total amount for expenses in a date range.
-  ///
-  /// Only includes expense transactions (type == 1).
   Future<Map<String, double>> getCategoryTotals(
     DateTime start,
     DateTime end,
   ) async {
-    final transactions = await _isar.transactionModels
-        .where()
-        .dateBetween(start, end)
-        .filter()
-        .typeEqualTo(1)
-        .findAll();
-
+    final txns = await (_d.select(_d.transactions)
+          ..where((t) =>
+              t.type.equals(1) & t.date.isBetweenValues(start, end)))
+        .get();
     final totals = <String, double>{};
-    for (final t in transactions) {
+    for (final t in txns) {
       totals[t.category] = (totals[t.category] ?? 0.0) + t.amount;
     }
     return totals;
   }
 
-  // -- REAL-TIME STREAM ------------------------------------------------------
+  // ── Real-Time Stream ─────────────────────────────────────────────────────
 
-  /// Watches the entire transaction collection for any changes.
-  ///
-  /// Emits an event whenever a transaction is added, updated, or deleted.
-  Stream<void> watchAll() {
-    return _isar.transactionModels.watchLazy();
-  }
+  Stream<void> watchAll() => _d.select(_d.transactions)
+      .watch()
+      .map((_) {});
 }

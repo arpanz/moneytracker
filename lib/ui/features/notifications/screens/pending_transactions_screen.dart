@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/di/providers.dart';
-import '../../../../config/constants/app_constants.dart';
 import '../../../../config/constants/asset_paths.dart';
 import '../../../../config/router/route_names.dart';
 import '../../../../config/theme/spacing.dart';
@@ -184,20 +183,19 @@ class PendingTransactionsScreen extends ConsumerWidget {
     final accounts = await accRepo.getActive();
     final defaultAccount = accounts.isNotEmpty ? accounts.first : null;
 
-    final transaction = TransactionModel()
-      ..amount = tx.amount
-      ..type = tx.isDebit ? 1 : 0
+    final transaction = TransactionModel(
+      amount: tx.amount,
+      type: tx.isDebit ? 1 : 0,
       // Use merchant as category hint; user can change on next screen.
-      ..category = tx.merchant ?? tx.appName
+      category: tx.merchant ?? tx.appName,
       // FIX: set accountId so balance is updated when the user taps Save.
-      ..accountId = defaultAccount?.id.toString() ?? ''
-      ..toAccountId = null
-      ..note = tx.merchant ?? tx.appName
-      ..date = tx.timestamp
-      ..tags = []
-      ..isRecurring = false
-      ..recurringRule = null
-      ..createdAt = DateTime.now();
+      accountId: defaultAccount?.id.toString() ?? '',
+      note: tx.merchant ?? tx.appName,
+      date: tx.timestamp,
+      tags: [],
+      isRecurring: false,
+      createdAt: DateTime.now(),
+    );
 
     if (context.mounted) {
       context.pushNamed(RouteNames.addTransaction, extra: transaction);
@@ -242,7 +240,7 @@ class PendingTransactionsScreen extends ConsumerWidget {
 
 // ── Pending Transaction Card ──
 
-class _PendingTransactionCard extends StatelessWidget {
+class _PendingTransactionCard extends ConsumerWidget {
   final PendingTransaction transaction;
   final VoidCallback onSave;
   final VoidCallback onDismiss;
@@ -269,9 +267,10 @@ class _PendingTransactionCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cheddarColors = theme.extension<CheddarColors>();
+    final currencySymbol = ref.watch(currencySymbolProvider);
     final isDebit = transaction.isDebit;
 
     final amountColor = isDebit
@@ -351,7 +350,7 @@ class _PendingTransactionCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '$amountPrefix${AppConstants.currencySymbol}$formattedAmount',
+                        '$amountPrefix$currencySymbol$formattedAmount',
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: amountColor,
                           fontWeight: FontWeight.bold,

@@ -1,26 +1,73 @@
-import 'package:isar/isar.dart';
-
-part 'loan_model.g.dart';
+import 'dart:convert';
 
 /// Embedded repayment record for a loan.
-@embedded
 class LoanRepayment {
-  late double amount;
-  late DateTime date;
+  double amount;
+  DateTime date;
   String? note;
 
-  LoanRepayment() : amount = 0;
+  LoanRepayment({this.amount = 0, DateTime? date, this.note})
+      : date = date ?? DateTime.now();
+
+  Map<String, dynamic> toJson() => {
+        'amount': amount,
+        'date': date.toIso8601String(),
+        'note': note,
+      };
+
+  factory LoanRepayment.fromJson(Map<String, dynamic> j) => LoanRepayment(
+        amount: (j['amount'] as num).toDouble(),
+        date: DateTime.parse(j['date'] as String),
+        note: j['note'] as String?,
+      );
+
+  static List<LoanRepayment> listFromJson(String raw) {
+    final list = jsonDecode(raw) as List<dynamic>;
+    return list
+        .map((e) => LoanRepayment.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  static String listToJson(List<LoanRepayment> items) =>
+      jsonEncode(items.map((e) => e.toJson()).toList());
 }
 
 /// Embedded disbursement record for a loan ledger.
-@embedded
 class LoanDisbursement {
-  late double amount;
-  late DateTime date;
+  double amount;
+  DateTime date;
   DateTime? dueDate;
   String? note;
 
-  LoanDisbursement() : amount = 0;
+  LoanDisbursement({this.amount = 0, DateTime? date, this.dueDate, this.note})
+      : date = date ?? DateTime.now();
+
+  Map<String, dynamic> toJson() => {
+        'amount': amount,
+        'date': date.toIso8601String(),
+        'dueDate': dueDate?.toIso8601String(),
+        'note': note,
+      };
+
+  factory LoanDisbursement.fromJson(Map<String, dynamic> j) =>
+      LoanDisbursement(
+        amount: (j['amount'] as num).toDouble(),
+        date: DateTime.parse(j['date'] as String),
+        dueDate: j['dueDate'] != null
+            ? DateTime.parse(j['dueDate'] as String)
+            : null,
+        note: j['note'] as String?,
+      );
+
+  static List<LoanDisbursement> listFromJson(String raw) {
+    final list = jsonDecode(raw) as List<dynamic>;
+    return list
+        .map((e) => LoanDisbursement.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  static String listToJson(List<LoanDisbursement> items) =>
+      jsonEncode(items.map((e) => e.toJson()).toList());
 }
 
 enum LoanLedgerEntryType { disbursement, repayment }
@@ -51,122 +98,84 @@ class LoanLedgerEntry {
 }
 
 /// Tracks money lent to or borrowed from a person.
-@collection
 class LoanModel {
-  Id id = Isar.autoIncrement;
+  int id;
 
   /// 0 = lending (you gave money), 1 = borrowing (you received money)
-  @Index()
-  late int type;
+  int type;
 
-  late String personName;
-
+  String personName;
   String? title;
-
-  late double principalAmount;
+  double principalAmount;
 
   /// Total amount repaid/collected so far.
-  late double paidAmount;
+  double paidAmount;
 
   /// Optional annual interest percentage.
   double? interestRate;
 
-  @Index()
   DateTime? dueDate;
-
   String? note;
+  bool isClosed;
+  DateTime createdAt;
+  DateTime updatedAt;
+  List<LoanDisbursement> disbursements;
+  List<LoanRepayment> repayments;
 
-  @Index()
-  late bool isClosed;
-
-  late DateTime createdAt;
-  late DateTime updatedAt;
-
-  late List<LoanDisbursement> disbursements;
-  late List<LoanRepayment> repayments;
-
-  @ignore
   double get outstandingAmount =>
       (principalAmount - paidAmount).clamp(0.0, double.infinity).toDouble();
 
-  @ignore
   double get progress => principalAmount > 0
       ? (paidAmount / principalAmount).clamp(0.0, 1.0).toDouble()
       : 0.0;
 
-  @ignore
-  bool get isOverdue {
-    return overdueAmount > 0.01;
-  }
+  bool get isOverdue => overdueAmount > 0.01;
 
-  /// Amount past due, computed from outstanding allocations on disbursements.
-  @ignore
   double get overdueAmount {
     if (isClosed || disbursements.isEmpty) return 0;
-
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     var remainingPaid = paidAmount;
     var overdue = 0.0;
-
     final sorted = [...disbursements]..sort((a, b) => a.date.compareTo(b.date));
-
     for (final item in sorted) {
       final covered = remainingPaid.clamp(0.0, item.amount).toDouble();
       remainingPaid = (remainingPaid - covered).clamp(0.0, double.infinity);
       final outstandingPart = (item.amount - covered).clamp(0.0, item.amount);
       final due = item.dueDate;
       if (due == null) continue;
-
       final dueDateOnly = DateTime(due.year, due.month, due.day);
-      if (dueDateOnly.isBefore(today)) {
-        overdue += outstandingPart;
-      }
+      if (dueDateOnly.isBefore(today)) overdue += outstandingPart;
     }
-
     return overdue;
   }
 
-  /// Nearest due date among disbursements that still have outstanding amount.
-  @ignore
   DateTime? get nextDueDate {
     if (disbursements.isEmpty || outstandingAmount <= 0.01) return dueDate;
-
     var remainingPaid = paidAmount;
     DateTime? nearest;
     final sorted = [...disbursements]..sort((a, b) => a.date.compareTo(b.date));
-
     for (final item in sorted) {
       final covered = remainingPaid.clamp(0.0, item.amount).toDouble();
       remainingPaid = (remainingPaid - covered).clamp(0.0, double.infinity);
       final outstandingPart = (item.amount - covered).clamp(0.0, item.amount);
       if (outstandingPart <= 0.01 || item.dueDate == null) continue;
-
       if (nearest == null || item.dueDate!.isBefore(nearest)) {
         nearest = item.dueDate;
       }
     }
-
     return nearest ?? dueDate;
   }
 
-  /// Unified timeline of disbursements + repayments sorted chronologically.
-  ///
-  /// Running totals allow UI to render a true ledger history without
-  /// duplicating relationships in persisted embedded objects.
-  @ignore
   List<LoanLedgerEntry> get timeline {
-    final events =
-        <
-          ({
-            LoanLedgerEntryType type,
-            double amount,
-            DateTime date,
-            DateTime? dueDate,
-            String? note,
-            int sourceIndex,
-          })
-        >[];
+    final events = <({
+      LoanLedgerEntryType type,
+      double amount,
+      DateTime date,
+      DateTime? dueDate,
+      String? note,
+      int sourceIndex,
+    })>[];
 
     for (var i = 0; i < disbursements.length; i++) {
       final d = disbursements[i];
@@ -179,7 +188,6 @@ class LoanModel {
         sourceIndex: i,
       ));
     }
-
     for (var i = 0; i < repayments.length; i++) {
       final r = repayments[i];
       events.add((
@@ -191,7 +199,6 @@ class LoanModel {
         sourceIndex: i,
       ));
     }
-
     events.sort((a, b) {
       final byDate = a.date.compareTo(b.date);
       if (byDate != 0) return byDate;
@@ -203,42 +210,47 @@ class LoanModel {
 
     var runningPrincipal = 0.0;
     var runningPaid = 0.0;
-    final timeline = <LoanLedgerEntry>[];
-
+    final result = <LoanLedgerEntry>[];
     for (final event in events) {
       if (event.type == LoanLedgerEntryType.disbursement) {
         runningPrincipal += event.amount;
       } else {
-        runningPaid = (runningPaid + event.amount).clamp(0.0, runningPrincipal);
+        runningPaid =
+            (runningPaid + event.amount).clamp(0.0, runningPrincipal);
       }
-
-      timeline.add(
-        LoanLedgerEntry(
-          type: event.type,
-          amount: event.amount,
-          date: event.date,
-          dueDate: event.dueDate,
-          note: event.note,
-          sourceIndex: event.sourceIndex,
-          runningPrincipal: runningPrincipal,
-          runningPaid: runningPaid,
-          runningOutstanding: (runningPrincipal - runningPaid).clamp(
-            0.0,
-            double.infinity,
-          ),
-        ),
-      );
+      result.add(LoanLedgerEntry(
+        type: event.type,
+        amount: event.amount,
+        date: event.date,
+        dueDate: event.dueDate,
+        note: event.note,
+        sourceIndex: event.sourceIndex,
+        runningPrincipal: runningPrincipal,
+        runningPaid: runningPaid,
+        runningOutstanding:
+            (runningPrincipal - runningPaid).clamp(0.0, double.infinity),
+      ));
     }
-
-    return timeline;
+    return result;
   }
 
-  LoanModel()
-    : type = 0,
-      paidAmount = 0.0,
-      isClosed = false,
-      disbursements = [],
-      repayments = [],
-      createdAt = DateTime.now(),
-      updatedAt = DateTime.now();
+  LoanModel({
+    this.id = 0,
+    this.type = 0,
+    this.personName = '',
+    this.title,
+    this.principalAmount = 0.0,
+    this.paidAmount = 0.0,
+    this.interestRate,
+    this.dueDate,
+    this.note,
+    this.isClosed = false,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    List<LoanDisbursement>? disbursements,
+    List<LoanRepayment>? repayments,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now(),
+        disbursements = disbursements ?? [],
+        repayments = repayments ?? [];
 }

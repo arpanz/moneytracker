@@ -1,45 +1,30 @@
-import 'package:isar/isar.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:drift/drift.dart' show TableInfo;
 
-import '../../domain/models/transaction_model.dart';
-import '../../domain/models/account_model.dart';
-import '../../domain/models/budget_model.dart';
-import '../../domain/models/goal_model.dart';
-import '../../domain/models/category_model.dart';
-import '../../domain/models/subscription_model.dart';
-import '../../domain/models/split_model.dart';
-import '../../domain/models/loan_model.dart';
+import 'app_database.dart';
 
+export 'app_database.dart';
+
+/// Thin wrapper around [AppDatabase] so existing provider code that
+/// depends on [DatabaseService] can stay unchanged.
 class DatabaseService {
-  late Isar _isar;
+  late AppDatabase _db;
 
-  Isar get isar => _isar;
+  AppDatabase get db => _db;
 
   Future<void> initialize() async {
-    final dir = await getApplicationDocumentsDirectory();
-    _isar = await Isar.open(
-      [
-        TransactionModelSchema,
-        AccountModelSchema,
-        BudgetModelSchema,
-        GoalModelSchema,
-        CategoryModelSchema,
-        SubscriptionModelSchema,
-        SplitModelSchema,
-        LoanModelSchema,
-      ],
-      directory: dir.path,
-      name: 'cheddar_db',
-    );
+    _db = AppDatabase();
   }
 
   Future<void> clearAll() async {
-    await _isar.writeTxn(() async {
-      await _isar.clear();
+    // Delete all rows from every table
+    await _db.transaction(() async {
+      for (final table in _db.allTables) {
+        await _db.delete(table as TableInfo).go();
+      }
     });
   }
 
   Future<void> close() async {
-    await _isar.close();
+    await _db.close();
   }
 }

@@ -19,8 +19,9 @@ dependencies:
   go_router: ^17.1.0
 
   # Database
-  isar: ^3.1.0+1
-  isar_flutter_libs: ^3.1.0+1
+  drift: ^2.20.0
+  drift_flutter: ^0.2.4
+  sqlite3_flutter_libs: ^0.5.24
   path_provider: ^2.1.5
 
   # Charts
@@ -52,6 +53,7 @@ dependencies:
   uuid: ^4.5.1
   equatable: ^2.0.7
   shared_preferences: ^2.3.4
+  file_picker: ^8.1.2
   permission_handler: ^12.0.1
   share_plus: ^12.0.1
   url_launcher: ^6.3.1
@@ -71,7 +73,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
   build_runner: ^2.4.13
-  isar_generator: ^3.1.0+1
+  drift_dev: ^2.20.0
   custom_lint:
 
 flutter:

@@ -35,8 +35,10 @@ void main() async {
 
   // Seed default categories (no-op if already seeded).
   // Run on a microtask so it does not block runApp.
+  // The `ref.read` call cannot be used directly in `main` before `ProviderScope` is set up.
+  // We will keep the direct instantiation for now, and rename the method.
   final categoryRepo = CategoryRepository(databaseService);
-  categoryRepo.seedDefaults().ignore();
+  categoryRepo.seedDefaultsIfEmpty().ignore();
 
   runApp(
     ProviderScope(

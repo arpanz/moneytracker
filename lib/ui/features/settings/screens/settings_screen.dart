@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -728,15 +729,47 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   }
 
   Future<void> _createBackup() async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Creating backup...')),
-    );
+    final scaffold = ScaffoldMessenger.of(context);
+    try {
+      scaffold.showSnackBar(
+        const SnackBar(content: Text('Creating backup...')),
+      );
+      await ref.read(exportServiceProvider).shareBackup();
+    } catch (e) {
+      scaffold.showSnackBar(
+        SnackBar(content: Text('Backup failed: $e')),
+      );
+    }
   }
 
   Future<void> _restoreBackup() async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Select a backup file...')),
-    );
+    final scaffold = ScaffoldMessenger.of(context);
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        dialogTitle: 'Select Cheddar backup file',
+      );
+      if (result == null || result.files.single.path == null) return;
+
+      scaffold.showSnackBar(
+        const SnackBar(content: Text('Restoring backup...')),
+      );
+      final counts = await ref
+          .read(exportServiceProvider)
+          .restoreFromBackup(result.files.single.path!);
+
+      final total = counts.values.fold(0, (a, b) => a + b);
+      if (mounted) {
+        scaffold.showSnackBar(
+          SnackBar(content: Text('Restored $total items successfully!')),
+        );
+      }
+    } catch (e) {
+      scaffold.showSnackBar(
+        SnackBar(content: Text('Restore failed: $e')),
+      );
+    }
   }
 }
 

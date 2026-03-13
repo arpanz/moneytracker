@@ -1,41 +1,42 @@
-import 'package:isar/isar.dart';
-
-part 'subscription_model.g.dart';
-
 /// Represents a recurring subscription or bill.
-@collection
 class SubscriptionModel {
-  Id id = Isar.autoIncrement;
+  int id;
 
-  late String name;
+  String name;
 
-  late double amount;
+  double amount;
 
   /// 0 = weekly, 1 = monthly, 2 = quarterly, 3 = yearly
-  late int frequency;
+  int frequency;
 
-  @Index()
-  late DateTime nextBillDate;
+  DateTime nextBillDate;
 
-  late String category;
+  String category;
 
   /// URL or asset path for the subscription service logo.
   String? logoUrl;
 
   String? notes;
 
-  @Index()
-  late bool isActive;
+  bool isActive;
 
   /// Whether this subscription was auto-detected from transaction patterns.
-  late bool isAutoDetected;
+  bool isAutoDetected;
 
-  late DateTime createdAt;
+  DateTime createdAt;
 
-  SubscriptionModel()
-      : frequency = 1,
-        category = 'Subscriptions',
-        isActive = true,
-        isAutoDetected = false,
-        createdAt = DateTime.now();
+  SubscriptionModel({
+    this.id = 0,
+    this.name = '',
+    this.amount = 0.0,
+    this.frequency = 1,
+    DateTime? nextBillDate,
+    this.category = 'Subscriptions',
+    this.logoUrl,
+    this.notes,
+    this.isActive = true,
+    this.isAutoDetected = false,
+    DateTime? createdAt,
+  })  : nextBillDate = nextBillDate ?? DateTime.now(),
+        createdAt = createdAt ?? DateTime.now();
 }

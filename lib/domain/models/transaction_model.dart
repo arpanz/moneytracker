@@ -1,31 +1,17 @@
-import 'package:isar/isar.dart';
-
-part 'transaction_model.g.dart';
-
 /// Represents a financial transaction (income, expense, or transfer).
-@collection
 class TransactionModel {
-  Id id = Isar.autoIncrement;
-
-  late double amount;
-
-  @Index()
-  late String category;
-
+  int id;
+  double amount;
+  String category;
   String? subcategory;
-
   String? note;
-
-  @Index()
-  late DateTime date;
+  DateTime date;
 
   /// 0 = income, 1 = expense, 2 = transfer
-  @Index()
-  late int type;
+  int type;
 
   String? receiptImagePath;
-
-  late bool isRecurring;
+  bool isRecurring;
 
   /// JSON string: {"frequency":"monthly","interval":1,"endDate":null}
   String? recurringRule;
@@ -33,22 +19,32 @@ class TransactionModel {
   /// Link to a SplitModel id (stored as string for flexibility)
   String? splitId;
 
-  late List<String> tags;
+  List<String> tags;
 
-  @Index()
-  late String accountId;
+  String accountId;
 
   /// Destination account for transfer-type transactions
   String? toAccountId;
 
-  late DateTime createdAt;
+  DateTime createdAt;
 
-  /// Composite index on [date, type] for efficient date+type queries.
-  @Index(composite: [CompositeIndex('type')])
-  DateTime get compositeDateTime => date;
-
-  TransactionModel()
-      : isRecurring = false,
-        tags = [],
-        createdAt = DateTime.now();
+  TransactionModel({
+    this.id = 0,
+    this.amount = 0.0,
+    this.category = '',
+    this.subcategory,
+    this.note,
+    DateTime? date,
+    this.type = 1,
+    this.receiptImagePath,
+    this.isRecurring = false,
+    this.recurringRule,
+    this.splitId,
+    List<String>? tags,
+    this.accountId = '',
+    this.toAccountId,
+    DateTime? createdAt,
+  })  : date = date ?? DateTime.now(),
+        tags = tags ?? [],
+        createdAt = createdAt ?? DateTime.now();
 }
