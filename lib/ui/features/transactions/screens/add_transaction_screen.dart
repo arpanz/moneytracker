@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -695,7 +696,6 @@ class _TopBar extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          // Placeholder to balance the close icon
           const SizedBox(width: 40),
         ],
       ),
@@ -780,10 +780,13 @@ class _CategoryGrid extends ConsumerWidget {
     required this.onSelected,
   });
 
+  static const IconData _svgFallback = Icons.category_rounded;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final categoriesAsync = ref.watch(_categoriesByTypeProvider(transactionType));
     final theme = Theme.of(context);
+    final cc = theme.extension<CheddarColors>();
 
     return SizedBox(
       height: 108,
@@ -796,12 +799,15 @@ class _CategoryGrid extends ConsumerWidget {
             vertical: Spacing.sm,
           ),
           itemCount: cats.length,
-          separatorBuilder: (_, _) => const SizedBox(width: Spacing.sm),
+          separatorBuilder: (_, __) => const SizedBox(width: Spacing.sm),
           itemBuilder: (context, i) {
             final cat = cats[i];
             final isSelected = selected?.id == cat.id ||
                 (selected == null && editCategoryName == cat.name);
-            final catColor = Color(cat.color);
+
+            // Prefer the CheddarColors map, fall back to stored color
+            final catColor = cc?.categoryColors[cat.name.toLowerCase()] ??
+                Color(cat.color);
 
             return GestureDetector(
               onTap: () => onSelected(cat),
@@ -819,37 +825,74 @@ class _CategoryGrid extends ConsumerWidget {
                         : theme.colorScheme.outline.withValues(alpha: 0.2),
                     width: isSelected ? 2 : 1,
                   ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: catColor.withValues(alpha: 0.18),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : null,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // SVG icon in a rounded square container — same style as
+                    // CategoryPickerRow._buildCategoryTile
                     Container(
-                      width: 40,
-                      height: 40,
+                      width: 42,
+                      height: 42,
                       decoration: BoxDecoration(
-                        color: catColor.withValues(alpha: isSelected ? 0.2 : 0.1),
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(12),
+                        color: theme.colorScheme.surface,
+                        border: Border.all(
+                          color: isSelected
+                              ? catColor.withValues(alpha: 0.4)
+                              : theme.colorScheme.outlineVariant
+                                  .withValues(alpha: 0.5),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      child: Center(
-                        child: Text(
-                          _categoryEmoji(cat.name),
-                          style: const TextStyle(fontSize: 20),
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.all(9),
+                        child: SvgPicture.asset(
+                          cat.icon,
+                          width: 22,
+                          height: 22,
+                          fit: BoxFit.contain,
+                          placeholderBuilder: (_) => Icon(
+                            _svgFallback,
+                            size: 20,
+                            color: catColor,
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      cat.name,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected
-                            ? catColor
-                            : theme.colorScheme.onSurface,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Text(
+                        cat.name,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                          color: isSelected
+                              ? catColor
+                              : theme.colorScheme.onSurface,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
@@ -861,29 +904,6 @@ class _CategoryGrid extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
     );
-  }
-
-  String _categoryEmoji(String name) {
-    switch (name.toLowerCase()) {
-      case 'food': return '🍔';
-      case 'transport': return '🚌';
-      case 'shopping': return '🛍️';
-      case 'bills': return '📄';
-      case 'entertainment': return '🎬';
-      case 'health': return '💊';
-      case 'education': return '📚';
-      case 'travel': return '✈️';
-      case 'gifts': return '🎁';
-      case 'rent': return '🏠';
-      case 'groceries': return '🛒';
-      case 'pets': return '🐾';
-      case 'subscriptions': return '📱';
-      case 'salary': return '💼';
-      case 'freelance': return '💻';
-      case 'investments': return '📈';
-      case 'other': return '📦';
-      default: return '💰';
-    }
   }
 }
 
@@ -1041,7 +1061,6 @@ class _MetaRow extends StatelessWidget {
       height: 44,
       child: Row(
         children: [
-          // Account pill
           Expanded(
             child: accountsAsync.when(
               data: (accounts) {
@@ -1053,7 +1072,7 @@ class _MetaRow extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                     horizontal: Spacing.md, vertical: Spacing.xs),
                   itemCount: accounts.length + 1,
-                  separatorBuilder: (_, _) => const SizedBox(width: Spacing.xs),
+                  separatorBuilder: (_, __) => const SizedBox(width: Spacing.xs),
                   itemBuilder: (ctx, i) {
                     if (i == accounts.length) {
                       return ActionChip(
@@ -1090,11 +1109,10 @@ class _MetaRow extends StatelessWidget {
                 );
               },
               loading: () => const SizedBox.shrink(),
-              error: (_, _) => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
             ),
           ),
 
-          // Date pill
           GestureDetector(
             onTap: onPickDate,
             child: Container(
@@ -1116,7 +1134,6 @@ class _MetaRow extends StatelessWidget {
             ),
           ),
 
-          // Time pill
           GestureDetector(
             onTap: onPickTime,
             child: Container(
@@ -1242,7 +1259,6 @@ class _MoreOptions extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Tags
           Wrap(
             spacing: Spacing.xs,
             runSpacing: Spacing.xs,
@@ -1268,10 +1284,8 @@ class _MoreOptions extends StatelessWidget {
 
           const SizedBox(height: Spacing.xs),
 
-          // Recurring + Split + Receipt row
           Row(
             children: [
-              // Recurring toggle
               Expanded(
                 child: _ToggleTile(
                   icon: FontAwesomeIcons.repeat,
@@ -1281,7 +1295,6 @@ class _MoreOptions extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: Spacing.sm),
-              // Split toggle
               Expanded(
                 child: _ToggleTile(
                   icon: FontAwesomeIcons.peopleLine,
@@ -1291,7 +1304,6 @@ class _MoreOptions extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: Spacing.sm),
-              // Receipt button
               InkWell(
                 onTap: onReceiptTap,
                 borderRadius: Radii.borderMd,
