@@ -21,10 +21,6 @@ abstract class AppConstants {
   static const int rageTapCount = 5;
   static const Duration rageTapWindow = Duration(seconds: 2);
 
-  // Receipt scanner
-  static const int maxReceiptImageSizeKb = 5120;
-  static const double receiptConfidenceThreshold = 0.7;
-
   // Notification listener
   static const List<String> trackedNotificationApps = [
     'com.google.android.apps.messaging',

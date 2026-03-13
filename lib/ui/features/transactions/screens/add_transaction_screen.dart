@@ -598,7 +598,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     setState(() => _isSplit = v);
                     if (v) context.pushNamed(RouteNames.addSplit);
                   },
-                  onReceiptTap: () => context.pushNamed(RouteNames.scanner),
                 )
               : const SizedBox.shrink(),
         ),
@@ -2078,7 +2077,6 @@ class _MoreOptions extends StatelessWidget {
   final ValueChanged<bool> onRecurringChanged;
   final ValueChanged<String> onFrequencyChanged;
   final ValueChanged<bool> onSplitChanged;
-  final VoidCallback onReceiptTap;
 
   const _MoreOptions({
     required this.accent,
@@ -2092,12 +2090,10 @@ class _MoreOptions extends StatelessWidget {
     required this.onRecurringChanged,
     required this.onFrequencyChanged,
     required this.onSplitChanged,
-    required this.onReceiptTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     const frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
 
     return Padding(
@@ -2132,7 +2128,7 @@ class _MoreOptions extends StatelessWidget {
           ),
           const SizedBox(height: Spacing.xs),
 
-          // Recurring + Split + Receipt
+          // Recurring + Split
           Row(
             children: [
               Expanded(
@@ -2154,8 +2150,6 @@ class _MoreOptions extends StatelessWidget {
                   onChanged: onSplitChanged,
                 ),
               ),
-              const SizedBox(width: Spacing.sm),
-              _ReceiptButton(onTap: onReceiptTap),
             ],
           ),
 
@@ -2276,48 +2270,6 @@ class _ToggleTile extends StatelessWidget {
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: value ? FontWeight.w700 : FontWeight.w500,
                 color: value ? accent : theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ReceiptButton extends StatelessWidget {
-  final VoidCallback onTap;
-  const _ReceiptButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: Spacing.sm,
-          vertical: Spacing.sm,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: theme.colorScheme.outline.withValues(alpha: 0.3),
-          ),
-          borderRadius: Radii.borderMd,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FaIcon(
-              FontAwesomeIcons.camera,
-              size: 12,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: Spacing.xs),
-            Text(
-              'Receipt',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],

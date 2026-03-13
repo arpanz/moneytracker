@@ -245,8 +245,6 @@ class ExportService {
     'note': t.note,
     'date': t.date.toIso8601String(),
     'accountId': t.accountId,
-    'receiptImagePath': t.receiptImagePath,
-
     'createdAt': t.createdAt.toIso8601String(),
   };
 
@@ -257,7 +255,6 @@ class ExportService {
     note: j['note'] as String?,
     date: DateTime.parse(j['date'] as String),
     accountId: j['accountId'] as String,
-    receiptImagePath: j['receiptImagePath'] as String?,
     createdAt: DateTime.parse(j['createdAt'] as String),
   );
 
@@ -304,7 +301,9 @@ class ExportService {
     name: j['name'] as String,
     targetAmount: (j['targetAmount'] as num).toDouble(),
     currentAmount: (j['currentAmount'] as num).toDouble(),
-    deadline: j['deadline'] != null ? DateTime.parse(j['deadline'] as String) : null,
+    deadline: j['deadline'] != null
+        ? DateTime.parse(j['deadline'] as String)
+        : null,
     icon: j['icon'] as String,
     color: j['color'] as int,
     linkedAccountId: j['linkedAccountId'] as String?,

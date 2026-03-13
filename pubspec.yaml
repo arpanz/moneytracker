@@ -30,13 +30,6 @@ dependencies:
   # Authentication
   local_auth: ^3.0.0
 
-  # Camera & Image
-  camera: ^0.12.0
-  image_picker: ^1.1.2
-
-  # OCR & Receipt Scanning
-  google_mlkit_text_recognition: ^0.15.1
-
   # Notifications Reader (Android)
   notification_listener_service: ^0.3.5
 

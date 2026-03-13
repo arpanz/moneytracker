@@ -10,7 +10,6 @@ class TransactionModel {
   /// 0 = income, 1 = expense, 2 = transfer
   int type;
 
-  String? receiptImagePath;
   bool isRecurring;
 
   /// JSON string: {"frequency":"monthly","interval":1,"endDate":null}
@@ -36,7 +35,6 @@ class TransactionModel {
     this.note,
     DateTime? date,
     this.type = 1,
-    this.receiptImagePath,
     this.isRecurring = false,
     this.recurringRule,
     this.splitId,
@@ -44,7 +42,7 @@ class TransactionModel {
     this.accountId = '',
     this.toAccountId,
     DateTime? createdAt,
-  })  : date = date ?? DateTime.now(),
-        tags = tags ?? [],
-        createdAt = createdAt ?? DateTime.now();
+  }) : date = date ?? DateTime.now(),
+       tags = tags ?? [],
+       createdAt = createdAt ?? DateTime.now();
 }

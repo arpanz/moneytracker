@@ -9,6 +9,11 @@ import '../../../../domain/models/transaction_model.dart';
 
 DateTime _monthStart(DateTime m) => DateTime(m.year, m.month);
 DateTime _monthEnd(DateTime m) => DateTime(m.year, m.month + 1, 0, 23, 59, 59);
+DateTime _maxDate() => DateTime(9999, 12, 31, 23, 59, 59);
+
+double _sourceAccountBalanceImpact(TransactionModel t) {
+  return t.type == 0 ? t.amount : -t.amount;
+}
 
 // ── User name ────────────────────────────────────────────────────────────────
 // ── Selected Month ────────────────────────────────────────────────────────────
@@ -55,12 +60,57 @@ final totalBalanceProvider = FutureProvider<double>((ref) async {
   ref.watch(accountStreamProvider);
   ref.watch(transactionStreamProvider);
   final activeId = ref.watch(activeAccountIdProvider);
-  final repo = ref.watch(accountRepositoryProvider);
+  final month = ref.watch(selectedMonthProvider);
+  final accountRepo = ref.watch(accountRepositoryProvider);
+  final transactionRepo = ref.watch(transactionRepositoryProvider);
+  final cutoff = _monthEnd(month);
+
+  final txnsInRange = await transactionRepo.getByDateRange(cutoff, _maxDate());
+  final txnsAfterCutoff = txnsInRange.where((t) => t.date.isAfter(cutoff));
+
   if (activeId == -1) {
-    return repo.getTotalBalance();
+    final accounts = await accountRepo.getActive();
+    final balances = <int, double>{
+      for (final account in accounts) account.id: account.balance,
+    };
+
+    for (final t in txnsAfterCutoff) {
+      final sourceId = int.tryParse(t.accountId);
+      if (sourceId != null && balances.containsKey(sourceId)) {
+        balances[sourceId] =
+            balances[sourceId]! - _sourceAccountBalanceImpact(t);
+      }
+
+      if (t.type == 2 && t.toAccountId != null) {
+        final destinationId = int.tryParse(t.toAccountId!);
+        if (destinationId != null && balances.containsKey(destinationId)) {
+          balances[destinationId] = balances[destinationId]! - t.amount;
+        }
+      }
+    }
+
+    return balances.values.fold<double>(0.0, (sum, b) => sum + b);
   }
-  final account = await repo.getById(activeId);
-  return account?.balance ?? 0.0;
+
+  final account = await accountRepo.getById(activeId);
+  if (account == null) return 0.0;
+
+  var adjustedBalance = account.balance;
+  for (final t in txnsAfterCutoff) {
+    final sourceId = int.tryParse(t.accountId);
+    if (sourceId == activeId) {
+      adjustedBalance -= _sourceAccountBalanceImpact(t);
+    }
+
+    if (t.type == 2 && t.toAccountId != null) {
+      final destinationId = int.tryParse(t.toAccountId!);
+      if (destinationId == activeId) {
+        adjustedBalance -= t.amount;
+      }
+    }
+  }
+
+  return adjustedBalance;
 });
 
 // ── Monthly Income ───────────────────────────────────────────────────────────
@@ -110,12 +160,19 @@ final recentTransactionsProvider = FutureProvider<List<TransactionModel>>((
 ) async {
   ref.watch(transactionStreamProvider);
   final activeId = ref.watch(activeAccountIdProvider);
+  final month = ref.watch(selectedMonthProvider);
   final repo = ref.watch(transactionRepositoryProvider);
+  final start = _monthStart(month);
+  final end = _monthEnd(month);
+
   if (activeId == -1) {
-    return repo.getAll(limit: 5);
+    return repo.getByDateRange(start, end);
   }
+
   final txns = await repo.getByAccount(activeId.toString());
-  return txns.take(5).toList();
+  return txns
+      .where((t) => !t.date.isBefore(start) && !t.date.isAfter(end))
+      .toList();
 });
 
 // ── Category Totals ───────────────────────────────────────────────────────────

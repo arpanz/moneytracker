@@ -16,22 +16,21 @@ class TransactionRepository {
   // ── Mapping ──────────────────────────────────────────────────────────────
 
   TransactionModel _fromRow(Transaction row) => TransactionModel(
-        id: row.id,
-        amount: row.amount,
-        category: row.category,
-        subcategory: row.subcategory,
-        note: row.note,
-        date: row.date,
-        type: row.type,
-        receiptImagePath: row.receiptImagePath,
-        isRecurring: row.isRecurring,
-        recurringRule: row.recurringRule,
-        splitId: row.splitId,
-        tags: List<String>.from(jsonDecode(row.tags) as List),
-        accountId: row.accountId,
-        toAccountId: row.toAccountId,
-        createdAt: row.createdAt,
-      );
+    id: row.id,
+    amount: row.amount,
+    category: row.category,
+    subcategory: row.subcategory,
+    note: row.note,
+    date: row.date,
+    type: row.type,
+    isRecurring: row.isRecurring,
+    recurringRule: row.recurringRule,
+    splitId: row.splitId,
+    tags: List<String>.from(jsonDecode(row.tags) as List),
+    accountId: row.accountId,
+    toAccountId: row.toAccountId,
+    createdAt: row.createdAt,
+  );
 
   TransactionsCompanion _toCompanion(TransactionModel t) =>
       TransactionsCompanion.insert(
@@ -41,7 +40,6 @@ class TransactionRepository {
         note: Value(t.note),
         date: t.date,
         type: Value(t.type),
-        receiptImagePath: Value(t.receiptImagePath),
         isRecurring: Value(t.isRecurring),
         recurringRule: Value(t.recurringRule),
         splitId: Value(t.splitId),
@@ -57,23 +55,24 @@ class TransactionRepository {
       _d.into(_d.transactions).insert(_toCompanion(transaction));
 
   Future<void> update(TransactionModel transaction) async {
-    await (_d.update(_d.transactions)
-          ..where((t) => t.id.equals(transaction.id)))
-        .write(TransactionsCompanion(
-      amount: Value(transaction.amount),
-      category: Value(transaction.category),
-      subcategory: Value(transaction.subcategory),
-      note: Value(transaction.note),
-      date: Value(transaction.date),
-      type: Value(transaction.type),
-      receiptImagePath: Value(transaction.receiptImagePath),
-      isRecurring: Value(transaction.isRecurring),
-      recurringRule: Value(transaction.recurringRule),
-      splitId: Value(transaction.splitId),
-      tags: Value(jsonEncode(transaction.tags)),
-      accountId: Value(transaction.accountId),
-      toAccountId: Value(transaction.toAccountId),
-    ));
+    await (_d.update(
+      _d.transactions,
+    )..where((t) => t.id.equals(transaction.id))).write(
+      TransactionsCompanion(
+        amount: Value(transaction.amount),
+        category: Value(transaction.category),
+        subcategory: Value(transaction.subcategory),
+        note: Value(transaction.note),
+        date: Value(transaction.date),
+        type: Value(transaction.type),
+        isRecurring: Value(transaction.isRecurring),
+        recurringRule: Value(transaction.recurringRule),
+        splitId: Value(transaction.splitId),
+        tags: Value(jsonEncode(transaction.tags)),
+        accountId: Value(transaction.accountId),
+        toAccountId: Value(transaction.toAccountId),
+      ),
+    );
   }
 
   Future<void> delete(int id) async {
@@ -81,9 +80,9 @@ class TransactionRepository {
   }
 
   Future<TransactionModel?> getById(int id) async {
-    final row = await (_d.select(_d.transactions)
-          ..where((t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final row = await (_d.select(
+      _d.transactions,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
     return row == null ? null : _fromRow(row);
   }
 
@@ -105,34 +104,38 @@ class TransactionRepository {
     DateTime start,
     DateTime end,
   ) async {
-    final rows = await (_d.select(_d.transactions)
-          ..where((t) => t.date.isBetweenValues(start, end))
-          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
-        .get();
+    final rows =
+        await (_d.select(_d.transactions)
+              ..where((t) => t.date.isBetweenValues(start, end))
+              ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+            .get();
     return rows.map(_fromRow).toList();
   }
 
   Future<List<TransactionModel>> getByCategory(String category) async {
-    final rows = await (_d.select(_d.transactions)
-          ..where((t) => t.category.equals(category))
-          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
-        .get();
+    final rows =
+        await (_d.select(_d.transactions)
+              ..where((t) => t.category.equals(category))
+              ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+            .get();
     return rows.map(_fromRow).toList();
   }
 
   Future<List<TransactionModel>> getByAccount(String accountId) async {
-    final rows = await (_d.select(_d.transactions)
-          ..where((t) => t.accountId.equals(accountId))
-          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
-        .get();
+    final rows =
+        await (_d.select(_d.transactions)
+              ..where((t) => t.accountId.equals(accountId))
+              ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+            .get();
     return rows.map(_fromRow).toList();
   }
 
   Future<List<TransactionModel>> getByType(int type) async {
-    final rows = await (_d.select(_d.transactions)
-          ..where((t) => t.type.equals(type))
-          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
-        .get();
+    final rows =
+        await (_d.select(_d.transactions)
+              ..where((t) => t.type.equals(type))
+              ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+            .get();
     return rows.map(_fromRow).toList();
   }
 
@@ -141,28 +144,32 @@ class TransactionRepository {
     final all = await getAll();
     return all.where((t) {
       if (t.category.toLowerCase().contains(lowerQuery)) return true;
-      if (t.subcategory?.toLowerCase().contains(lowerQuery) == true) return true;
+      if (t.subcategory?.toLowerCase().contains(lowerQuery) == true)
+        return true;
       if (t.note?.toLowerCase().contains(lowerQuery) == true) return true;
-      if (t.tags.any((tag) => tag.toLowerCase().contains(lowerQuery))) return true;
+      if (t.tags.any((tag) => tag.toLowerCase().contains(lowerQuery)))
+        return true;
       return false;
     }).toList();
   }
 
   Future<List<TransactionModel>> getRecurring() async {
-    final rows = await (_d.select(_d.transactions)
-          ..where((t) => t.isRecurring.equals(true))
-          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
-        .get();
+    final rows =
+        await (_d.select(_d.transactions)
+              ..where((t) => t.isRecurring.equals(true))
+              ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+            .get();
     return rows.map(_fromRow).toList();
   }
 
   // ── Aggregates ───────────────────────────────────────────────────────────
 
   Future<double> getTotalByType(int type, DateTime start, DateTime end) async {
-    final txns = await (_d.select(_d.transactions)
-          ..where((t) =>
-              t.type.equals(type) & t.date.isBetweenValues(start, end)))
-        .get();
+    final txns =
+        await (_d.select(_d.transactions)..where(
+              (t) => t.type.equals(type) & t.date.isBetweenValues(start, end),
+            ))
+            .get();
     return txns.fold<double>(0.0, (s, t) => s + t.amount);
   }
 
@@ -170,10 +177,11 @@ class TransactionRepository {
     DateTime start,
     DateTime end,
   ) async {
-    final txns = await (_d.select(_d.transactions)
-          ..where((t) =>
-              t.type.equals(1) & t.date.isBetweenValues(start, end)))
-        .get();
+    final txns =
+        await (_d.select(_d.transactions)..where(
+              (t) => t.type.equals(1) & t.date.isBetweenValues(start, end),
+            ))
+            .get();
     final totals = <String, double>{};
     for (final t in txns) {
       totals[t.category] = (totals[t.category] ?? 0.0) + t.amount;
@@ -183,7 +191,5 @@ class TransactionRepository {
 
   // ── Real-Time Stream ─────────────────────────────────────────────────────
 
-  Stream<void> watchAll() => _d.select(_d.transactions)
-      .watch()
-      .map((_) {});
+  Stream<void> watchAll() => _d.select(_d.transactions).watch().map((_) {});
 }

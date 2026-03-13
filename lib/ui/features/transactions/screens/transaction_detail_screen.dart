@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -245,12 +244,6 @@ class _TransactionDetailContent extends ConsumerWidget {
               ),
             ],
 
-            // ── Receipt Image ──
-            if (transaction.receiptImagePath != null) ...[
-              const SizedBox(height: Spacing.md),
-              _ReceiptSection(imagePath: transaction.receiptImagePath!),
-            ],
-
             // ── Recurring Info ──
             if (transaction.isRecurring) ...[
               const SizedBox(height: Spacing.md),
@@ -473,80 +466,6 @@ class _InfoCard extends StatelessWidget {
             const SizedBox(height: Spacing.sm),
             child,
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Receipt Section ─────────────────────────────────────────────────────────
-
-class _ReceiptSection extends StatelessWidget {
-  final String imagePath;
-
-  const _ReceiptSection({required this.imagePath});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return _InfoCard(
-      icon: FontAwesomeIcons.receipt,
-      label: 'Receipt',
-      child: GestureDetector(
-        onTap: () => _viewFullscreen(context),
-        child: ClipRRect(
-          borderRadius: Radii.borderMd,
-          child: Image.file(
-            File(imagePath),
-            height: 200,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(
-              height: 100,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerLow,
-                borderRadius: Radii.borderMd,
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    FaIcon(
-                      FontAwesomeIcons.image,
-                      size: 24,
-                      color: theme.colorScheme.onSurface.withOpacity(0.3),
-                    ),
-                    const SizedBox(height: Spacing.xs),
-                    Text(
-                      'Unable to load receipt',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.5),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _viewFullscreen(BuildContext context) {
-    final theme = Theme.of(context);
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(
-            backgroundColor: theme.colorScheme.surface,
-            iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
-          ),
-          backgroundColor: theme.colorScheme.surface,
-          body: Center(
-            child: InteractiveViewer(child: Image.file(File(imagePath))),
-          ),
         ),
       ),
     );

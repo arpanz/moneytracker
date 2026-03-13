@@ -24,7 +24,6 @@ import '../../ui/features/loans/screens/loans_screen.dart';
 import '../../ui/features/lock/screens/lock_screen.dart';
 import '../../ui/features/notifications/screens/pending_transactions_screen.dart';
 import '../../ui/features/onboarding/screens/onboarding_screen.dart';
-import '../../ui/features/scanner/screens/scanner_screen.dart';
 import '../../ui/features/settings/screens/settings_screen.dart';
 import '../../ui/features/settings/screens/theme_picker_screen.dart';
 import '../../ui/features/split/screens/add_split_screen.dart';
@@ -261,11 +260,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/settings/themes',
         name: RouteNames.themePicker,
         builder: (context, state) => const ThemePickerScreen(),
-      ),
-      GoRoute(
-        path: '/scanner',
-        name: RouteNames.scanner,
-        builder: (context, state) => const ScannerScreen(),
       ),
       GoRoute(
         path: '/pending-transactions',

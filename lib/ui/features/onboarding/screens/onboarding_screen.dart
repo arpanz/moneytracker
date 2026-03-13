@@ -212,11 +212,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     badge: 'Tracking',
                     title: 'Log expenses, income, and transfers in seconds.',
                     subtitle:
-                        'Categories, notes, receipts, and account routing are built into the flow.',
+                        'Categories, notes, and account routing are built into the flow.',
                     bullets: const [
                       'Quick amount entry',
                       'Custom categories',
-                      'Receipt attachment support',
+                      'Account-aware transaction flow',
                     ],
                   ),
                   _FeaturePage(

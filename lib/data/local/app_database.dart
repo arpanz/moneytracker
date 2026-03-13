@@ -28,7 +28,6 @@ class Transactions extends Table {
   TextColumn get note => text().nullable()();
   DateTimeColumn get date => dateTime()();
   IntColumn get type => integer().withDefault(const Constant(1))();
-  TextColumn get receiptImagePath => text().nullable()();
   BoolColumn get isRecurring => boolean().withDefault(const Constant(false))();
   TextColumn get recurringRule => text().nullable()();
   TextColumn get splitId => text().nullable()();
