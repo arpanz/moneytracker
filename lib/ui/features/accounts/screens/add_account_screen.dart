@@ -23,8 +23,16 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   bool _isSaving = false;
 
   static const _types = [
-    {'label': 'Bank Account', 'icon': Icons.account_balance_rounded, 'value': 0},
-    {'label': 'Digital Wallet', 'icon': Icons.account_balance_wallet_rounded, 'value': 1},
+    {
+      'label': 'Bank Account',
+      'icon': Icons.account_balance_rounded,
+      'value': 0,
+    },
+    {
+      'label': 'Digital Wallet',
+      'icon': Icons.account_balance_wallet_rounded,
+      'value': 1,
+    },
     {'label': 'Credit Card', 'icon': Icons.credit_card_rounded, 'value': 2},
     {'label': 'Cash', 'icon': Icons.money_rounded, 'value': 3},
   ];
@@ -40,6 +48,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -48,8 +57,11 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
           TextButton(
             onPressed: _isSaving ? null : _save,
             child: _isSaving
-                ? const SizedBox(width: 20, height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2))
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
                 : const Text('Save'),
           ),
         ],
@@ -69,8 +81,13 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                 final value = t['value'] as int;
                 final isSelected = _type == value;
                 return ChoiceChip(
-                  avatar: Icon(t['icon'] as IconData, size: 18,
-                      color: isSelected ? colors.onPrimary : colors.onSurfaceVariant),
+                  avatar: Icon(
+                    t['icon'] as IconData,
+                    size: 18,
+                    color: isSelected
+                        ? colors.onPrimary
+                        : colors.onSurfaceVariant,
+                  ),
                   label: Text(t['label'] as String),
                   selected: isSelected,
                   onSelected: (_) => setState(() => _type = value),
@@ -88,19 +105,24 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                 prefixIcon: Icon(Icons.label_outlined),
               ),
               textCapitalization: TextCapitalization.words,
-              validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? 'Required' : null,
             ),
             const SizedBox(height: AppSpacing.md),
 
             // Opening balance
             TextFormField(
               controller: _balanceController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Opening Balance',
                 hintText: '0.00',
-                prefixIcon: Icon(Icons.attach_money_rounded),
+                prefixIcon: const Icon(Icons.attach_money_rounded),
+                prefixText: '$currencySymbol ',
               ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+                signed: true,
+              ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[\d.\-]')),
               ],
@@ -122,8 +144,11 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline_rounded,
-                      color: colors.primary, size: 20),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: colors.primary,
+                    size: 20,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
@@ -151,22 +176,23 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         ..name = _nameController.text.trim()
         ..accountType = _type
         ..balance = double.parse(_balanceController.text)
+        ..currency = ref.read(currencyCodeProvider)
         ..createdAt = DateTime.now();
 
       final repo = ref.read(accountRepositoryProvider);
       await repo.add(account);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Account added!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Account added!')));
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);

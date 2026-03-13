@@ -54,11 +54,11 @@ abstract class Radii {
 /// Animation duration tokens.
 /// Named AppDurations to avoid conflict with Flutter's built-in Durations class.
 abstract class AppDurations {
-  static const Duration fast = Duration(milliseconds: 200);
-  static const Duration medium = Duration(milliseconds: 350);
-  static const Duration slow = Duration(milliseconds: 500);
-  static const Duration pageTransition = Duration(milliseconds: 300);
-  static const Duration shimmer = Duration(milliseconds: 1500);
+  static const Duration fast = Duration(milliseconds: 160);
+  static const Duration medium = Duration(milliseconds: 240);
+  static const Duration slow = Duration(milliseconds: 360);
+  static const Duration pageTransition = Duration(milliseconds: 240);
+  static const Duration shimmer = Duration(milliseconds: 1100);
 }
 
 /// Alias so screens can use `AppSpacing.md` instead of `Spacing.md`.

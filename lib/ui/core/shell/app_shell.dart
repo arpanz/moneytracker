@@ -200,19 +200,19 @@ class _FabPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const radius = 88.0;
+    const radius = 96.0;
     const actions = [
-      _FabAction(
-        label: 'Expense',
-        icon: Icons.remove_rounded,
-        colorLight: Color(0xFFEF4444),
-        colorDark: Color(0xFFF87171),
-      ),
       _FabAction(
         label: 'Income',
         icon: Icons.add_rounded,
         colorLight: Color(0xFF16A34A),
         colorDark: Color(0xFF4ADE80),
+      ),
+      _FabAction(
+        label: 'Expense',
+        icon: Icons.remove_rounded,
+        colorLight: Color(0xFFEF4444),
+        colorDark: Color(0xFFF87171),
       ),
       _FabAction(
         label: 'Transfer',
@@ -222,22 +222,33 @@ class _FabPopup extends StatelessWidget {
       ),
     ];
     const angles = [150.0, 90.0, 30.0];
-    final callbacks = [onAddExpense, onAddIncome, onTransfer];
+    final callbacks = [onAddIncome, onAddExpense, onTransfer];
     final isDark = colorScheme.brightness == Brightness.dark;
 
     return Transform.scale(
       scale: scale,
       child: SizedBox(
-        width: radius * 2 + 80,
-        height: radius + 40,
+        width: radius * 2 + 88,
+        height: radius + 74,
         child: Stack(
           alignment: Alignment.bottomCenter,
           children: [
+            Positioned(
+              bottom: 18,
+              child: IgnorePointer(
+                child: CustomPaint(
+                  size: const Size(220, 120),
+                  painter: _FabArcPainter(
+                    color: colorScheme.primary.withValues(alpha: 0.12),
+                  ),
+                ),
+              ),
+            ),
             for (int i = 0; i < actions.length; i++)
               Positioned(
-                bottom: 0,
+                bottom: i == 1 ? 18 : 0,
                 left:
-                    (radius + 40) +
+                    (radius + 44) +
                     radius * math.cos(angles[i] * math.pi / 180) -
                     28,
                 child: _FabActionButton(
@@ -251,6 +262,34 @@ class _FabPopup extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _FabArcPainter extends CustomPainter {
+  final Color color;
+
+  const _FabArcPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawArc(
+      Rect.fromLTWH(0, 0, size.width, size.height * 2),
+      math.pi,
+      math.pi,
+      false,
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _FabArcPainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }
 
@@ -304,13 +343,20 @@ class _FabActionButton extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          action.label,
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: colorScheme.surface.withValues(alpha: 0.96),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            action.label,
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurface,
+            ),
           ),
         ),
       ],

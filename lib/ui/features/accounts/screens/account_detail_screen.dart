@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/di/providers.dart';
+import '../../../../config/constants/currency_catalog.dart';
 import '../../../../config/theme/spacing.dart';
 import '../../../../domain/models/account_model.dart';
 import '../../../../domain/models/transaction_model.dart';
@@ -14,7 +15,8 @@ class AccountDetailScreen extends ConsumerStatefulWidget {
   const AccountDetailScreen({super.key, required this.accountId});
 
   @override
-  ConsumerState<AccountDetailScreen> createState() => _AccountDetailScreenState();
+  ConsumerState<AccountDetailScreen> createState() =>
+      _AccountDetailScreenState();
 }
 
 class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
@@ -67,6 +69,7 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
     }
 
     final account = _account!;
+    final currencySymbol = currencySymbolFor(account.currency);
     final income = _transactions
         .where((t) => t.type == 0)
         .fold<double>(0, (s, t) => s + t.amount);
@@ -104,12 +107,15 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
             ),
             child: Column(
               children: [
-                Text(_accountTypeLabel(account.accountType),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onPrimaryContainer.withValues(alpha: 0.7))),
+                Text(
+                  _accountTypeLabel(account.accountType),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.onPrimaryContainer.withValues(alpha: 0.7),
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  '\$${account.balance.toStringAsFixed(2)}',
+                  '$currencySymbol${account.balance.toStringAsFixed(2)}',
                   style: theme.textTheme.displaySmall?.copyWith(
                     color: colors.onPrimaryContainer,
                     fontWeight: FontWeight.bold,
@@ -121,18 +127,24 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
                   children: [
                     _MiniStat(
                       label: 'Income',
-                      value: '\$${income.toStringAsFixed(0)}',
+                      value: '$currencySymbol${income.toStringAsFixed(0)}',
                       color: Colors.green,
                     ),
-                    Container(width: 1, height: 30,
-                        color: colors.onPrimaryContainer.withValues(alpha: 0.2)),
+                    Container(
+                      width: 1,
+                      height: 30,
+                      color: colors.onPrimaryContainer.withValues(alpha: 0.2),
+                    ),
                     _MiniStat(
                       label: 'Expenses',
-                      value: '\$${expenses.toStringAsFixed(0)}',
+                      value: '$currencySymbol${expenses.toStringAsFixed(0)}',
                       color: colors.error,
                     ),
-                    Container(width: 1, height: 30,
-                        color: colors.onPrimaryContainer.withValues(alpha: 0.2)),
+                    Container(
+                      width: 1,
+                      height: 30,
+                      color: colors.onPrimaryContainer.withValues(alpha: 0.2),
+                    ),
                     _MiniStat(
                       label: 'Transactions',
                       value: '${_transactions.length}',
@@ -154,47 +166,48 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
             Padding(
               padding: const EdgeInsets.all(AppSpacing.xl),
               child: Center(
-                child: Text('No transactions for this account.',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colors.onSurfaceVariant)),
+                child: Text(
+                  'No transactions for this account.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
               ),
             )
           else
-            ...List.generate(
-              _transactions.take(20).length,
-              (i) {
-                final txn = _transactions[i];
-                final isIncome = txn.type == 0;
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: CircleAvatar(
-                    backgroundColor: isIncome
-                        ? Colors.green.withValues(alpha: 0.15)
-                        : colors.errorContainer,
-                    child: Icon(
-                      isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
-                      color: isIncome ? Colors.green : colors.error,
-                      size: 20,
-                    ),
+            ...List.generate(_transactions.take(20).length, (i) {
+              final txn = _transactions[i];
+              final isIncome = txn.type == 0;
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: CircleAvatar(
+                  backgroundColor: isIncome
+                      ? Colors.green.withValues(alpha: 0.15)
+                      : colors.errorContainer,
+                  child: Icon(
+                    isIncome
+                        ? Icons.arrow_downward_rounded
+                        : Icons.arrow_upward_rounded,
+                    color: isIncome ? Colors.green : colors.error,
+                    size: 20,
                   ),
-                  title: Text(txn.category, style: theme.textTheme.bodyMedium),
-                  subtitle: Text(
-                    txn.note ?? _formatDate(txn.date),
-                    style: theme.textTheme.bodySmall,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                ),
+                title: Text(txn.category, style: theme.textTheme.bodyMedium),
+                subtitle: Text(
+                  txn.note ?? _formatDate(txn.date),
+                  style: theme.textTheme.bodySmall,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: Text(
+                  '${isIncome ? '+' : '-'}$currencySymbol${txn.amount.toStringAsFixed(2)}',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: isIncome ? Colors.green : colors.error,
                   ),
-                  trailing: Text(
-                    '${isIncome ? '+' : '-'}\$${txn.amount.toStringAsFixed(2)}',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: isIncome ? Colors.green : colors.error,
-                    ),
-                  ),
-                ).animate(delay: (i * 40).ms)
-                    .fadeIn(duration: 200.ms);
-              },
-            ),
+                ),
+              ).animate(delay: (i * 40).ms).fadeIn(duration: 200.ms);
+            }),
         ],
       ),
     );
@@ -202,23 +215,41 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
 
   String _accountTypeLabel(int type) {
     switch (type) {
-      case 0: return 'Bank Account';
-      case 1: return 'Digital Wallet';
-      case 2: return 'Credit Card';
-      case 3: return 'Cash';
-      default: return 'Account';
+      case 0:
+        return 'Bank Account';
+      case 1:
+        return 'Digital Wallet';
+      case 2:
+        return 'Credit Card';
+      case 3:
+        return 'Cash';
+      default:
+        return 'Account';
     }
   }
 
   String _formatDate(DateTime date) {
-    final months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
   void _editAccount() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Edit coming soon')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Edit coming soon')));
   }
 
   Future<void> _deleteAccount() async {
@@ -231,10 +262,16 @@ class _AccountDetailScreenState extends ConsumerState<AccountDetailScreen> {
           'This action cannot be undone.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ),
         ],
       ),
@@ -252,18 +289,31 @@ class _MiniStat extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _MiniStat({required this.label, required this.value, required this.color});
+  const _MiniStat({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Column(
       children: [
-        Text(value, style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.bold, color: color)),
+        Text(
+          value,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
         const SizedBox(height: 2),
-        Text(label, style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.6))),
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.6),
+          ),
+        ),
       ],
     );
   }

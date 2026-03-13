@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:fl_chart/fl_chart.dart';
@@ -38,7 +37,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ref.invalidate(recentTransactionsProvider);
     ref.invalidate(categoryTotalsProvider);
     ref.invalidate(accountsListProvider);
-    await Future.delayed(const Duration(milliseconds: 300));
   }
 
   String _greeting() {
@@ -263,14 +261,7 @@ class _GreetingHeader extends StatelessWidget {
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
-              )
-                  .animate()
-                  .fadeIn(duration: AppDurations.medium)
-                  .slideY(
-                      begin: -0.1,
-                      end: 0,
-                      duration: AppDurations.medium,
-                      curve: Curves.easeOut),
+              ),
             ),
             if (pendingCount > 0)
               Stack(
@@ -322,9 +313,7 @@ class _GreetingHeader extends StatelessWidget {
           dateStr,
           style: theme.textTheme.bodyMedium
               ?.copyWith(color: colorScheme.onSurfaceVariant),
-        ).animate().fadeIn(
-            delay: const Duration(milliseconds: 100),
-            duration: AppDurations.medium),
+        ),
 
         const SizedBox(height: Spacing.md),
 
@@ -386,12 +375,10 @@ class _GreetingHeader extends StatelessWidget {
                     onTap: onMoreTap,
                     theme: theme,
                   ),
-                ),
+              ),
             ],
           ),
-        ).animate().fadeIn(
-            delay: const Duration(milliseconds: 150),
-            duration: AppDurations.medium),
+        ),
       ],
     );
   }
@@ -703,17 +690,10 @@ class _BalanceSection extends StatelessWidget {
 
     return balanceAsync.when(
       data: (balance) => BalanceCard(
-            balance: balance,
-            currencySymbol: currencySymbol,
-            obscureValues: !showValues,
-          )
-          .animate()
-          .fadeIn(duration: AppDurations.medium)
-          .slideY(
-              begin: 0.05,
-              end: 0,
-              duration: AppDurations.medium,
-              curve: Curves.easeOut),
+          balance: balance,
+          currencySymbol: currencySymbol,
+          obscureValues: !showValues,
+        ),
       loading: () => const _BalanceCardShimmer(),
       error: (_, __) => BalanceCard(
           balance: 0,
@@ -766,44 +746,34 @@ class _IncomeExpenseRow extends StatelessWidget {
     final cheddarColors = theme.extension<CheddarColors>();
 
     return Row(
-          children: [
-            Expanded(
-              child: _MiniStatCard(
-                label: 'Income',
-                amount: incomeAsync.value ?? 0,
-                isLoading: incomeAsync.isLoading,
-                icon: Icons.arrow_downward_rounded,
-                iconColor: cheddarColors?.income ?? Colors.green,
-                theme: theme,
-                currencySymbol: currencySymbol,
-                showValues: showValues,
-              ),
-            ),
-            const SizedBox(width: Spacing.md),
-            Expanded(
-              child: _MiniStatCard(
-                label: 'Expense',
-                amount: expenseAsync.value ?? 0,
-                isLoading: expenseAsync.isLoading,
-                icon: Icons.arrow_upward_rounded,
-                iconColor: cheddarColors?.expense ?? Colors.red,
-                theme: theme,
-                currencySymbol: currencySymbol,
-                showValues: showValues,
-              ),
-            ),
-          ],
-        )
-        .animate()
-        .fadeIn(
-            delay: const Duration(milliseconds: 200),
-            duration: AppDurations.medium)
-        .slideY(
-            begin: 0.05,
-            end: 0,
-            delay: const Duration(milliseconds: 200),
-            duration: AppDurations.medium,
-            curve: Curves.easeOut);
+      children: [
+        Expanded(
+          child: _MiniStatCard(
+            label: 'Income',
+            amount: incomeAsync.value ?? 0,
+            isLoading: incomeAsync.isLoading,
+            icon: Icons.arrow_downward_rounded,
+            iconColor: cheddarColors?.income ?? Colors.green,
+            theme: theme,
+            currencySymbol: currencySymbol,
+            showValues: showValues,
+          ),
+        ),
+        const SizedBox(width: Spacing.md),
+        Expanded(
+          child: _MiniStatCard(
+            label: 'Expense',
+            amount: expenseAsync.value ?? 0,
+            isLoading: expenseAsync.isLoading,
+            icon: Icons.arrow_upward_rounded,
+            iconColor: cheddarColors?.expense ?? Colors.red,
+            theme: theme,
+            currencySymbol: currencySymbol,
+            showValues: showValues,
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -1070,17 +1040,7 @@ class _SpendingChart extends StatelessWidget {
                   ),
                 ],
               ),
-            )
-            .animate()
-            .fadeIn(
-                delay: const Duration(milliseconds: 400),
-                duration: AppDurations.medium)
-            .slideY(
-                begin: 0.05,
-                end: 0,
-                delay: const Duration(milliseconds: 400),
-                duration: AppDurations.medium,
-                curve: Curves.easeOut);
+            );
       },
       loading: () => const SizedBox(
         height: 160,
@@ -1232,29 +1192,16 @@ class _RecentTransactionsListState
                     ));
                 },
                 child: _TransactionRow(
-                      transaction: txn,
-                      theme: widget.theme,
-                      cheddarColors: cheddarColors,
-                      currencySymbol: widget.currencySymbol,
-                      showValues: widget.showValues,
-                      onTap: () => context.pushNamed(
-                        RouteNames.transactionDetail,
-                        pathParameters: {
-                          'id': txn.id.toString()
-                        },
-                      ),
-                    )
-                    .animate()
-                    .fadeIn(
-                        delay: Duration(milliseconds: 100 * index),
-                        duration: AppDurations.medium)
-                    .slideX(
-                        begin: 0.05,
-                        end: 0,
-                        delay: Duration(
-                            milliseconds: 100 * index),
-                        duration: AppDurations.medium,
-                        curve: Curves.easeOut),
+                  transaction: txn,
+                  theme: widget.theme,
+                  cheddarColors: cheddarColors,
+                  currencySymbol: widget.currencySymbol,
+                  showValues: widget.showValues,
+                  onTap: () => context.pushNamed(
+                    RouteNames.transactionDetail,
+                    pathParameters: {'id': txn.id.toString()},
+                  ),
+                ),
               );
             },
           ),

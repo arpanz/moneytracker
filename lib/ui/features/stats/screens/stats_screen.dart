@@ -30,6 +30,10 @@ enum StatsSection {
 }
 
 class _StatsScreenState extends ConsumerState<StatsScreen> {
+  static const ScrollPhysics _scrollPhysics = BouncingScrollPhysics(
+    parent: AlwaysScrollableScrollPhysics(),
+  );
+
   int _touchedPieIndex = -1;
   StatsSection _selectedSection = StatsSection.spending;
 
@@ -163,6 +167,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
 
     return Scaffold(
       body: CustomScrollView(
+        physics: _scrollPhysics,
+        cacheExtent: 1200,
         slivers: [
           SliverAppBar(
             floating: true,
@@ -206,47 +212,103 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
   }
 
   Widget _buildSectionSelector(ThemeData theme) {
+    final icon = switch (_selectedSection) {
+      StatsSection.spending => Icons.show_chart_rounded,
+      StatsSection.categories => Icons.pie_chart_rounded,
+      StatsSection.cashflow => Icons.bar_chart_rounded,
+      StatsSection.calendar => Icons.calendar_month_rounded,
+    };
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(Spacing.md, Spacing.sm, Spacing.md, 0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: StatsSection.values.map((section) {
-            final isSelected = section == _selectedSection;
-            return Padding(
-              padding: const EdgeInsets.only(right: Spacing.sm),
-              child: ChoiceChip(
-                label: Text(section.label),
-                selected: isSelected,
-                onSelected: (_) {
-                  if (!isSelected) {
-                    setState(() => _selectedSection = section);
-                  }
-                },
-                selectedColor: theme.colorScheme.primary.withValues(
-                  alpha: 0.14,
-                ),
-                backgroundColor: theme.colorScheme.surface,
-                side: BorderSide(
-                  color: isSelected
-                      ? theme.colorScheme.primary.withValues(alpha: 0.35)
-                      : theme.colorScheme.outline.withValues(alpha: 0.25),
-                ),
-                labelStyle: TextStyle(
-                  color: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-                shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: Spacing.sm,
-                  vertical: Spacing.xs,
-                ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: Radii.borderFull,
+          onTap: _showSectionPicker,
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: Radii.borderFull,
+              gradient: LinearGradient(
+                colors: [
+                  theme.colorScheme.primary.withValues(alpha: 0.16),
+                  theme.colorScheme.secondary.withValues(alpha: 0.08),
+                ],
               ),
-            );
-          }).toList(),
+              border: Border.all(
+                color: theme.colorScheme.primary.withValues(alpha: 0.18),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: Spacing.md,
+                vertical: 12,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      color: theme.colorScheme.onPrimary,
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: Spacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'View',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.55,
+                            ),
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        Text(
+                          _selectedSection.label,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Spacing.sm,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface.withValues(alpha: 0.9),
+                      borderRadius: Radii.borderFull,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${StatsSection.values.length} options',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.expand_more_rounded, size: 18),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -272,6 +334,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
+        physics: _scrollPhysics,
         child: Row(
           children: PeriodType.values.map((type) {
             final isSelected = type == selectedPeriod;
@@ -281,28 +344,33 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
 
             return Padding(
               padding: const EdgeInsets.only(right: Spacing.sm),
-              child: ChoiceChip(
+              child: FilterChip(
                 label: Text(label),
                 selected: isSelected,
                 onSelected: (_) => _onPeriodChanged(type),
-                selectedColor: theme.colorScheme.primary,
-                backgroundColor: theme.colorScheme.surface,
+                selectedColor: theme.colorScheme.primary.withValues(
+                  alpha: 0.95,
+                ),
+                backgroundColor: theme.colorScheme.surfaceContainerLow,
+                showCheckmark: false,
                 side: BorderSide(
                   color: isSelected
-                      ? Colors.transparent
-                      : theme.colorScheme.outline.withValues(alpha: 0.3),
+                      ? theme.colorScheme.primary.withValues(alpha: 0.25)
+                      : theme.colorScheme.outline.withValues(alpha: 0.16),
                 ),
                 labelStyle: TextStyle(
                   color: isSelected
                       ? theme.colorScheme.onPrimary
                       : theme.colorScheme.onSurface,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),
-                shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
+                ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: Spacing.sm,
-                  vertical: Spacing.xs,
+                  vertical: 10,
                 ),
               ),
             );
@@ -310,6 +378,110 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _showSectionPicker() async {
+    final theme = Theme.of(context);
+    final selected = await showModalBottomSheet<StatsSection>(
+      context: context,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(
+            Spacing.md,
+            Spacing.md,
+            Spacing.md,
+            Spacing.xl,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Choose stats view',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: Spacing.sm),
+              ...StatsSection.values.map((section) {
+                final isSelected = section == _selectedSection;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: Spacing.sm),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: Radii.borderLg,
+                      onTap: () => Navigator.of(context).pop(section),
+                      child: Ink(
+                        padding: const EdgeInsets.all(Spacing.md),
+                        decoration: BoxDecoration(
+                          borderRadius: Radii.borderLg,
+                          color: isSelected
+                              ? theme.colorScheme.primary.withValues(
+                                  alpha: 0.12,
+                                )
+                              : theme.colorScheme.surfaceContainerLow,
+                          border: Border.all(
+                            color: isSelected
+                                ? theme.colorScheme.primary.withValues(
+                                    alpha: 0.25,
+                                  )
+                                : theme.colorScheme.outline.withValues(
+                                    alpha: 0.12,
+                                  ),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              switch (section) {
+                                StatsSection.spending =>
+                                  Icons.show_chart_rounded,
+                                StatsSection.categories =>
+                                  Icons.pie_chart_rounded,
+                                StatsSection.cashflow =>
+                                  Icons.bar_chart_rounded,
+                                StatsSection.calendar =>
+                                  Icons.calendar_month_rounded,
+                              },
+                              color: isSelected
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: Spacing.sm),
+                            Expanded(
+                              child: Text(
+                                section.label,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            if (isSelected)
+                              Icon(
+                                Icons.check_circle_rounded,
+                                color: theme.colorScheme.primary,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected != null && selected != _selectedSection && mounted) {
+      setState(() => _selectedSection = selected);
+    }
   }
 
   Widget _buildEmptyState(ThemeData theme) {

@@ -31,7 +31,8 @@ class BudgetWithSpending {
     required this.status,
   });
 
-  double get remaining => (budget.limitAmount - spent).clamp(0, double.infinity);
+  double get remaining =>
+      (budget.limitAmount - spent).clamp(0, double.infinity);
 
   int get daysRemaining {
     final now = DateTime.now();
@@ -58,32 +59,16 @@ class BudgetWithSpending {
 
   static DateTime _calculateCurrentPeriodStart(BudgetModel budget) {
     final now = DateTime.now();
-    var periodStart = budget.startDate;
+    var periodStart = DateTime(
+      budget.startDate.year,
+      budget.startDate.month,
+      budget.startDate.day,
+    );
 
-    switch (budget.period) {
-      case 0: // weekly
-        while (periodStart.add(const Duration(days: 7)).isBefore(now)) {
-          periodStart = periodStart.add(const Duration(days: 7));
-        }
-      case 1: // monthly
-        while (DateTime(periodStart.year, periodStart.month + 1, periodStart.day)
-            .isBefore(now)) {
-          periodStart = DateTime(
-            periodStart.year,
-            periodStart.month + 1,
-            periodStart.day,
-          );
-        }
-      case 2: // yearly
-        while (DateTime(periodStart.year + 1, periodStart.month, periodStart.day)
-            .isBefore(now)) {
-          periodStart = DateTime(
-            periodStart.year + 1,
-            periodStart.month,
-            periodStart.day,
-          );
-        }
+    while (_nextPeriodStart(periodStart, budget.period).isBefore(now)) {
+      periodStart = _nextPeriodStart(periodStart, budget.period);
     }
+
     return periodStart;
   }
 
@@ -93,11 +78,11 @@ class BudgetWithSpending {
       case 0:
         return start.add(const Duration(days: 7));
       case 1:
-        return DateTime(start.year, start.month + 1, start.day);
+        return _nextPeriodStart(start, budget.period);
       case 2:
-        return DateTime(start.year + 1, start.month, start.day);
+        return _nextPeriodStart(start, budget.period);
       default:
-        return start.add(const Duration(days: 30));
+        return _nextPeriodStart(start, 1);
     }
   }
 
@@ -106,6 +91,24 @@ class BudgetWithSpending {
     final end = _calculatePeriodEnd(budget);
     return end.difference(start).inDays;
   }
+
+  static DateTime _nextPeriodStart(DateTime start, int period) {
+    switch (period) {
+      case 0:
+        return start.add(const Duration(days: 7));
+      case 1:
+        return _dateWithClampedDay(start.year, start.month + 1, start.day);
+      case 2:
+        return _dateWithClampedDay(start.year + 1, start.month, start.day);
+      default:
+        return _dateWithClampedDay(start.year, start.month + 1, start.day);
+    }
+  }
+
+  static DateTime _dateWithClampedDay(int year, int month, int day) {
+    final lastDayOfMonth = DateTime(year, month + 1, 0).day;
+    return DateTime(year, month, day.clamp(1, lastDayOfMonth));
+  }
 }
 
 /// Represents a category with spending but no associated budget.
@@ -113,39 +116,41 @@ class UnbudgetedCategory {
   final String category;
   final double totalSpent;
 
-  const UnbudgetedCategory({
-    required this.category,
-    required this.totalSpent,
-  });
+  const UnbudgetedCategory({required this.category, required this.totalSpent});
 }
 
 // ── Providers ───────────────────────────────────────────────────────────────
 
 /// All active budgets from the repository.
-final allBudgetsProvider =
-    FutureProvider<List<BudgetModel>>((ref) async {
+final allBudgetsProvider = FutureProvider<List<BudgetModel>>((ref) async {
   final repo = ref.watch(budgetRepositoryProvider);
   return repo.getActive();
 });
 
 /// Retrieves a single budget by its Isar id.
-final budgetByIdProvider =
-    FutureProvider.family<BudgetModel?, int>((ref, id) async {
+final budgetByIdProvider = FutureProvider.family<BudgetModel?, int>((
+  ref,
+  id,
+) async {
   final repo = ref.watch(budgetRepositoryProvider);
   return repo.getById(id);
 });
 
 /// Combines each active budget with its spent amount and status.
-final budgetWithSpendingProvider =
-    FutureProvider<List<BudgetWithSpending>>((ref) async {
+final budgetWithSpendingProvider = FutureProvider<List<BudgetWithSpending>>((
+  ref,
+) async {
+  ref.watch(budgetStreamProvider);
+  ref.watch(budgetTransactionStreamProvider);
   final budgetRepo = ref.watch(budgetRepositoryProvider);
   final budgets = await ref.watch(allBudgetsProvider.future);
 
   final results = <BudgetWithSpending>[];
   for (final budget in budgets) {
     final spent = await budgetRepo.getSpentForBudget(budget);
-    final percentage =
-        budget.limitAmount > 0 ? spent / budget.limitAmount : 0.0;
+    final percentage = budget.limitAmount > 0
+        ? spent / budget.limitAmount
+        : 0.0;
 
     final BudgetStatus status;
     if (percentage >= 1.0) {
@@ -156,12 +161,14 @@ final budgetWithSpendingProvider =
       status = BudgetStatus.underBudget;
     }
 
-    results.add(BudgetWithSpending(
-      budget: budget,
-      spent: spent,
-      percentage: percentage,
-      status: status,
-    ));
+    results.add(
+      BudgetWithSpending(
+        budget: budget,
+        spent: spent,
+        percentage: percentage,
+        status: status,
+      ),
+    );
   }
 
   // Sort: over-budget first, then warning, then under-budget
@@ -170,8 +177,11 @@ final budgetWithSpendingProvider =
 });
 
 /// Categories with spending in the current month but no active budget.
-final unbudgetedSpendingProvider =
-    FutureProvider<List<UnbudgetedCategory>>((ref) async {
+final unbudgetedSpendingProvider = FutureProvider<List<UnbudgetedCategory>>((
+  ref,
+) async {
+  ref.watch(budgetStreamProvider);
+  ref.watch(budgetTransactionStreamProvider);
   final txnRepo = ref.watch(transactionRepositoryProvider);
   final budgets = await ref.watch(allBudgetsProvider.future);
 
@@ -185,10 +195,9 @@ final unbudgetedSpendingProvider =
   final unbudgeted = <UnbudgetedCategory>[];
   for (final entry in categoryTotals.entries) {
     if (!budgetedCategories.contains(entry.key)) {
-      unbudgeted.add(UnbudgetedCategory(
-        category: entry.key,
-        totalSpent: entry.value,
-      ));
+      unbudgeted.add(
+        UnbudgetedCategory(category: entry.key, totalSpent: entry.value),
+      );
     }
   }
 
@@ -199,32 +208,35 @@ final unbudgetedSpendingProvider =
 /// Daily spending breakdown for a specific budget's category within its period.
 /// Returns `Map<DateTime, double>` (day-only keys) for chart display.
 final dailySpendingForBudgetProvider =
-    FutureProvider.family<Map<DateTime, double>, int>(
-        (ref, budgetId) async {
-  final budgetRepo = ref.watch(budgetRepositoryProvider);
-  final txnRepo = ref.watch(transactionRepositoryProvider);
+    FutureProvider.family<Map<DateTime, double>, int>((ref, budgetId) async {
+      ref.watch(budgetStreamProvider);
+      ref.watch(budgetTransactionStreamProvider);
+      final budgetRepo = ref.watch(budgetRepositoryProvider);
+      final txnRepo = ref.watch(transactionRepositoryProvider);
 
-  final budget = await budgetRepo.getById(budgetId);
-  if (budget == null) return {};
+      final budget = await budgetRepo.getById(budgetId);
+      if (budget == null) return {};
 
-  final now = DateTime.now();
-  final periodStart = BudgetWithSpending._calculateCurrentPeriodStart(budget);
-  final periodEnd = BudgetWithSpending._calculatePeriodEnd(budget);
-  final endDate = now.isBefore(periodEnd) ? now : periodEnd;
+      final now = DateTime.now();
+      final periodStart = BudgetWithSpending._calculateCurrentPeriodStart(
+        budget,
+      );
+      final periodEnd = BudgetWithSpending._calculatePeriodEnd(budget);
+      final endDate = now.isBefore(periodEnd) ? now : periodEnd;
 
-  final transactions = await txnRepo.getByDateRange(periodStart, endDate);
-  final filtered = transactions
-      .where((t) => t.type == 1 && t.category == budget.category)
-      .toList();
+      final transactions = await txnRepo.getByDateRange(periodStart, endDate);
+      final filtered = transactions
+          .where((t) => t.type == 1 && t.category == budget.category)
+          .toList();
 
-  final dailyMap = <DateTime, double>{};
-  for (final txn in filtered) {
-    final dayKey = DateTime(txn.date.year, txn.date.month, txn.date.day);
-    dailyMap[dayKey] = (dailyMap[dayKey] ?? 0.0) + txn.amount;
-  }
+      final dailyMap = <DateTime, double>{};
+      for (final txn in filtered) {
+        final dayKey = DateTime(txn.date.year, txn.date.month, txn.date.day);
+        dailyMap[dayKey] = (dailyMap[dayKey] ?? 0.0) + txn.amount;
+      }
 
-  return dailyMap;
-});
+      return dailyMap;
+    });
 
 /// Watches the budget collection for real-time updates.
 final budgetStreamProvider = StreamProvider<void>((ref) {
@@ -232,11 +244,19 @@ final budgetStreamProvider = StreamProvider<void>((ref) {
   return repo.watchAll();
 });
 
+/// Watches transaction changes so budget spending recomputes live.
+final budgetTransactionStreamProvider = StreamProvider<void>((ref) {
+  final repo = ref.watch(transactionRepositoryProvider);
+  return repo.watchAll();
+});
+
 // ── Mutation Providers ──────────────────────────────────────────────────────
 
 /// Adds a new budget and invalidates caches.
-final addBudgetProvider =
-    FutureProvider.family<int, BudgetModel>((ref, budget) async {
+final addBudgetProvider = FutureProvider.family<int, BudgetModel>((
+  ref,
+  budget,
+) async {
   final repo = ref.read(budgetRepositoryProvider);
   final id = await repo.add(budget);
   ref.invalidate(allBudgetsProvider);
@@ -246,8 +266,10 @@ final addBudgetProvider =
 });
 
 /// Updates an existing budget and invalidates caches.
-final updateBudgetProvider =
-    FutureProvider.family<void, BudgetModel>((ref, budget) async {
+final updateBudgetProvider = FutureProvider.family<void, BudgetModel>((
+  ref,
+  budget,
+) async {
   final repo = ref.read(budgetRepositoryProvider);
   await repo.update(budget);
   ref.invalidate(allBudgetsProvider);
@@ -258,8 +280,7 @@ final updateBudgetProvider =
 });
 
 /// Deletes a budget by id and invalidates caches.
-final deleteBudgetProvider =
-    FutureProvider.family<void, int>((ref, id) async {
+final deleteBudgetProvider = FutureProvider.family<void, int>((ref, id) async {
   final repo = ref.read(budgetRepositoryProvider);
   await repo.delete(id);
   ref.invalidate(allBudgetsProvider);

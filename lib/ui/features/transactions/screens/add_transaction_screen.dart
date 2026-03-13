@@ -2598,5 +2598,12 @@ final _activeAccountsProvider = FutureProvider<List<AccountModel>>((ref) {
 
 final _categoriesByTypeProvider =
     FutureProvider.family<List<CategoryModel>, int>((ref, type) {
-      return ref.watch(categoryRepositoryProvider).getByType(type);
+      // Transaction types are 0=income,1=expense while category types are
+      // 0=expense,1=income. Map before querying categories.
+      final categoryType = switch (type) {
+        0 => 1,
+        1 => 0,
+        _ => 2,
+      };
+      return ref.watch(categoryRepositoryProvider).getByType(categoryType);
     });

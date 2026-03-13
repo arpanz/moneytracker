@@ -137,19 +137,14 @@ class BudgetScreen extends ConsumerWidget {
             SvgPicture.asset(
               AssetPaths.emptyBudgets,
               height: 180,
-            ).animate().fadeIn(duration: 600.ms).scale(
-                  begin: const Offset(0.8, 0.8),
-                  end: const Offset(1.0, 1.0),
-                  duration: 600.ms,
-                  curve: Curves.easeOutBack,
-                ),
+            ),
             const SizedBox(height: Spacing.lg),
             Text(
               'No Budgets Yet',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
-            ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
+            ),
             const SizedBox(height: Spacing.sm),
             Text(
               'Set spending limits for categories\nto keep your finances in check.',
@@ -160,17 +155,14 @@ class BudgetScreen extends ConsumerWidget {
                         .onSurface
                         .withValues(alpha: 0.6),
                   ),
-            ).animate().fadeIn(delay: 300.ms, duration: 400.ms),
+            ),
             const SizedBox(height: Spacing.lg),
             FilledButton.icon(
               onPressed: () =>
                   GoRouter.of(context).pushNamed(RouteNames.addBudget),
               icon: const Icon(Icons.add_rounded),
               label: const Text('Create Budget'),
-            ).animate().fadeIn(delay: 400.ms, duration: 400.ms).slideY(
-                  begin: 0.3,
-                  end: 0,
-                ),
+            ),
           ],
         ),
       ),
@@ -257,7 +249,7 @@ class _BudgetSummaryCard extends StatelessWidget {
               child: TweenAnimationBuilder<double>(
                 tween:
                     Tween(begin: 0, end: overallPercentage.clamp(0.0, 1.5)),
-                duration: const Duration(milliseconds: 1200),
+                duration: AppDurations.medium,
                 curve: Curves.easeOutCubic,
                 builder: (context, value, _) {
                   return Stack(
@@ -318,7 +310,7 @@ class _BudgetSummaryCard extends StatelessWidget {
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 500.ms).slideY(begin: -0.2, end: 0);
+    );
   }
 }
 
@@ -456,7 +448,7 @@ class _BudgetCard extends ConsumerWidget {
                     begin: 0,
                     end: bws.percentage.clamp(0.0, 1.0),
                   ),
-                  duration: Duration(milliseconds: 800 + (index * 100)),
+                  duration: AppDurations.medium,
                   curve: Curves.easeOutCubic,
                   builder: (context, value, _) {
                     return ClipRRect(
@@ -508,11 +500,7 @@ class _BudgetCard extends ConsumerWidget {
           ),
         ),
       ),
-    )
-        .animate()
-        .fadeIn(
-            delay: Duration(milliseconds: 100 * index), duration: 400.ms)
-        .slideX(begin: 0.1, end: 0);
+    );
   }
 
   // FIX #8: period labels match AddBudgetScreen _PeriodStep values.
@@ -649,15 +637,9 @@ class _UnbudgetedSection extends StatelessWidget {
                 ],
               ),
             ),
-          )
-              .animate()
-              .fadeIn(
-                delay: Duration(milliseconds: 50 * entry.key),
-                duration: 300.ms,
-              )
-              .slideX(begin: 0.05, end: 0);
+          );
         }),
       ],
-    ).animate().fadeIn(duration: 400.ms);
+    );
   }
 }
