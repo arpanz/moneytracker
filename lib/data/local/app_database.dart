@@ -158,6 +158,17 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 
+  /// Stub migration strategy — extend [onUpgrade] when bumping [schemaVersion].
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      // Add migration steps here when schemaVersion is incremented.
+      // Example:
+      // if (from < 2) await m.addColumn(transactions, transactions.newColumn);
+    },
+  );
+
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'cheddar_db');
   }

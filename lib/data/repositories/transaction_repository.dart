@@ -87,14 +87,16 @@ class TransactionRepository {
     return row == null ? null : _fromRow(row);
   }
 
+  /// Fetches transactions with optional SQL-level [limit] and [offset].
+  /// Both are applied directly on the Drift query — no in-memory slicing.
   Future<List<TransactionModel>> getAll({int? limit, int? offset}) async {
-    var q = _d.select(_d.transactions)..orderBy([(t) => OrderingTerm.desc(t.date)]);
-    if (offset != null) q = q..where((t) => const Constant(true));
+    final q = _d.select(_d.transactions)
+      ..orderBy([(t) => OrderingTerm.desc(t.date)]);
+    if (limit != null || offset != null) {
+      q.limit(limit ?? -1, offset: offset ?? 0);
+    }
     final rows = await q.get();
-    var result = rows.map(_fromRow).toList();
-    if (offset != null) result = result.skip(offset).toList();
-    if (limit != null) result = result.take(limit).toList();
-    return result;
+    return rows.map(_fromRow).toList();
   }
 
   // ── Filtered Queries ─────────────────────────────────────────────────────
