@@ -15,10 +15,8 @@ class Accounts extends Table {
   RealColumn get creditLimit => real().nullable()();
   TextColumn get currency => text().withDefault(const Constant('INR'))();
   TextColumn get icon => text().withDefault(const Constant('wallet'))();
-  IntColumn get color =>
-      integer().withDefault(const Constant(0xFF4CAF50))();
-  BoolColumn get isArchived =>
-      boolean().withDefault(const Constant(false))();
+  IntColumn get color => integer().withDefault(const Constant(0xFF4CAF50))();
+  BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime()();
 }
 
@@ -31,10 +29,10 @@ class Transactions extends Table {
   DateTimeColumn get date => dateTime()();
   IntColumn get type => integer().withDefault(const Constant(1))();
   TextColumn get receiptImagePath => text().nullable()();
-  BoolColumn get isRecurring =>
-      boolean().withDefault(const Constant(false))();
+  BoolColumn get isRecurring => boolean().withDefault(const Constant(false))();
   TextColumn get recurringRule => text().nullable()();
   TextColumn get splitId => text().nullable()();
+
   /// JSON-encoded List<String>
   TextColumn get tags => text().withDefault(const Constant('[]'))();
   TextColumn get accountId => text()();
@@ -48,8 +46,7 @@ class Categories extends Table {
   TextColumn get icon => text()();
   IntColumn get color => integer().withDefault(const Constant(0xFF9E9E9E))();
   IntColumn get type => integer().withDefault(const Constant(0))();
-  BoolColumn get isCustom =>
-      boolean().withDefault(const Constant(false))();
+  BoolColumn get isCustom => boolean().withDefault(const Constant(false))();
   TextColumn get parentId => text().nullable()();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime()();
@@ -69,20 +66,16 @@ class Goals extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();
   RealColumn get targetAmount => real()();
-  RealColumn get currentAmount =>
-      real().withDefault(const Constant(0.0))();
+  RealColumn get currentAmount => real().withDefault(const Constant(0.0))();
   DateTimeColumn get deadline => dateTime().nullable()();
-  TextColumn get icon =>
-      text().withDefault(const Constant('piggy-bank'))();
-  IntColumn get color =>
-      integer().withDefault(const Constant(0xFF7C3AED))();
+  TextColumn get icon => text().withDefault(const Constant('piggy-bank'))();
+  IntColumn get color => integer().withDefault(const Constant(0xFF7C3AED))();
   TextColumn get linkedAccountId => text().nullable()();
-  BoolColumn get isCompleted =>
-      boolean().withDefault(const Constant(false))();
+  BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime()();
+
   /// JSON-encoded List<GoalContribution>
-  TextColumn get contributions =>
-      text().withDefault(const Constant('[]'))();
+  TextColumn get contributions => text().withDefault(const Constant('[]'))();
 }
 
 class Subscriptions extends Table {
@@ -107,9 +100,9 @@ class Splits extends Table {
   TextColumn get description => text()();
   RealColumn get totalAmount => real()();
   IntColumn get splitMethod => integer().withDefault(const Constant(0))();
+
   /// JSON-encoded List<SplitParticipant>
-  TextColumn get participants =>
-      text().withDefault(const Constant('[]'))();
+  TextColumn get participants => text().withDefault(const Constant('[]'))();
   BoolColumn get isFullySettled =>
       boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime()();
@@ -121,37 +114,37 @@ class Loans extends Table {
   TextColumn get personName => text()();
   TextColumn get title => text().nullable()();
   RealColumn get principalAmount => real()();
-  RealColumn get paidAmount =>
-      real().withDefault(const Constant(0.0))();
+  RealColumn get paidAmount => real().withDefault(const Constant(0.0))();
   RealColumn get interestRate => real().nullable()();
   DateTimeColumn get dueDate => dateTime().nullable()();
   TextColumn get note => text().nullable()();
-  BoolColumn get isClosed =>
-      boolean().withDefault(const Constant(false))();
+  BoolColumn get isClosed => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
+
   /// JSON-encoded List<LoanDisbursement>
-  TextColumn get disbursements =>
-      text().withDefault(const Constant('[]'))();
+  TextColumn get disbursements => text().withDefault(const Constant('[]'))();
+
   /// JSON-encoded List<LoanRepayment>
-  TextColumn get repayments =>
-      text().withDefault(const Constant('[]'))();
+  TextColumn get repayments => text().withDefault(const Constant('[]'))();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Database
 // ─────────────────────────────────────────────────────────────────────────────
 
-@DriftDatabase(tables: [
-  Accounts,
-  Transactions,
-  Categories,
-  Budgets,
-  Goals,
-  Subscriptions,
-  Splits,
-  Loans,
-])
+@DriftDatabase(
+  tables: [
+    Accounts,
+    Transactions,
+    Categories,
+    Budgets,
+    Goals,
+    Subscriptions,
+    Splits,
+    Loans,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
