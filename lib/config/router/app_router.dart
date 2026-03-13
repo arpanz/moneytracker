@@ -33,8 +33,6 @@ import '../../ui/features/loans/screens/loan_detail_screen.dart';
 import '../../ui/features/settings/screens/settings_screen.dart';
 import '../../ui/features/settings/screens/theme_picker_screen.dart';
 import '../../ui/features/scanner/screens/scanner_screen.dart';
-import '../../ui/features/personality/screens/personality_screen.dart';
-import '../../ui/features/personality/screens/weekly_wrap_screen.dart';
 import '../../ui/features/notifications/screens/pending_transactions_screen.dart';
 import '../../ui/core/shell/app_shell.dart';
 import 'route_names.dart';
@@ -53,7 +51,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: '/',
-    // FIX: show diagnostics in debug builds only.
     debugLogDiagnostics: kDebugMode,
 
     redirect: (context, state) {
@@ -93,7 +90,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const LockScreen(),
       ),
 
-      // ── Main App Shell with Bottom Nav ──
+      // ── Main App Shell with Bottom Nav (4 tabs: Home, Stats, Budget, More) ──
       ShellRoute(
         builder: (context, state, child) => AppShell(child: child),
         routes: [
@@ -103,15 +100,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
               child: const HomeScreen(),
-              transitionsBuilder: _fadeTransition,
-            ),
-          ),
-          GoRoute(
-            path: '/transactions',
-            name: RouteNames.transactions,
-            pageBuilder: (context, state) => CustomTransitionPage(
-              key: state.pageKey,
-              child: const TransactionListScreen(),
               transitionsBuilder: _fadeTransition,
             ),
           ),
@@ -145,6 +133,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
+      // ── Transactions (accessible from FAB and deep links) ──
+      GoRoute(
+        path: '/transactions',
+        name: RouteNames.transactions,
+        builder: (context, state) => const TransactionListScreen(),
+      ),
+
       // ── Detail / Modal Routes ──
       GoRoute(
         path: '/transaction/add',
@@ -161,7 +156,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/transaction/:id',
         name: RouteNames.transactionDetail,
         builder: (context, state) {
-          // FIX: guard int.parse with tryParse to avoid crash on bad deep-links.
           final id = int.tryParse(state.pathParameters['id'] ?? '');
           if (id == null) return const _NotFoundScreen();
           return TransactionDetailScreen(transactionId: id);
@@ -192,7 +186,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/goal/:id',
         name: RouteNames.goalDetail,
         builder: (context, state) {
-          // FIX: guard int.parse with tryParse.
           final id = int.tryParse(state.pathParameters['id'] ?? '');
           if (id == null) return const _NotFoundScreen();
           return GoalDetailScreen(goalId: id);
@@ -233,7 +226,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.addLoan,
         builder: (context, state) {
           final extra = state.extra;
-          return AddLoanScreen(existingLoan: extra is LoanModel ? extra : null);
+          return AddLoanScreen(
+              existingLoan: extra is LoanModel ? extra : null);
         },
       ),
       GoRoute(
@@ -254,7 +248,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/account/:id',
         name: RouteNames.accountDetail,
         builder: (context, state) {
-          // FIX: guard int.parse with tryParse.
           final id = int.tryParse(state.pathParameters['id'] ?? '');
           if (id == null) return const _NotFoundScreen();
           return AccountDetailScreen(accountId: id);
@@ -276,16 +269,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ScannerScreen(),
       ),
       GoRoute(
-        path: '/personality',
-        name: RouteNames.personality,
-        builder: (context, state) => const PersonalityScreen(),
-      ),
-      GoRoute(
-        path: '/weekly-wrap',
-        name: RouteNames.weeklyWrap,
-        builder: (context, state) => const WeeklyWrapScreen(),
-      ),
-      GoRoute(
         path: '/pending-transactions',
         name: RouteNames.pendingTransactions,
         builder: (context, state) => const PendingTransactionsScreen(),
@@ -303,7 +286,6 @@ Widget _fadeTransition(
   return FadeTransition(opacity: animation, child: child);
 }
 
-/// FIX: Safe fallback screen shown when a path parameter fails to parse.
 class _NotFoundScreen extends StatelessWidget {
   const _NotFoundScreen();
 
@@ -311,7 +293,8 @@ class _NotFoundScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Not Found')),
-      body: const Center(child: Text('The requested item could not be found.')),
+      body: const Center(
+          child: Text('The requested item could not be found.')),
     );
   }
 }
