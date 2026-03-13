@@ -9,7 +9,7 @@ import '../../../../config/theme/vibe_themes.dart';
 // ── Enums ───────────────────────────────────────────────────────────────────
 
 /// Time period options for statistics display.
-enum PeriodType { week, month, year, custom }
+enum PeriodType { week, month, quarter, year, custom }
 
 // ── Data Classes ────────────────────────────────────────────────────────────
 

@@ -97,37 +97,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/home',
             name: RouteNames.home,
-            pageBuilder: (context, state) => CustomTransitionPage(
-              key: state.pageKey,
-              child: const HomeScreen(),
-              transitionsBuilder: _fadeTransition,
-            ),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(key: state.pageKey, child: const HomeScreen()),
           ),
           GoRoute(
             path: '/stats',
             name: RouteNames.stats,
-            pageBuilder: (context, state) => CustomTransitionPage(
+            pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
               child: const StatsScreen(),
-              transitionsBuilder: _fadeTransition,
             ),
           ),
           GoRoute(
             path: '/budget',
             name: RouteNames.budget,
-            pageBuilder: (context, state) => CustomTransitionPage(
+            pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
               child: const BudgetScreen(),
-              transitionsBuilder: _fadeTransition,
             ),
           ),
           GoRoute(
             path: '/more',
             name: RouteNames.more,
-            pageBuilder: (context, state) => CustomTransitionPage(
+            pageBuilder: (context, state) => NoTransitionPage(
               key: state.pageKey,
               child: const SettingsScreen(),
-              transitionsBuilder: _fadeTransition,
             ),
           ),
         ],
@@ -226,8 +220,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.addLoan,
         builder: (context, state) {
           final extra = state.extra;
-          return AddLoanScreen(
-              existingLoan: extra is LoanModel ? extra : null);
+          return AddLoanScreen(existingLoan: extra is LoanModel ? extra : null);
         },
       ),
       GoRoute(
@@ -277,15 +270,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-Widget _fadeTransition(
-  BuildContext context,
-  Animation<double> animation,
-  Animation<double> secondaryAnimation,
-  Widget child,
-) {
-  return FadeTransition(opacity: animation, child: child);
-}
-
 class _NotFoundScreen extends StatelessWidget {
   const _NotFoundScreen();
 
@@ -293,8 +277,7 @@ class _NotFoundScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Not Found')),
-      body: const Center(
-          child: Text('The requested item could not be found.')),
+      body: const Center(child: Text('The requested item could not be found.')),
     );
   }
 }

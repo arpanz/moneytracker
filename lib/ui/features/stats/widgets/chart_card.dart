@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-
 import '../../../../config/theme/spacing.dart';
 
 /// Reusable chart container card with consistent styling across all stats sections.
@@ -51,12 +49,12 @@ class ChartCard extends StatelessWidget {
           borderRadius: Radii.borderLg,
           boxShadow: [
             BoxShadow(
-              color: theme.shadowColor.withOpacity(0.06),
+              color: theme.shadowColor.withValues(alpha: 0.06),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
             BoxShadow(
-              color: theme.shadowColor.withOpacity(0.03),
+              color: theme.shadowColor.withValues(alpha: 0.03),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -87,8 +85,9 @@ class ChartCard extends StatelessWidget {
                           Text(
                             subtitle!,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withOpacity(0.5),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.5,
+                              ),
                             ),
                           ),
                         ],
@@ -109,9 +108,6 @@ class ChartCard extends StatelessWidget {
           ),
         ),
       ),
-    )
-        .animate()
-        .fadeIn(delay: animationDelay, duration: 500.ms)
-        .slideY(begin: 0.15, end: 0, delay: animationDelay, duration: 500.ms);
+    );
   }
 }

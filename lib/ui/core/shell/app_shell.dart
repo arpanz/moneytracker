@@ -21,7 +21,6 @@ class _NavTab {
   });
 }
 
-// 4 real tabs + a centre placeholder slot for the FAB
 const List<_NavTab> _tabs = [
   _NavTab(
     label: 'Home',
@@ -35,7 +34,6 @@ const List<_NavTab> _tabs = [
     activeIcon: FontAwesomeIcons.chartPie,
     path: '/stats',
   ),
-  // index 2 is reserved for the centre FAB — no real tab
   _NavTab(
     label: 'Budget',
     icon: FontAwesomeIcons.wallet,
@@ -54,6 +52,7 @@ const double kFloatingNavBarHeight = 80.0;
 
 class AppShell extends StatefulWidget {
   final Widget child;
+
   const AppShell({super.key, required this.child});
 
   @override
@@ -66,13 +65,13 @@ class _AppShellState extends State<AppShell>
 
   late final AnimationController _fabController = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 280),
+    duration: const Duration(milliseconds: 220),
   );
 
   late final Animation<double> _fabScale = CurvedAnimation(
     parent: _fabController,
-    curve: Curves.easeOutBack,
-    reverseCurve: Curves.easeIn,
+    curve: Curves.easeOutCubic,
+    reverseCurve: Curves.easeInCubic,
   );
 
   void _toggleFab() {
@@ -81,10 +80,9 @@ class _AppShellState extends State<AppShell>
   }
 
   void _closeFab() {
-    if (_fabOpen) {
-      setState(() => _fabOpen = false);
-      _fabController.reverse();
-    }
+    if (!_fabOpen) return;
+    setState(() => _fabOpen = false);
+    _fabController.reverse();
   }
 
   int _currentIndex(BuildContext context) {
@@ -117,75 +115,79 @@ class _AppShellState extends State<AppShell>
 
     return Scaffold(
       extendBody: false,
-      body: GestureDetector(
-        onTap: _closeFab,
-        behavior: HitTestBehavior.translucent,
-        child: widget.child,
-      ),
-      bottomNavigationBar: Stack(
-        alignment: Alignment.bottomCenter,
-        clipBehavior: Clip.none,
+      body: Stack(
         children: [
-          // ── Floating pill nav bar ──
-          _FloatingNavBar(
-            currentIndex: selectedIndex,
-            onTap: (i) => _onTabTapped(context, i),
-            colorScheme: colorScheme,
-            bottomInset: bottomInset,
-            onFabTap: _toggleFab,
-            fabOpen: _fabOpen,
-            fabController: _fabController,
+          GestureDetector(
+            onTap: _closeFab,
+            behavior: HitTestBehavior.translucent,
+            child: widget.child,
           ),
+          if (_fabOpen)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: _closeFab,
+                behavior: HitTestBehavior.opaque,
+                child: ColoredBox(
+                  color: colorScheme.scrim.withValues(alpha: 0.08),
+                ),
+              ),
+            ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom:
+                kFloatingNavBarHeight + bottomInset + Spacing.lg + Spacing.sm,
+            child: IgnorePointer(
+              ignoring: !_fabOpen,
+              child: AnimatedBuilder(
+                animation: _fabScale,
+                builder: (context, _) {
+                  if (_fabScale.value == 0) {
+                    return const SizedBox.shrink();
+                  }
 
-          // ── Circular action popup ──
-          AnimatedBuilder(
-            animation: _fabScale,
-            builder: (_, __) => _fabScale.value == 0
-                ? const SizedBox.shrink()
-                : Positioned(
-                    bottom: kFloatingNavBarHeight +
-                        bottomInset +
-                        Spacing.lg +
-                        Spacing.sm,
+                  return Align(
                     child: _FabPopup(
                       scale: _fabScale.value,
                       colorScheme: colorScheme,
                       onAddExpense: () {
                         _closeFab();
-                        context.pushNamed(RouteNames.addTransaction,
-                            extra: 1);
+                        context.pushNamed(RouteNames.addTransaction, extra: 1);
                       },
                       onAddIncome: () {
                         _closeFab();
-                        context.pushNamed(RouteNames.addTransaction,
-                            extra: 0);
-                      },
-                      onScanReceipt: () {
-                        _closeFab();
-                        context.pushNamed(RouteNames.scanner);
+                        context.pushNamed(RouteNames.addTransaction, extra: 0);
                       },
                       onTransfer: () {
                         _closeFab();
-                        context.pushNamed(RouteNames.addTransaction,
-                            extra: 2);
+                        context.pushNamed(RouteNames.addTransaction, extra: 2);
                       },
                     ),
-                  ),
+                  );
+                },
+              ),
+            ),
           ),
         ],
+      ),
+      bottomNavigationBar: _FloatingNavBar(
+        currentIndex: selectedIndex,
+        onTap: (index) => _onTabTapped(context, index),
+        colorScheme: colorScheme,
+        bottomInset: bottomInset,
+        onFabTap: _toggleFab,
+        fabOpen: _fabOpen,
+        fabController: _fabController,
       ),
     );
   }
 }
-
-// ══ Circular FAB Popup ═══════════════════════════════════════════════════
 
 class _FabPopup extends StatelessWidget {
   final double scale;
   final ColorScheme colorScheme;
   final VoidCallback onAddExpense;
   final VoidCallback onAddIncome;
-  final VoidCallback onScanReceipt;
   final VoidCallback onTransfer;
 
   const _FabPopup({
@@ -193,13 +195,11 @@ class _FabPopup extends StatelessWidget {
     required this.colorScheme,
     required this.onAddExpense,
     required this.onAddIncome,
-    required this.onScanReceipt,
     required this.onTransfer,
   });
 
   @override
   Widget build(BuildContext context) {
-    // 4 actions arranged in a semicircle arc above the + button
     const radius = 88.0;
     const actions = [
       _FabAction(
@@ -207,37 +207,23 @@ class _FabPopup extends StatelessWidget {
         icon: Icons.remove_rounded,
         colorLight: Color(0xFFEF4444),
         colorDark: Color(0xFFF87171),
-        angleDeg: 135,
       ),
       _FabAction(
         label: 'Income',
         icon: Icons.add_rounded,
         colorLight: Color(0xFF16A34A),
         colorDark: Color(0xFF4ADE80),
-        angleDeg: 90,
       ),
       _FabAction(
         label: 'Transfer',
         icon: Icons.swap_horiz_rounded,
         colorLight: Color(0xFF2563EB),
         colorDark: Color(0xFF60A5FA),
-        angleDeg: 45,
-      ),
-      _FabAction(
-        label: 'Scan',
-        icon: Icons.document_scanner_outlined,
-        colorLight: Color(0xFF7C3AED),
-        colorDark: Color(0xFFBBA4FF),
-        angleDeg: 0,
-        // Scan sits at 0° — will be adjusted below
       ),
     ];
-
+    const angles = [150.0, 90.0, 30.0];
+    final callbacks = [onAddExpense, onAddIncome, onTransfer];
     final isDark = colorScheme.brightness == Brightness.dark;
-
-    // Place the 4 items symmetrically: 150°, 110°, 70°, 30°
-    const angles = [150.0, 110.0, 70.0, 30.0];
-    final callbacks = [onAddExpense, onAddIncome, onTransfer, onScanReceipt];
 
     return Transform.scale(
       scale: scale,
@@ -250,9 +236,9 @@ class _FabPopup extends StatelessWidget {
             for (int i = 0; i < actions.length; i++)
               Positioned(
                 bottom: 0,
-                left: (radius + 40) +
-                    radius *
-                        math.cos(angles[i] * math.pi / 180) -
+                left:
+                    (radius + 40) +
+                    radius * math.cos(angles[i] * math.pi / 180) -
                     28,
                 child: _FabActionButton(
                   action: actions[i],
@@ -273,14 +259,12 @@ class _FabAction {
   final IconData icon;
   final Color colorLight;
   final Color colorDark;
-  final double angleDeg;
 
   const _FabAction({
     required this.label,
     required this.icon,
     required this.colorLight,
     required this.colorDark,
-    required this.angleDeg,
   });
 }
 
@@ -300,6 +284,7 @@ class _FabActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = isDark ? action.colorDark : action.colorLight;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -332,8 +317,6 @@ class _FabActionButton extends StatelessWidget {
     );
   }
 }
-
-// ══ Floating Nav Bar ═══════════════════════════════════════════════════════════
 
 class _FloatingNavBar extends StatelessWidget {
   final int currentIndex;
@@ -389,35 +372,30 @@ class _FloatingNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // Tab 0: Home
               _NavBarItem(
                 tab: _tabs[0],
                 isSelected: currentIndex == 0,
                 colorScheme: colorScheme,
                 onTap: () => onTap(0),
               ),
-              // Tab 1: Stats
               _NavBarItem(
                 tab: _tabs[1],
                 isSelected: currentIndex == 1,
                 colorScheme: colorScheme,
                 onTap: () => onTap(1),
               ),
-              // Centre + FAB button
               _CentreFab(
                 colorScheme: colorScheme,
                 isOpen: fabOpen,
                 controller: fabController,
                 onTap: onFabTap,
               ),
-              // Tab 2: Budget
               _NavBarItem(
                 tab: _tabs[2],
                 isSelected: currentIndex == 2,
                 colorScheme: colorScheme,
                 onTap: () => onTap(2),
               ),
-              // Tab 3: More
               _NavBarItem(
                 tab: _tabs[3],
                 isSelected: currentIndex == 3,
@@ -450,28 +428,27 @@ class _CentreFab extends StatelessWidget {
     return SizedBox(
       width: 56,
       height: 56,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Material(
-          color: colorScheme.primary,
-          shape: const CircleBorder(),
-          elevation: isOpen ? 6 : 3,
-          shadowColor: colorScheme.primary.withValues(alpha: 0.40),
+      child: Material(
+        color: colorScheme.primary,
+        shape: const CircleBorder(),
+        elevation: isOpen ? 6 : 3,
+        shadowColor: colorScheme.primary.withValues(alpha: 0.40),
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
           child: AnimatedBuilder(
             animation: controller,
-            builder: (_, __) => Transform.rotate(
+            builder: (context, child) => Transform.rotate(
               angle: controller.value * math.pi / 4,
-              child: const Icon(Icons.add_rounded,
-                  color: Colors.white, size: 28),
+              child: child,
             ),
+            child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
           ),
         ),
       ),
     );
   }
 }
-
-// ══ Nav Bar Item ═════════════════════════════════════════════════════════════════
 
 class _NavBarItem extends StatelessWidget {
   final _NavTab tab;
@@ -488,9 +465,8 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color activeColor = colorScheme.primary;
-    final Color inactiveColor =
-        colorScheme.onSurface.withValues(alpha: 0.40);
+    final activeColor = colorScheme.primary;
+    final inactiveColor = colorScheme.onSurface.withValues(alpha: 0.40);
 
     return SizedBox(
       width: 64,
@@ -499,14 +475,13 @@ class _NavBarItem extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: AppDurations.fast,
-          curve: Curves.easeInOut,
+          curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(vertical: Spacing.xs),
           decoration: BoxDecoration(
             color: isSelected
                 ? activeColor.withValues(alpha: 0.10)
                 : Colors.transparent,
-            borderRadius:
-                const BorderRadius.all(Radius.circular(Radii.lg)),
+            borderRadius: const BorderRadius.all(Radius.circular(Radii.lg)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -516,25 +491,21 @@ class _NavBarItem extends StatelessWidget {
                 width: 24,
                 height: 24,
                 child: Center(
-                  child: AnimatedSwitcher(
-                    duration: AppDurations.fast,
-                    child: FaIcon(
-                      isSelected ? tab.activeIcon : tab.icon,
-                      key: ValueKey<bool>(isSelected),
-                      size: 18,
-                      color: isSelected ? activeColor : inactiveColor,
-                    ),
+                  child: FaIcon(
+                    isSelected ? tab.activeIcon : tab.icon,
+                    size: 18,
+                    color: isSelected ? activeColor : inactiveColor,
                   ),
                 ),
               ),
               const SizedBox(height: 4),
               AnimatedDefaultTextStyle(
                 duration: AppDurations.fast,
+                curve: Curves.easeOutCubic,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 10,
-                  fontWeight:
-                      isSelected ? FontWeight.w600 : FontWeight.w500,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   color: isSelected ? activeColor : inactiveColor,
                 ),
                 child: Text(
