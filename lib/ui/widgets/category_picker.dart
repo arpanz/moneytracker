@@ -581,7 +581,11 @@ class _CategoryPickerRowState extends ConsumerState<CategoryPickerRow> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
+                      color: theme.colorScheme.scrim.withValues(
+                        alpha: theme.brightness == Brightness.dark
+                            ? 0.28
+                            : 0.04,
+                      ),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),

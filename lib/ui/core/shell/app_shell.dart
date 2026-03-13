@@ -292,6 +292,10 @@ class _FabActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = isDark ? action.colorDark : action.colorLight;
+    final iconColor =
+        ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+        ? Colors.white
+        : const Color(0xFF111111);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -307,7 +311,7 @@ class _FabActionButton extends StatelessWidget {
             child: SizedBox(
               width: 52,
               height: 52,
-              child: Icon(action.icon, color: Colors.white, size: 22),
+              child: Icon(action.icon, color: iconColor, size: 22),
             ),
           ),
         ),
@@ -359,6 +363,7 @@ class _FloatingNavBar extends StatelessWidget {
     final splitIndex = (tabs.length / 2).ceil();
     final leftTabs = tabs.take(splitIndex).toList(growable: false);
     final rightTabs = tabs.skip(splitIndex).toList(growable: false);
+    final isDark = colorScheme.brightness == Brightness.dark;
 
     return Container(
       margin: EdgeInsets.fromLTRB(
@@ -377,8 +382,8 @@ class _FloatingNavBar extends StatelessWidget {
             offset: const Offset(0, 4),
           ),
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
+            color: colorScheme.scrim.withValues(alpha: isDark ? 0.24 : 0.04),
+            blurRadius: isDark ? 12 : 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -470,7 +475,11 @@ class _CentreFab extends StatelessWidget {
               angle: controller.value * math.pi / 4,
               child: child,
             ),
-            child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+            child: Icon(
+              Icons.add_rounded,
+              color: colorScheme.onPrimary,
+              size: 28,
+            ),
           ),
         ),
       ),
@@ -494,7 +503,7 @@ class _NavBarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeColor = colorScheme.primary;
-    final inactiveColor = colorScheme.onSurface.withValues(alpha: 0.40);
+    final inactiveColor = colorScheme.onSurfaceVariant;
 
     return SizedBox(
       width: 64,

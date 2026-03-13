@@ -1073,16 +1073,25 @@ class _SpendingChart extends StatelessWidget {
                           centerSpaceRadius: 28,
                           sections: List.generate(top5.length, (i) {
                             final entry = top5[i];
+                            final sectionColor =
+                                chartColors[i % chartColors.length];
+                            final sectionOnColor =
+                                ThemeData.estimateBrightnessForColor(
+                                      sectionColor,
+                                    ) ==
+                                    Brightness.dark
+                                ? Colors.white
+                                : const Color(0xFF121212);
                             final pct = total > 0
                                 ? (entry.value / total) * 100
                                 : 0.0;
                             return PieChartSectionData(
                               value: entry.value,
-                              color: chartColors[i % chartColors.length],
+                              color: sectionColor,
                               radius: 28,
                               title: showValues ? '${pct.round()}%' : '••',
                               titleStyle: theme.textTheme.labelSmall?.copyWith(
-                                color: Colors.white,
+                                color: sectionOnColor,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 10,
                               ),
@@ -1239,9 +1248,9 @@ class _RecentTransactionsListState extends State<_RecentTransactionsList> {
                     color: widget.theme.colorScheme.error,
                     borderRadius: Radii.borderMd,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.delete_outline_rounded,
-                    color: Colors.white,
+                    color: widget.theme.colorScheme.onError,
                   ),
                 ),
                 confirmDismiss: (_) async =>

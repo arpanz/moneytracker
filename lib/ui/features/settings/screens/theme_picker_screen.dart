@@ -13,7 +13,6 @@ class ThemePickerScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     final currentTheme = ref.watch(themeProvider);
     final allThemes = VibeTheme.values;
 
@@ -63,6 +62,10 @@ class _ThemeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final d = vibe.data;
+    final isDark = theme.brightness == Brightness.dark;
+    final previewPrimary = isDark ? d.primaryDark : d.primaryLight;
+    final previewSecondary = isDark ? d.secondaryDark : d.secondaryLight;
+    final previewAccent = isDark ? d.accentAlt : d.accent;
 
     return GestureDetector(
       onTap: onTap,
@@ -73,14 +76,14 @@ class _ThemeCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           border: Border.all(
             color: isSelected
-                ? d.primaryLight
+                ? previewPrimary
                 : theme.colorScheme.outlineVariant,
             width: isSelected ? 3 : 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: d.primaryLight.withValues(alpha: 0.3),
+                    color: previewPrimary.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -97,7 +100,7 @@ class _ThemeCard extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [d.primaryLight, d.secondaryLight],
+                      colors: [previewPrimary, previewSecondary],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -112,9 +115,9 @@ class _ThemeCard extends StatelessWidget {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            _ColorDot(color: d.primaryLight),
-                            _ColorDot(color: d.secondaryLight),
-                            _ColorDot(color: d.accent),
+                            _ColorDot(color: previewPrimary),
+                            _ColorDot(color: previewSecondary),
+                            _ColorDot(color: previewAccent),
                           ],
                         ),
                       ],
@@ -145,7 +148,7 @@ class _ThemeCard extends StatelessWidget {
                         const SizedBox(height: AppSpacing.xxs),
                         Icon(
                           Icons.check_circle_rounded,
-                          color: d.primaryLight,
+                          color: previewPrimary,
                           size: 18,
                         ),
                       ],
@@ -167,6 +170,9 @@ class _ColorDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final borderColor = Theme.of(
+      context,
+    ).colorScheme.onSurface.withValues(alpha: 0.45);
     return Container(
       width: 16,
       height: 16,
@@ -174,10 +180,7 @@ class _ColorDot extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.5),
-          width: 1.5,
-        ),
+        border: Border.all(color: borderColor, width: 1.5),
       ),
     );
   }
