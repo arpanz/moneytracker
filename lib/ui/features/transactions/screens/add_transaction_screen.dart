@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -14,9 +15,7 @@ import '../../../../config/theme/theme_extensions.dart';
 import '../../../../domain/models/account_model.dart';
 import '../../../../domain/models/category_model.dart';
 import '../../../../domain/models/transaction_model.dart';
-import '../../../widgets/category_picker.dart';
 import '../providers/transaction_providers.dart';
-import '../widgets/amount_input_widget.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   final TransactionModel? existingTransaction;
@@ -33,8 +32,17 @@ class AddTransactionScreen extends ConsumerStatefulWidget {
       _AddTransactionScreenState();
 }
 
-class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
-  double _amount = 0.0;
+class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
+    with SingleTickerProviderStateMixin {
+  // ── Amount state ──────────────────────────────────────────────────────────
+  String _rawInput = '';
+  bool _hasDecimal = false;
+  int _decimalDigits = 0;
+  static const int _maxIntDigits = 10;
+  static const int _maxDecDigits = 2;
+  final _formatter = NumberFormat('#,##,###.##', 'en_IN');
+
+  // ── Form state ────────────────────────────────────────────────────────────
   late int _type;
   CategoryModel? _selectedCategory;
   AccountModel? _selectedAccount;
@@ -48,25 +56,113 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   String _recurringFrequency = 'Monthly';
   bool _isSplit = false;
   bool _isSaving = false;
+  bool _showMore = false;
 
+  // ── Edit restore ─────────────────────────────────────────────────────────
   String? _editCategoryName;
   String? _editAccountId;
   String? _editToAccountId;
 
   bool get _isEditing => widget.existingTransaction != null;
 
+  // ── Amount helpers ────────────────────────────────────────────────────────
+
+  double get _amount {
+    if (_rawInput.isEmpty) return 0.0;
+    if (!_hasDecimal) return double.tryParse(_rawInput) ?? 0.0;
+    final intLen = _rawInput.length - _decimalDigits;
+    final ip = _rawInput.substring(0, intLen);
+    final dp = _rawInput.substring(intLen);
+    return double.tryParse('$ip.$dp') ?? 0.0;
+  }
+
+  String get _displayAmount {
+    if (_rawInput.isEmpty) return '0';
+    if (!_hasDecimal) return _formatter.format(_amount.truncate());
+    final ip = _amount.truncate();
+    final intLen = _rawInput.length - _decimalDigits;
+    final dp = _rawInput.substring(intLen);
+    return '${_formatter.format(ip)}.$dp';
+  }
+
+  void _initAmountFromDouble(double amount) {
+    final parts = amount.toStringAsFixed(2).split('.');
+    final ip = parts[0];
+    final dp = parts[1];
+    if (dp == '00') {
+      _rawInput = ip;
+      _hasDecimal = false;
+      _decimalDigits = 0;
+    } else if (dp.endsWith('0')) {
+      _rawInput = '$ip${dp[0]}';
+      _hasDecimal = true;
+      _decimalDigits = 1;
+    } else {
+      _rawInput = '$ip$dp';
+      _hasDecimal = true;
+      _decimalDigits = 2;
+    }
+  }
+
+  void _digit(String d) {
+    HapticFeedback.lightImpact();
+    if (_hasDecimal) {
+      if (_decimalDigits >= _maxDecDigits) return;
+      _decimalDigits++;
+    } else {
+      if (_rawInput.length >= _maxIntDigits) return;
+      if (_rawInput == '0' && d == '0') return;
+      if (_rawInput == '0' && d != '0') _rawInput = '';
+    }
+    setState(() => _rawInput += d);
+  }
+
+  void _decimal() {
+    HapticFeedback.lightImpact();
+    if (_hasDecimal) return;
+    setState(() {
+      _hasDecimal = true;
+      if (_rawInput.isEmpty) _rawInput = '0';
+    });
+  }
+
+  void _backspace() {
+    HapticFeedback.mediumImpact();
+    if (_rawInput.isEmpty) return;
+    setState(() {
+      if (_hasDecimal && _decimalDigits > 0) {
+        _rawInput = _rawInput.substring(0, _rawInput.length - 1);
+        _decimalDigits--;
+        if (_decimalDigits == 0) _hasDecimal = false;
+      } else if (_hasDecimal) {
+        _hasDecimal = false;
+      } else {
+        _rawInput = _rawInput.substring(0, _rawInput.length - 1);
+      }
+    });
+  }
+
+  void _clearAmount() {
+    HapticFeedback.heavyImpact();
+    setState(() {
+      _rawInput = '';
+      _hasDecimal = false;
+      _decimalDigits = 0;
+    });
+  }
+
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
+
   @override
   void initState() {
     super.initState();
     _type = widget.initialType ?? 1;
-    if (_isEditing) {
-      _populateFromExisting();
-    }
+    if (_isEditing) _populateFromExisting();
   }
 
   void _populateFromExisting() {
     final txn = widget.existingTransaction!;
-    _amount = txn.amount;
+    _initAmountFromDouble(txn.amount);
     _type = txn.type;
     _selectedDate = txn.date;
     _selectedTime = TimeOfDay.fromDateTime(txn.date);
@@ -92,43 +188,29 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   void _tryRestoreAccounts(List<AccountModel> accounts) {
     if (accounts.isEmpty) return;
-
     bool changed = false;
     if (_editAccountId != null && _selectedAccount == null) {
-      final match = accounts
+      final m = accounts
           .where((a) => a.id.toString() == _editAccountId)
           .firstOrNull;
-      if (match != null) {
-        _selectedAccount = match;
-        changed = true;
-      }
+      if (m != null) { _selectedAccount = m; changed = true; }
     }
     if (_editToAccountId != null && _selectedToAccount == null) {
-      final match = accounts
+      final m = accounts
           .where((a) => a.id.toString() == _editToAccountId)
           .firstOrNull;
-      if (match != null) {
-        _selectedToAccount = match;
-        changed = true;
-      }
+      if (m != null) { _selectedToAccount = m; changed = true; }
     }
-
     if (!_isEditing && _selectedAccount == null) {
       _selectedAccount = accounts.first;
       changed = true;
     }
-
     if (_type == 2 && !_isEditing && _selectedToAccount == null) {
-      _selectedToAccount = accounts.last;
-      if (_selectedToAccount?.id == _selectedAccount?.id &&
-          accounts.length > 1) {
-        _selectedToAccount = accounts.firstWhere(
-          (account) => account.id != _selectedAccount?.id,
-        );
-      }
+      _selectedToAccount = accounts.length > 1
+          ? accounts.firstWhere((a) => a.id != _selectedAccount?.id)
+          : accounts.last;
       changed = true;
     }
-
     if (changed && mounted) setState(() {});
   }
 
@@ -139,683 +221,252 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     super.dispose();
   }
 
-  String get _appBarTitle {
-    if (_isEditing) return 'Edit Transaction';
-    switch (_type) {
-      case 0:
-        return 'Add Income';
-      case 2:
-        return 'Add Transfer';
-      default:
-        return 'Add Expense';
-    }
-  }
+  // ── Accent colour helper ──────────────────────────────────────────────────
+
+  Color _accentColor(CheddarColors cc) => switch (_type) {
+        0 => cc.income,
+        2 => cc.transfer,
+        _ => cc.expense,
+      };
+
+  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final cheddarColors = theme.extension<CheddarColors>()!;
+    final cc = theme.extension<CheddarColors>()!;
+    final accent = _accentColor(cc);
     final accountsAsync = ref.watch(_activeAccountsProvider);
     final currencySymbol = ref.watch(currencySymbolProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_appBarTitle),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => context.pop(),
-        ),
-      ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: SingleChildScrollView(
-          padding: Spacing.screenPadding,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: Spacing.md),
-
-              _AmountDisplayButton(
-                amount: _amount,
-                type: _type,
-                cheddarColors: cheddarColors,
-                currencySymbol: currencySymbol,
-                onTap: () => _showAmountInput(context, cheddarColors),
-              ),
-
-              const SizedBox(height: Spacing.lg),
-
-              _buildTypeSelector(cheddarColors),
-
-              const SizedBox(height: Spacing.lg),
-
-              if (_type != 2) ...[
-                Container(
-                  padding: const EdgeInsets.all(Spacing.md),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerLow,
-                    borderRadius: Radii.borderLg,
-                    border: Border.all(
-                      color: theme.colorScheme.outlineVariant.withValues(
-                        alpha: 0.35,
-                      ),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Category',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: Spacing.xs),
-                      Text(
-                        'Pick the bucket that fits this transaction.',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: Spacing.md),
-                      CategoryPickerRow(
-                        key: ValueKey('cat_picker_$_type'),
-                        selected: _selectedCategory,
-                        selectedCategoryName: _selectedCategory == null
-                            ? _editCategoryName
-                            : null,
-                        transactionType: _type,
-                        onSelected: (cat) {
-                          setState(() => _selectedCategory = cat);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: Spacing.lg),
-              ],
-
-              Row(
-                children: [
-                  Text(
-                    _type == 2 ? 'From Account' : 'Account',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const Spacer(),
-                  TextButton.icon(
-                    onPressed: () => _showCreateAccountSheet(context),
-                    icon: const Icon(Icons.add_rounded, size: 16),
-                    label: const Text('New'),
-                    style: TextButton.styleFrom(
-                      visualDensity: VisualDensity.compact,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: Spacing.sm,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: Spacing.sm),
-              accountsAsync.when(
-                data: (accounts) {
-                  _tryRestoreAccounts(accounts);
-                  return _buildAccountChips(accounts, false);
-                },
-                loading: () => const SizedBox(
-                  height: 48,
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-                error: (e, _) => Text('Error loading accounts: $e'),
-              ),
-
-              if (_type == 2) ...[
-                const SizedBox(height: Spacing.md),
-                Text(
-                  'To Account',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: Spacing.sm),
-                accountsAsync.when(
-                  data: (accounts) => _buildAccountChips(accounts, true),
-                  loading: () => const SizedBox(
-                    height: 48,
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                  error: (e, _) => Text('Error: $e'),
-                ),
-              ],
-
-              const SizedBox(height: Spacing.lg),
-
-              _buildDateTimePicker(theme),
-
-              const SizedBox(height: Spacing.lg),
-
-              TextField(
-                controller: _noteController,
-                decoration: InputDecoration(
-                  hintText: 'Add a note...',
-                  prefixIcon: const Icon(Icons.note_alt_outlined, size: 20),
-                  border: OutlineInputBorder(borderRadius: Radii.borderMd),
-                ),
-                textCapitalization: TextCapitalization.sentences,
-                maxLength: 200,
-              ),
-
-              const SizedBox(height: Spacing.md),
-
-              _buildTagsSection(theme),
-
-              const SizedBox(height: Spacing.md),
-
-              OutlinedButton.icon(
-                onPressed: () => context.pushNamed(RouteNames.scanner),
-                icon: const FaIcon(FontAwesomeIcons.camera, size: 16),
-                label: const Text('Attach Receipt'),
-                style: OutlinedButton.styleFrom(
-                  padding: Spacing.paddingMd,
-                  shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
-                ),
-              ),
-
-              const SizedBox(height: Spacing.md),
-
-              _buildRecurringSection(theme),
-
-              const SizedBox(height: Spacing.sm),
-
-              _buildSplitSection(theme),
-
-              const SizedBox(height: Spacing.xl),
-
-              SizedBox(
-                height: 56,
-                child: FilledButton(
-                  onPressed: _isSaving ? null : _onSave,
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
-                  ),
-                  child: _isSaving
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          _isEditing
-                              ? 'Update Transaction'
-                              : 'Save Transaction',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                ),
-              ),
-
-              const SizedBox(height: Spacing.xxl),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Amount Bottom Sheet ──
-
-  void _showAmountInput(BuildContext context, CheddarColors cheddarColors) {
-    final Color accentColor;
-    switch (_type) {
-      case 0:
-        accentColor = cheddarColors.income;
-        break;
-      case 2:
-        accentColor = cheddarColors.transfer;
-        break;
-      default:
-        accentColor = cheddarColors.expense;
-    }
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl)),
-      ),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            top: Spacing.lg,
-            left: Spacing.md,
-            right: Spacing.md,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + Spacing.lg,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Theme.of(
-                    ctx,
-                  ).colorScheme.onSurface.withValues(alpha: 0.2),
-                  borderRadius: Radii.borderFull,
-                ),
-              ),
-              const SizedBox(height: Spacing.lg),
-              AmountInputWidget(
-                initialAmount: _amount,
-                amountColor: accentColor,
-                onAmountChanged: (value) {
-                  setState(() => _amount = value);
-                },
-              ),
-              const SizedBox(height: Spacing.lg),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: FilledButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: accentColor,
-                    shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
-                  ),
-                  child: const Text(
-                    'Done',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  // ── Inline Account Creation Sheet ──
-
-  void _showCreateAccountSheet(BuildContext context) {
-    final nameCtrl = TextEditingController();
-    int selectedType = 0;
-    final accountTypes = [
-      (label: 'Bank', value: 0, icon: Icons.account_balance_rounded),
-      (label: 'Wallet', value: 1, icon: Icons.account_balance_wallet_rounded),
-      (label: 'Card', value: 2, icon: Icons.credit_card_rounded),
-      (label: 'Cash', value: 3, icon: Icons.money_rounded),
-    ];
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl)),
-      ),
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setSheetState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                top: Spacing.lg,
-                left: Spacing.md,
-                right: Spacing.md,
-                bottom: MediaQuery.of(ctx).viewInsets.bottom + Spacing.lg,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          ctx,
-                        ).colorScheme.onSurface.withValues(alpha: 0.2),
-                        borderRadius: Radii.borderFull,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: Spacing.md),
-                  Text(
-                    'New Account',
-                    style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: Spacing.md),
-                  TextField(
-                    controller: nameCtrl,
-                    autofocus: true,
-                    textCapitalization: TextCapitalization.words,
-                    decoration: InputDecoration(
-                      labelText: 'Account name',
-                      border: OutlineInputBorder(borderRadius: Radii.borderMd),
-                    ),
-                  ),
-                  const SizedBox(height: Spacing.md),
-                  Text(
-                    'Account type',
-                    style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: Spacing.sm),
-                  Wrap(
-                    spacing: Spacing.sm,
-                    children: accountTypes.map((t) {
-                      return ChoiceChip(
-                        avatar: Icon(t.icon, size: 16),
-                        label: Text(t.label),
-                        selected: selectedType == t.value,
-                        onSelected: (_) =>
-                            setSheetState(() => selectedType = t.value),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: Radii.borderFull,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: Spacing.md),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: () async {
-                        await _submitNewAccount(
-                          ctx,
-                          nameCtrl.text,
-                          selectedType,
-                        );
-                      },
-                      child: const Text('Create & Select'),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Future<void> _submitNewAccount(
-    BuildContext sheetCtx,
-    String rawName,
-    int accountType,
-  ) async {
-    final name = rawName.trim();
-    if (name.isEmpty) return;
-
-    final accountRepo = ref.read(accountRepositoryProvider);
-    final currencyCode = ref.read(currencyCodeProvider);
-    final newAccount = AccountModel()
-      ..name = name
-      ..accountType = accountType
-      ..balance = 0.0
-      ..currency = currencyCode
-      ..color = 0xFF9E9E9E
-      ..icon = switch (accountType) {
-        0 => 'building-columns',
-        1 => 'wallet',
-        2 => 'credit-card',
-        3 => 'money-bill',
-        _ => 'wallet',
-      }
-      ..isArchived = false
-      ..createdAt = DateTime.now();
-
-    await accountRepo.add(newAccount);
-    ref.invalidate(_activeAccountsProvider);
-    if (mounted) setState(() => _selectedAccount = newAccount);
-    if (sheetCtx.mounted) Navigator.of(sheetCtx).pop();
-  }
-
-  // ── Type Selector ──
-
-  Widget _buildTypeSelector(CheddarColors cheddarColors) {
-    final types = [
-      _TypeOption(
-        'Expense',
-        1,
-        cheddarColors.expense,
-        FontAwesomeIcons.arrowUp,
-      ),
-      _TypeOption(
-        'Income',
-        0,
-        cheddarColors.income,
-        FontAwesomeIcons.arrowDown,
-      ),
-      _TypeOption(
-        'Transfer',
-        2,
-        cheddarColors.transfer,
-        FontAwesomeIcons.arrowRightArrowLeft,
-      ),
-    ];
-
-    return Row(
-      children: types.map((option) {
-        final isSelected = _type == option.value;
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: AnimatedContainer(
-              duration: AppDurations.fast,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? option.color.withValues(alpha: 0.15)
-                    : Colors.transparent,
-                borderRadius: Radii.borderMd,
-                border: Border.all(
-                  color: isSelected
-                      ? option.color
-                      : Theme.of(
-                          context,
-                        ).colorScheme.outline.withValues(alpha: 0.3),
-                  width: isSelected ? 2 : 1,
-                ),
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => setState(() {
-                    if (_type != option.value) {
-                      _type = option.value;
-                      _selectedCategory = null;
-                      _editCategoryName = null;
-                      if (_type != 2) {
-                        _selectedToAccount = null;
-                      }
-                    }
-                  }),
-                  borderRadius: Radii.borderMd,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: Spacing.sm + 2,
-                      horizontal: Spacing.sm,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FaIcon(
-                          option.icon,
-                          size: 14,
-                          color: isSelected
-                              ? option.color
-                              : Theme.of(context).colorScheme.onSurface,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          option.label,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w500,
-                            color: isSelected
-                                ? option.color
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+      backgroundColor: theme.colorScheme.surface,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // ── Top bar ──────────────────────────────────────────────────
+            _TopBar(
+              isEditing: _isEditing,
+              onClose: () => context.pop(),
             ),
-          ),
-        );
-      }).toList(),
-    );
-  }
 
-  // ── Account Chips ──
-
-  Widget _buildAccountChips(List<AccountModel> accounts, bool isToAccount) {
-    final selected = isToAccount ? _selectedToAccount : _selectedAccount;
-
-    return SizedBox(
-      height: 48,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: accounts.length,
-        separatorBuilder: (_, _) => const SizedBox(width: Spacing.sm),
-        itemBuilder: (context, index) {
-          final account = accounts[index];
-          final isSelected = selected?.id == account.id;
-          final accountColor = Color(account.color);
-
-          return ChoiceChip(
-            label: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FaIcon(
-                  _accountIcon(account.icon),
-                  size: 14,
-                  color: isSelected
-                      ? accountColor
-                      : Theme.of(context).colorScheme.onSurface,
-                ),
-                const SizedBox(width: 6),
-                Text(account.name),
-              ],
-            ),
-            selected: isSelected,
-            onSelected: (sel) {
-              if (!sel) return;
-              setState(() {
-                if (isToAccount) {
-                  _selectedToAccount = account;
-                } else {
-                  _selectedAccount = account;
-                }
-              });
-            },
-            selectedColor: accountColor.withValues(alpha: 0.15),
-            side: BorderSide(
-              color: isSelected
-                  ? accountColor
-                  : Theme.of(
-                      context,
-                    ).colorScheme.outline.withValues(alpha: 0.3),
-            ),
-            shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
-          );
-        },
-      ),
-    );
-  }
-
-  // ── Date & Time Picker ──
-
-  Widget _buildDateTimePicker(ThemeData theme) {
-    final dateFormat = DateFormat('EEE, MMM d, yyyy');
-    final timeFormat = DateFormat('hh:mm a');
-
-    return Row(
-      children: [
-        Expanded(
-          child: InkWell(
-            onTap: _pickDate,
-            borderRadius: Radii.borderMd,
-            child: Container(
+            // ── Type selector ─────────────────────────────────────────────
+            Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: Spacing.md,
-                vertical: Spacing.sm + 4,
+                vertical: Spacing.xs,
               ),
-              decoration: BoxDecoration(
-                border: Border.all(
+              child: _TypeSelector(
+                selected: _type,
+                cc: cc,
+                onChanged: (t) => setState(() {
+                  if (_type == t) return;
+                  _type = t;
+                  _selectedCategory = null;
+                  _editCategoryName = null;
+                  if (_type != 2) _selectedToAccount = null;
+                }),
+              ),
+            ),
+
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: AppDurations.fast,
+                child: _buildBody(
+                  context,
+                  theme,
+                  cc,
+                  accent,
+                  accountsAsync,
+                  currencySymbol,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    ThemeData theme,
+    CheddarColors cc,
+    Color accent,
+    AsyncValue<List<AccountModel>> accountsAsync,
+    String currencySymbol,
+  ) {
+    return Column(
+      key: ValueKey(_type),
+      children: [
+        // ── Category grid (hidden for Transfer) ───────────────────────────
+        if (_type != 2)
+          _CategoryGrid(
+            transactionType: _type,
+            selected: _selectedCategory,
+            editCategoryName: _editCategoryName,
+            onSelected: (cat) => setState(() => _selectedCategory = cat),
+          ),
+
+        if (_type == 2)
+          _TransferAccountPicker(
+            accountsAsync: accountsAsync,
+            selectedFrom: _selectedAccount,
+            selectedTo: _selectedToAccount,
+            onRestoreAccounts: _tryRestoreAccounts,
+            onFromChanged: (a) => setState(() => _selectedAccount = a),
+            onToChanged: (a) => setState(() => _selectedToAccount = a),
+            onCreateAccount: () => _showCreateAccountSheet(context),
+          ),
+
+        const Divider(height: 1),
+
+        // ── Meta row: account + date ──────────────────────────────────────
+        if (_type != 2)
+          _MetaRow(
+            accountsAsync: accountsAsync,
+            selectedAccount: _selectedAccount,
+            selectedDate: _selectedDate,
+            selectedTime: _selectedTime,
+            onRestoreAccounts: _tryRestoreAccounts,
+            onAccountChanged: (a) => setState(() => _selectedAccount = a),
+            onCreateAccount: () => _showCreateAccountSheet(context),
+            onPickDate: _pickDate,
+            onPickTime: _pickTime,
+          ),
+
+        const Divider(height: 1),
+
+        // ── Amount display ────────────────────────────────────────────────
+        _AmountDisplay(
+          displayText: _hasDecimal && _decimalDigits == 0
+              ? '$_displayAmount.'
+              : _displayAmount,
+          accent: accent,
+          currencySymbol: currencySymbol,
+        ),
+
+        // ── Note field (inline, compact) ──────────────────────────────────
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Spacing.md,
+            vertical: Spacing.xs,
+          ),
+          child: TextField(
+            controller: _noteController,
+            style: theme.textTheme.bodyMedium,
+            decoration: InputDecoration(
+              hintText: 'Add a note...',
+              hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              ),
+              prefixIcon: Icon(
+                Icons.edit_note_rounded,
+                size: 20,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: Spacing.sm,
+                vertical: Spacing.sm,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: Radii.borderMd,
+                borderSide: BorderSide(
                   color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
-                borderRadius: Radii.borderMd,
               ),
-              child: Row(
-                children: [
-                  FaIcon(
-                    FontAwesomeIcons.calendar,
-                    size: 16,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(width: Spacing.sm),
-                  Expanded(
-                    child: Text(
-                      dateFormat.format(_selectedDate),
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ),
-                ],
+              enabledBorder: OutlineInputBorder(
+                borderRadius: Radii.borderMd,
+                borderSide: BorderSide(
+                  color: theme.colorScheme.outline.withValues(alpha: 0.25),
+                ),
               ),
             ),
+            textCapitalization: TextCapitalization.sentences,
+            maxLines: 1,
           ),
         ),
-        const SizedBox(width: Spacing.sm),
-        InkWell(
-          onTap: _pickTime,
-          borderRadius: Radii.borderMd,
-          child: Container(
+
+        // ── More options toggle ───────────────────────────────────────────
+        GestureDetector(
+          onTap: () => setState(() => _showMore = !_showMore),
+          child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: Spacing.md,
-              vertical: Spacing.sm + 4,
-            ),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: theme.colorScheme.outline.withValues(alpha: 0.3),
-              ),
-              borderRadius: Radii.borderMd,
+              vertical: Spacing.xs,
             ),
             child: Row(
               children: [
-                FaIcon(
-                  FontAwesomeIcons.clock,
-                  size: 16,
-                  color: theme.colorScheme.primary,
+                Icon(
+                  _showMore
+                      ? Icons.expand_less_rounded
+                      : Icons.expand_more_rounded,
+                  size: 18,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
-                const SizedBox(width: Spacing.sm),
+                const SizedBox(width: 4),
                 Text(
-                  timeFormat.format(
-                    DateTime(0, 1, 1, _selectedTime.hour, _selectedTime.minute),
+                  _showMore ? 'Less options' : 'More options',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
-                  style: theme.textTheme.bodyMedium,
                 ),
+                if (_isRecurring || _tags.isNotEmpty || _isSplit) ...[
+                  const SizedBox(width: Spacing.xs),
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: accent,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
         ),
+
+        if (_showMore)
+          _MoreOptions(
+            theme: theme,
+            accent: accent,
+            tags: _tags,
+            tagController: _tagController,
+            isRecurring: _isRecurring,
+            recurringFrequency: _recurringFrequency,
+            isSplit: _isSplit,
+            onTagAdded: (t) => setState(() => _tags.add(t)),
+            onTagRemoved: (t) => setState(() => _tags.remove(t)),
+            onRecurringChanged: (v) => setState(() => _isRecurring = v),
+            onFrequencyChanged: (f) => setState(() => _recurringFrequency = f),
+            onSplitChanged: (v) {
+              setState(() => _isSplit = v);
+              if (v) context.pushNamed(RouteNames.addSplit);
+            },
+            onReceiptTap: () => context.pushNamed(RouteNames.scanner),
+          ),
+
+        const Spacer(),
+
+        // ── Numpad ────────────────────────────────────────────────────────
+        _Numpad(
+          accent: accent,
+          isSaving: _isSaving,
+          onDigit: _digit,
+          onDecimal: _decimal,
+          onBackspace: _backspace,
+          onClear: _clearAmount,
+          onConfirm: _onSave,
+        ),
+
+        const SizedBox(height: Spacing.sm),
       ],
     );
   }
+
+  // ── Pickers ───────────────────────────────────────────────────────────────
 
   Future<void> _pickDate() async {
     final now = DateTime.now();
@@ -836,383 +487,703 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     if (picked != null) setState(() => _selectedTime = picked);
   }
 
-  // ── Tags Section ──
+  // ── Inline account creation ───────────────────────────────────────────────
 
-  Widget _buildTagsSection(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Tags',
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: Spacing.sm),
-        Wrap(
-          spacing: Spacing.sm,
-          runSpacing: Spacing.xs,
-          children: [
-            ..._tags.map((tag) {
-              return InputChip(
-                label: Text(tag),
-                onDeleted: () => setState(() => _tags.remove(tag)),
-                deleteIcon: const Icon(Icons.close, size: 16),
-                shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
-              );
-            }),
-            ActionChip(
-              avatar: const Icon(Icons.add, size: 16),
-              label: const Text('Add Tag'),
-              onPressed: () => _showAddTagDialog(theme),
-              shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  void _showAddTagDialog(ThemeData theme) {
-    _tagController.clear();
-    showDialog(
+  void _showCreateAccountSheet(BuildContext context) {
+    final nameCtrl = TextEditingController();
+    int selectedType = 0;
+    const accountTypes = [
+      (label: 'Bank', value: 0, icon: Icons.account_balance_rounded),
+      (label: 'Wallet', value: 1, icon: Icons.account_balance_wallet_rounded),
+      (label: 'Card', value: 2, icon: Icons.credit_card_rounded),
+      (label: 'Cash', value: 3, icon: Icons.money_rounded),
+    ];
+    showModalBottomSheet(
       context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          title: const Text('Add Tag'),
-          content: TextField(
-            controller: _tagController,
-            autofocus: true,
-            decoration: const InputDecoration(hintText: 'Tag name...'),
-            textCapitalization: TextCapitalization.words,
-            onSubmitted: (_) => _submitTag(ctx),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.xl)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setS) => Padding(
+          padding: EdgeInsets.only(
+            top: Spacing.lg,
+            left: Spacing.md,
+            right: Spacing.md,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + Spacing.lg,
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => _submitTag(ctx),
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _submitTag(BuildContext dialogContext) {
-    final tag = _tagController.text.trim();
-    if (tag.isNotEmpty && !_tags.contains(tag)) {
-      setState(() => _tags.add(tag));
-    }
-    Navigator.of(dialogContext).pop();
-  }
-
-  // ── Recurring Section ──
-
-  Widget _buildRecurringSection(ThemeData theme) {
-    const frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
-
-    return Card(
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: Spacing.md,
-          vertical: Spacing.xs,
-        ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                const FaIcon(FontAwesomeIcons.repeat, size: 16),
-                const SizedBox(width: Spacing.sm),
-                Expanded(
-                  child: Text(
-                    'Recurring',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40, height: 4,
+                  decoration: BoxDecoration(
+                    color: Theme.of(ctx).colorScheme.onSurface.withValues(alpha: 0.2),
+                    borderRadius: Radii.borderFull,
                   ),
                 ),
-                Switch(
-                  value: _isRecurring,
-                  onChanged: (val) => setState(() => _isRecurring = val),
-                ),
-              ],
-            ),
-            if (_isRecurring) ...[
-              const Divider(height: 1),
-              const SizedBox(height: Spacing.sm),
-              Row(
-                children: frequencies.map((freq) {
-                  final isSelected = _recurringFrequency == freq;
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: ChoiceChip(
-                        label: Text(freq, style: const TextStyle(fontSize: 12)),
-                        selected: isSelected,
-                        onSelected: (sel) {
-                          if (sel) {
-                            setState(() => _recurringFrequency = freq);
-                          }
-                        },
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: Radii.borderFull,
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
               ),
+              const SizedBox(height: Spacing.md),
+              Text('New Account',
+                  style: Theme.of(ctx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
+              const SizedBox(height: Spacing.md),
+              TextField(
+                controller: nameCtrl,
+                autofocus: true,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: 'Account name',
+                  border: OutlineInputBorder(borderRadius: Radii.borderMd),
+                ),
+              ),
+              const SizedBox(height: Spacing.md),
+              Text('Account type',
+                  style: Theme.of(ctx).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
               const SizedBox(height: Spacing.sm),
+              Wrap(
+                spacing: Spacing.sm,
+                children: accountTypes.map((t) => ChoiceChip(
+                  avatar: Icon(t.icon, size: 16),
+                  label: Text(t.label),
+                  selected: selectedType == t.value,
+                  onSelected: (_) => setS(() => selectedType = t.value),
+                  shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
+                )).toList(),
+              ),
+              const SizedBox(height: Spacing.md),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () async {
+                    final name = nameCtrl.text.trim();
+                    if (name.isEmpty) return;
+                    final repo = ref.read(accountRepositoryProvider);
+                    final currency = ref.read(currencyCodeProvider);
+                    final acc = AccountModel()
+                      ..name = name
+                      ..accountType = selectedType
+                      ..balance = 0.0
+                      ..currency = currency
+                      ..color = 0xFF9E9E9E
+                      ..icon = switch (selectedType) {
+                        0 => 'building-columns',
+                        1 => 'wallet',
+                        2 => 'credit-card',
+                        3 => 'money-bill',
+                        _ => 'wallet',
+                      }
+                      ..isArchived = false
+                      ..createdAt = DateTime.now();
+                    await repo.add(acc);
+                    ref.invalidate(_activeAccountsProvider);
+                    if (mounted) setState(() => _selectedAccount = acc);
+                    if (ctx.mounted) Navigator.of(ctx).pop();
+                  },
+                  child: const Text('Create & Select'),
+                ),
+              ),
             ],
-          ],
+          ),
         ),
       ),
     );
   }
 
-  // ── Split Section ──
-
-  Widget _buildSplitSection(ThemeData theme) {
-    return Card(
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: Spacing.md,
-          vertical: Spacing.xs,
-        ),
-        child: Row(
-          children: [
-            const FaIcon(FontAwesomeIcons.peopleLine, size: 16),
-            const SizedBox(width: Spacing.sm),
-            Expanded(
-              child: Text(
-                'Split this expense',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Switch(
-              value: _isSplit,
-              onChanged: (val) {
-                setState(() => _isSplit = val);
-                if (val) context.pushNamed(RouteNames.addSplit);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ── Save Logic ──
+  // ── Save ──────────────────────────────────────────────────────────────────
 
   Future<void> _onSave() async {
     if (_amount <= 0) {
-      _showSnackBar('Please enter an amount greater than zero.');
+      _snack('Please enter an amount greater than zero.');
       return;
     }
     if (_type != 2 && _selectedCategory == null) {
-      _showSnackBar('Please select a category.');
+      _snack('Please select a category.');
       return;
     }
     if (_selectedAccount == null) {
-      _showSnackBar('Please select an account.');
+      _snack('Please select an account.');
       return;
     }
     if (_type == 2 && _selectedToAccount == null) {
-      _showSnackBar('Please select a destination account for transfer.');
+      _snack('Please select a destination account.');
       return;
     }
     if (_type == 2 && _selectedAccount?.id == _selectedToAccount?.id) {
-      _showSnackBar('Source and destination accounts must be different.');
+      _snack('Source and destination accounts must be different.');
       return;
     }
 
     setState(() => _isSaving = true);
-
     try {
-      final dateTime = DateTime(
-        _selectedDate.year,
-        _selectedDate.month,
-        _selectedDate.day,
-        _selectedTime.hour,
-        _selectedTime.minute,
+      final dt = DateTime(
+        _selectedDate.year, _selectedDate.month, _selectedDate.day,
+        _selectedTime.hour, _selectedTime.minute,
       );
-
-      final TransactionModel txn;
-      if (_isEditing) {
-        txn = widget.existingTransaction!;
-      } else {
-        txn = TransactionModel();
-      }
-
-      txn.amount = _amount;
-      txn.type = _type;
-      txn.category = _type == 2 ? 'Transfer' : _selectedCategory!.name;
-      txn.accountId = _selectedAccount!.id.toString();
-      txn.toAccountId = _type == 2 ? _selectedToAccount?.id.toString() : null;
-      txn.date = dateTime;
-      txn.note = _noteController.text.trim().isEmpty
-          ? null
-          : _noteController.text.trim();
-      txn.tags = List<String>.from(_tags);
-      txn.isRecurring = _isRecurring;
-      txn.recurringRule = _isRecurring
-          ? json.encode({
-              'frequency': _recurringFrequency.toLowerCase(),
-              'interval': 1,
-              'endDate': null,
-            })
-          : null;
+      final txn = _isEditing ? widget.existingTransaction! : TransactionModel();
+      txn
+        ..amount = _amount
+        ..type = _type
+        ..category = _type == 2 ? 'Transfer' : _selectedCategory!.name
+        ..accountId = _selectedAccount!.id.toString()
+        ..toAccountId = _type == 2 ? _selectedToAccount?.id.toString() : null
+        ..date = dt
+        ..note = _noteController.text.trim().isEmpty ? null : _noteController.text.trim()
+        ..tags = List<String>.from(_tags)
+        ..isRecurring = _isRecurring
+        ..recurringRule = _isRecurring
+            ? json.encode({'frequency': _recurringFrequency.toLowerCase(), 'interval': 1, 'endDate': null})
+            : null;
 
       if (_isEditing) {
         await ref.read(updateTransactionProvider(txn).future);
       } else {
         await ref.read(addTransactionProvider(txn).future);
       }
-
       if (mounted) context.pop();
     } catch (e) {
-      _showSnackBar('Failed to save transaction: $e');
+      _snack('Failed to save: $e');
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
   }
 
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: AppConstants.snackBarDuration,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
-      ),
-    );
-  }
-
-  FaIconData _accountIcon(String iconName) {
-    switch (iconName) {
-      case 'wallet':
-        return FontAwesomeIcons.wallet;
-      case 'credit-card':
-        return FontAwesomeIcons.creditCard;
-      case 'piggy-bank':
-        return FontAwesomeIcons.piggyBank;
-      case 'money-bill':
-        return FontAwesomeIcons.moneyBill;
-      case 'chart-line':
-        return FontAwesomeIcons.chartLine;
-      case 'building-columns':
-        return FontAwesomeIcons.buildingColumns;
-      case 'landmark':
-        return FontAwesomeIcons.landmark;
-      default:
-        return FontAwesomeIcons.wallet;
-    }
+  void _snack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+      duration: AppConstants.snackBarDuration,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: Radii.borderMd),
+    ));
   }
 }
 
-// ── Type Option ────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// Sub-widgets
+// ═══════════════════════════════════════════════════════════════════════════════
 
-class _TypeOption {
-  final String label;
-  final int value;
-  final Color color;
-  final FaIconData icon;
+// ── Top Bar ───────────────────────────────────────────────────────────────────
 
-  const _TypeOption(this.label, this.value, this.color, this.icon);
-}
+class _TopBar extends StatelessWidget {
+  final bool isEditing;
+  final VoidCallback onClose;
 
-// ── Amount Display Button ─────────────────────────────────────────────────────
-
-class _AmountDisplayButton extends StatelessWidget {
-  final double amount;
-  final int type;
-  final CheddarColors cheddarColors;
-  final String currencySymbol;
-  final VoidCallback onTap;
-
-  const _AmountDisplayButton({
-    required this.amount,
-    required this.type,
-    required this.cheddarColors,
-    required this.currencySymbol,
-    required this.onTap,
-  });
-
-  Color get _amountColor {
-    switch (type) {
-      case 0:
-        return cheddarColors.income;
-      case 2:
-        return cheddarColors.transfer;
-      default:
-        return cheddarColors.expense;
-    }
-  }
+  const _TopBar({required this.isEditing, required this.onClose});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final formatter = NumberFormat('#,##,###.##', 'en_IN');
-    final displayAmount = amount == 0 ? '0' : formatter.format(amount);
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.sm,
+        vertical: Spacing.xs,
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.close_rounded),
+            onPressed: onClose,
+            visualDensity: VisualDensity.compact,
+          ),
+          Expanded(
+            child: Text(
+              isEditing ? 'Edit Transaction' : 'New Transaction',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          // Placeholder to balance the close icon
+          const SizedBox(width: 40),
+        ],
+      ),
+    );
+  }
+}
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: Radii.borderLg,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: Spacing.lg,
-          horizontal: Spacing.md,
-        ),
-        decoration: BoxDecoration(
-          color: _amountColor.withValues(alpha: 0.08),
-          borderRadius: Radii.borderLg,
-          border: Border.all(color: _amountColor.withValues(alpha: 0.2)),
-        ),
-        child: Column(
-          children: [
-            Text(
-              'Tap to enter amount',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+// ── Type Selector ─────────────────────────────────────────────────────────────
+
+class _TypeSelector extends StatelessWidget {
+  final int selected;
+  final CheddarColors cc;
+  final ValueChanged<int> onChanged;
+
+  const _TypeSelector({
+    required this.selected,
+    required this.cc,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final types = [
+      (label: 'Expense', value: 1, color: cc.expense),
+      (label: 'Income', value: 0, color: cc.income),
+      (label: 'Transfer', value: 2, color: cc.transfer),
+    ];
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: Radii.borderFull,
+      ),
+      child: Row(
+        children: types.map((t) {
+          final isSelected = selected == t.value;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onChanged(t.value),
+              child: AnimatedContainer(
+                duration: AppDurations.fast,
+                margin: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: isSelected ? t.color : Colors.transparent,
+                  borderRadius: Radii.borderFull,
+                  boxShadow: isSelected
+                      ? [BoxShadow(color: t.color.withValues(alpha: 0.35), blurRadius: 6, offset: const Offset(0, 2))]
+                      : null,
+                ),
+                child: Center(
+                  child: Text(
+                    t.label,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected ? Colors.white : theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: Spacing.xs),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    currencySymbol,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: _amountColor.withValues(alpha: 0.7),
-                      fontWeight: FontWeight.w500,
-                    ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+// ── Category Grid ─────────────────────────────────────────────────────────────
+
+class _CategoryGrid extends ConsumerWidget {
+  final int transactionType;
+  final CategoryModel? selected;
+  final String? editCategoryName;
+  final ValueChanged<CategoryModel> onSelected;
+
+  const _CategoryGrid({
+    required this.transactionType,
+    required this.selected,
+    required this.editCategoryName,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final categoriesAsync = ref.watch(_categoriesByTypeProvider(transactionType));
+    final theme = Theme.of(context);
+
+    return SizedBox(
+      height: 108,
+      child: categoriesAsync.when(
+        data: (cats) => ListView.separated(
+          key: ValueKey(transactionType),
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(
+            horizontal: Spacing.md,
+            vertical: Spacing.sm,
+          ),
+          itemCount: cats.length,
+          separatorBuilder: (_, _) => const SizedBox(width: Spacing.sm),
+          itemBuilder: (context, i) {
+            final cat = cats[i];
+            final isSelected = selected?.id == cat.id ||
+                (selected == null && editCategoryName == cat.name);
+            final catColor = Color(cat.color);
+
+            return GestureDetector(
+              onTap: () => onSelected(cat),
+              child: AnimatedContainer(
+                duration: AppDurations.fast,
+                width: 72,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? catColor.withValues(alpha: 0.15)
+                      : theme.colorScheme.surfaceContainerLow,
+                  borderRadius: Radii.borderMd,
+                  border: Border.all(
+                    color: isSelected
+                        ? catColor
+                        : theme.colorScheme.outline.withValues(alpha: 0.2),
+                    width: isSelected ? 2 : 1,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    displayAmount,
-                    style: theme.textTheme.displayMedium?.copyWith(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w700,
-                      color: _amountColor,
-                      letterSpacing: -1,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: catColor.withValues(alpha: isSelected ? 0.2 : 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          _categoryEmoji(cat.name),
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      cat.name,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                        color: isSelected
+                            ? catColor
+                            : theme.colorScheme.onSurface,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+      ),
+    );
+  }
+
+  String _categoryEmoji(String name) {
+    switch (name.toLowerCase()) {
+      case 'food': return '🍔';
+      case 'transport': return '🚌';
+      case 'shopping': return '🛍️';
+      case 'bills': return '📄';
+      case 'entertainment': return '🎬';
+      case 'health': return '💊';
+      case 'education': return '📚';
+      case 'travel': return '✈️';
+      case 'gifts': return '🎁';
+      case 'rent': return '🏠';
+      case 'groceries': return '🛒';
+      case 'pets': return '🐾';
+      case 'subscriptions': return '📱';
+      case 'salary': return '💼';
+      case 'freelance': return '💻';
+      case 'investments': return '📈';
+      case 'other': return '📦';
+      default: return '💰';
+    }
+  }
+}
+
+// ── Transfer Account Picker ────────────────────────────────────────────────────
+
+class _TransferAccountPicker extends StatelessWidget {
+  final AsyncValue<List<AccountModel>> accountsAsync;
+  final AccountModel? selectedFrom;
+  final AccountModel? selectedTo;
+  final ValueChanged<List<AccountModel>> onRestoreAccounts;
+  final ValueChanged<AccountModel> onFromChanged;
+  final ValueChanged<AccountModel> onToChanged;
+  final VoidCallback onCreateAccount;
+
+  const _TransferAccountPicker({
+    required this.accountsAsync,
+    required this.selectedFrom,
+    required this.selectedTo,
+    required this.onRestoreAccounts,
+    required this.onFromChanged,
+    required this.onToChanged,
+    required this.onCreateAccount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.md,
+        vertical: Spacing.sm,
+      ),
+      child: accountsAsync.when(
+        data: (accounts) {
+          onRestoreAccounts(accounts);
+          return Row(
+            children: [
+              Expanded(
+                child: _AccountColumn(
+                  label: 'From',
+                  accounts: accounts,
+                  selected: selectedFrom,
+                  onChanged: onFromChanged,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.sm),
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              Expanded(
+                child: _AccountColumn(
+                  label: 'To',
+                  accounts: accounts,
+                  selected: selectedTo,
+                  onChanged: onToChanged,
+                ),
+              ),
+            ],
+          );
+        },
+        loading: () => const SizedBox(
+          height: 60,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+        error: (e, _) => Text('Error: $e'),
+      ),
+    );
+  }
+}
+
+class _AccountColumn extends StatelessWidget {
+  final String label;
+  final List<AccountModel> accounts;
+  final AccountModel? selected;
+  final ValueChanged<AccountModel> onChanged;
+
+  const _AccountColumn({
+    required this.label,
+    required this.accounts,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            )),
+        const SizedBox(height: Spacing.xs),
+        DropdownButtonFormField<AccountModel>(
+          value: selected,
+          decoration: InputDecoration(
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: Spacing.sm, vertical: Spacing.sm),
+            border: OutlineInputBorder(borderRadius: Radii.borderMd),
+          ),
+          items: accounts.map((a) => DropdownMenuItem(
+            value: a,
+            child: Text(a.name, overflow: TextOverflow.ellipsis),
+          )).toList(),
+          onChanged: (a) { if (a != null) onChanged(a); },
+        ),
+      ],
+    );
+  }
+}
+
+// ── Meta Row (account + date) ─────────────────────────────────────────────────
+
+class _MetaRow extends StatelessWidget {
+  final AsyncValue<List<AccountModel>> accountsAsync;
+  final AccountModel? selectedAccount;
+  final DateTime selectedDate;
+  final TimeOfDay selectedTime;
+  final ValueChanged<List<AccountModel>> onRestoreAccounts;
+  final ValueChanged<AccountModel> onAccountChanged;
+  final VoidCallback onCreateAccount;
+  final VoidCallback onPickDate;
+  final VoidCallback onPickTime;
+
+  const _MetaRow({
+    required this.accountsAsync,
+    required this.selectedAccount,
+    required this.selectedDate,
+    required this.selectedTime,
+    required this.onRestoreAccounts,
+    required this.onAccountChanged,
+    required this.onCreateAccount,
+    required this.onPickDate,
+    required this.onPickTime,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final dateStr = DateFormat('MMM d').format(selectedDate);
+    final isToday = DateUtils.isSameDay(selectedDate, DateTime.now());
+    final timeStr = DateFormat('hh:mm a').format(
+      DateTime(0, 1, 1, selectedTime.hour, selectedTime.minute),
+    );
+
+    return SizedBox(
+      height: 44,
+      child: Row(
+        children: [
+          // Account pill
+          Expanded(
+            child: accountsAsync.when(
+              data: (accounts) {
+                onRestoreAccounts(accounts);
+                return ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Spacing.md, vertical: Spacing.xs),
+                  itemCount: accounts.length + 1,
+                  separatorBuilder: (_, _) => const SizedBox(width: Spacing.xs),
+                  itemBuilder: (ctx, i) {
+                    if (i == accounts.length) {
+                      return ActionChip(
+                        avatar: const Icon(Icons.add, size: 14),
+                        label: const Text('New'),
+                        onPressed: onCreateAccount,
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        labelStyle: const TextStyle(fontSize: 11),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: Radii.borderFull),
+                      );
+                    }
+                    final acc = accounts[i];
+                    final isSel = selectedAccount?.id == acc.id;
+                    final accColor = Color(acc.color);
+                    return ChoiceChip(
+                      label: Text(acc.name,
+                          style: const TextStyle(fontSize: 11)),
+                      selected: isSel,
+                      onSelected: (s) { if (s) onAccountChanged(acc); },
+                      selectedColor: accColor.withValues(alpha: 0.15),
+                      side: BorderSide(
+                        color: isSel
+                            ? accColor
+                            : theme.colorScheme.outline.withValues(alpha: 0.3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: Radii.borderFull),
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                    );
+                  },
+                );
+              },
+              loading: () => const SizedBox.shrink(),
+              error: (_, _) => const SizedBox.shrink(),
+            ),
+          ),
+
+          // Date pill
+          GestureDetector(
+            onTap: onPickDate,
+            child: Container(
+              margin: const EdgeInsets.symmetric(
+                  horizontal: Spacing.xs, vertical: Spacing.xs),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: Spacing.sm, vertical: Spacing.xs),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.6),
+                borderRadius: Radii.borderFull,
+              ),
+              child: Text(
+                isToday ? 'Today' : dateStr,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+
+          // Time pill
+          GestureDetector(
+            onTap: onPickTime,
+            child: Container(
+              margin: const EdgeInsets.only(
+                  right: Spacing.sm, top: Spacing.xs, bottom: Spacing.xs),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: Spacing.sm, vertical: Spacing.xs),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.6),
+                borderRadius: Radii.borderFull,
+              ),
+              child: Text(
+                timeStr,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Amount Display ────────────────────────────────────────────────────────────
+
+class _AmountDisplay extends StatelessWidget {
+  final String displayText;
+  final Color accent;
+  final String currencySymbol;
+
+  const _AmountDisplay({
+    required this.displayText,
+    required this.accent,
+    required this.currencySymbol,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.lg,
+        vertical: Spacing.sm,
+      ),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerRight,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              currencySymbol,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: accent.withValues(alpha: 0.6),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              displayText,
+              style: theme.textTheme.displayMedium?.copyWith(
+                fontSize: 52,
+                fontWeight: FontWeight.w700,
+                color: accent,
+                letterSpacing: -2,
               ),
             ),
           ],
@@ -1222,9 +1193,403 @@ class _AmountDisplayButton extends StatelessWidget {
   }
 }
 
-// ── Internal Provider ────────────────────────────────────────────────────────────
+// ── More Options ─────────────────────────────────────────────────────────────
 
-final _activeAccountsProvider = FutureProvider<List<AccountModel>>((ref) async {
-  final repo = ref.watch(accountRepositoryProvider);
-  return repo.getActive();
+class _MoreOptions extends StatelessWidget {
+  final ThemeData theme;
+  final Color accent;
+  final List<String> tags;
+  final TextEditingController tagController;
+  final bool isRecurring;
+  final String recurringFrequency;
+  final bool isSplit;
+  final ValueChanged<String> onTagAdded;
+  final ValueChanged<String> onTagRemoved;
+  final ValueChanged<bool> onRecurringChanged;
+  final ValueChanged<String> onFrequencyChanged;
+  final ValueChanged<bool> onSplitChanged;
+  final VoidCallback onReceiptTap;
+
+  const _MoreOptions({
+    required this.theme,
+    required this.accent,
+    required this.tags,
+    required this.tagController,
+    required this.isRecurring,
+    required this.recurringFrequency,
+    required this.isSplit,
+    required this.onTagAdded,
+    required this.onTagRemoved,
+    required this.onRecurringChanged,
+    required this.onFrequencyChanged,
+    required this.onSplitChanged,
+    required this.onReceiptTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.md,
+        vertical: Spacing.xs,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Tags
+          Wrap(
+            spacing: Spacing.xs,
+            runSpacing: Spacing.xs,
+            children: [
+              ...tags.map((tag) => InputChip(
+                label: Text(tag, style: const TextStyle(fontSize: 12)),
+                onDeleted: () => onTagRemoved(tag),
+                deleteIcon: const Icon(Icons.close, size: 14),
+                shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+              )),
+              ActionChip(
+                avatar: const Icon(Icons.label_outline, size: 14),
+                label: const Text('Tag', style: TextStyle(fontSize: 12)),
+                onPressed: () => _addTagDialog(context),
+                shape: RoundedRectangleBorder(borderRadius: Radii.borderFull),
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: Spacing.xs),
+
+          // Recurring + Split + Receipt row
+          Row(
+            children: [
+              // Recurring toggle
+              Expanded(
+                child: _ToggleTile(
+                  icon: FontAwesomeIcons.repeat,
+                  label: 'Recurring',
+                  value: isRecurring,
+                  onChanged: onRecurringChanged,
+                ),
+              ),
+              const SizedBox(width: Spacing.sm),
+              // Split toggle
+              Expanded(
+                child: _ToggleTile(
+                  icon: FontAwesomeIcons.peopleLine,
+                  label: 'Split',
+                  value: isSplit,
+                  onChanged: onSplitChanged,
+                ),
+              ),
+              const SizedBox(width: Spacing.sm),
+              // Receipt button
+              InkWell(
+                onTap: onReceiptTap,
+                borderRadius: Radii.borderMd,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Spacing.sm, vertical: Spacing.sm + 2),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.3)),
+                    borderRadius: Radii.borderMd,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FaIcon(FontAwesomeIcons.camera, size: 13,
+                          color: theme.colorScheme.onSurfaceVariant),
+                      const SizedBox(width: 4),
+                      Text('Receipt',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          if (isRecurring) ...[
+            const SizedBox(height: Spacing.xs),
+            Row(
+              children: frequencies.map((f) {
+                final isSel = recurringFrequency == f;
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: ChoiceChip(
+                      label: Text(f, style: const TextStyle(fontSize: 11)),
+                      selected: isSel,
+                      onSelected: (s) { if (s) onFrequencyChanged(f); },
+                      shape: RoundedRectangleBorder(
+                          borderRadius: Radii.borderFull),
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _addTagDialog(BuildContext context) {
+    tagController.clear();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Add Tag'),
+        content: TextField(
+          controller: tagController,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Tag name...'),
+          textCapitalization: TextCapitalization.words,
+          onSubmitted: (_) {
+            final t = tagController.text.trim();
+            if (t.isNotEmpty && !tags.contains(t)) onTagAdded(t);
+            Navigator.of(ctx).pop();
+          },
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () {
+              final t = tagController.text.trim();
+              if (t.isNotEmpty && !tags.contains(t)) onTagAdded(t);
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ToggleTile extends StatelessWidget {
+  final FaIconData icon;
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _ToggleTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: Spacing.sm, vertical: Spacing.sm + 2),
+        decoration: BoxDecoration(
+          color: value
+              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
+              : Colors.transparent,
+          border: Border.all(
+            color: value
+                ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                : theme.colorScheme.outline.withValues(alpha: 0.3),
+          ),
+          borderRadius: Radii.borderMd,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FaIcon(icon, size: 13,
+                color: value
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurfaceVariant),
+            const SizedBox(width: 4),
+            Text(label,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: value ? FontWeight.w700 : FontWeight.w500,
+                  color: value
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Numpad ────────────────────────────────────────────────────────────────────
+
+class _Numpad extends StatelessWidget {
+  final Color accent;
+  final bool isSaving;
+  final ValueChanged<String> onDigit;
+  final VoidCallback onDecimal;
+  final VoidCallback onBackspace;
+  final VoidCallback onClear;
+  final VoidCallback onConfirm;
+
+  const _Numpad({
+    required this.accent,
+    required this.isSaving,
+    required this.onDigit,
+    required this.onDecimal,
+    required this.onBackspace,
+    required this.onClear,
+    required this.onConfirm,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final btnColor = theme.colorScheme.surfaceContainerHighest;
+    final txtColor = theme.colorScheme.onSurface;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm),
+      child: Column(
+        children: [
+          _row(['1', '2', '3'], btnColor, txtColor),
+          const SizedBox(height: Spacing.xs),
+          _row(['4', '5', '6'], btnColor, txtColor),
+          const SizedBox(height: Spacing.xs),
+          _row(['7', '8', '9'], btnColor, txtColor),
+          const SizedBox(height: Spacing.xs),
+          _bottomRow(theme, btnColor, txtColor),
+        ],
+      ),
+    );
+  }
+
+  Widget _row(List<String> digits, Color bg, Color fg) {
+    return Row(
+      children: digits.map((d) => Expanded(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          child: _Btn(label: d, color: bg, textColor: fg, onTap: () => onDigit(d)),
+        ),
+      )).toList(),
+    );
+  }
+
+  Widget _bottomRow(ThemeData theme, Color bg, Color fg) {
+    return Row(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: _Btn(label: '.', color: bg, textColor: fg, onTap: onDecimal),
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: _Btn(label: '0', color: bg, textColor: fg, onTap: () => onDigit('0')),
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: _Btn(
+              icon: Icons.backspace_outlined,
+              color: bg,
+              textColor: fg,
+              onTap: onBackspace,
+              onLongPress: onClear,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: _Btn(
+              icon: isSaving ? null : Icons.check_rounded,
+              color: accent,
+              textColor: Colors.white,
+              onTap: onConfirm,
+              child: isSaving
+                  ? const SizedBox(
+                      width: 20, height: 20,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white))
+                  : null,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Btn extends StatelessWidget {
+  final String? label;
+  final IconData? icon;
+  final Color color;
+  final Color textColor;
+  final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final Widget? child;
+
+  const _Btn({
+    this.label,
+    this.icon,
+    required this.color,
+    required this.textColor,
+    required this.onTap,
+    this.onLongPress,
+    this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: color,
+      borderRadius: Radii.borderMd,
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        borderRadius: Radii.borderMd,
+        child: SizedBox(
+          height: 52,
+          child: Center(
+            child: child ??
+                (icon != null
+                    ? Icon(icon, color: textColor, size: 22)
+                    : Text(label ?? '',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ))),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Providers
+// ═══════════════════════════════════════════════════════════════════════════════
+
+final _activeAccountsProvider = FutureProvider<List<AccountModel>>((ref) {
+  return ref.watch(accountRepositoryProvider).getActive();
+});
+
+final _categoriesByTypeProvider =
+    FutureProvider.family<List<CategoryModel>, int>((ref, type) {
+  return ref.watch(categoryRepositoryProvider).getByType(type);
 });
